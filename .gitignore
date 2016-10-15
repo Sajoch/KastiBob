@@ -27,3 +27,7 @@
 *.exe
 *.out
 *.app
+
+
+# Kastia client
+kclient_v1
