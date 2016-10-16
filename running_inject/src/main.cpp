@@ -3,10 +3,49 @@
 #include <string>
 #include <map>
 #include <TlHelp32.h>
+#include "objectfile.hpp"
 using namespace std;
+
+extern unsigned long remoteCode_length;
+extern unsigned const char* remoteCode_data;
 
 bool inject(int pid){
 	//TODO inject
+	HANDLE hProc=OpenProcess(
+		PROCESS_CREATE_THREAD|PROCESS_QUERY_INFORMATION|PROCESS_VM_OPERATION|PROCESS_VM_WRITE|PROCESS_VM_READ,
+		FALSE,
+		pid
+	);
+	if(!hProc){
+		cout<<"OpenProcess "<<pid<<" failed"<<endl;
+		return false;
+	}
+	ObjectFile injecter(remoteCode_data, remoteCode_length);
+	//cout<<GetProcAddress(hProc, "MessageBoxA")<<endl;
+
+	void* proc_injected_memory = VirtualAllocEx(hProc, 0, injecter.size(), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	if(!proc_injected_memory){
+		cout<<"VirtualAllocEx "<<pid<<" failed"<<endl;
+		return false;
+	}
+	injecter.remap(proc_injected_memory);
+	void* RemoteThreadFunc=injecter.getAddress("_RemoteThread");
+
+	if(!WriteProcessMemory(hProc, proc_injected_memory, injecter.map(), injecter.size(), 0)){
+		cout<<"WriteProcessMemory "<<pid<<" failed"<<endl;
+		return false;
+	}
+	cout<<"base "<<proc_injected_memory<<endl;
+	cout<<"ep "<<RemoteThreadFunc<<endl;
+	cin.get();
+	HANDLE hRThread=CreateRemoteThread(hProc, 0, 0, (LPTHREAD_START_ROUTINE)RemoteThreadFunc, 0, 0, 0);
+	if(!hRThread){
+		cout<<"CreateRemoteThread "<<pid<<" failed"<<endl;
+		return false;
+	}
+	CloseHandle(hRThread);
+	//*/
+	CloseHandle(hProc);
 	return true;
 }
 
@@ -47,11 +86,11 @@ int main(int argc, char* argv[]){
 		if(inject(it->first)){
 			cout<<"done"<<endl;
 		}else{
-			cout<<"fail"<<endl;
 			cout<<"exiting"<<endl;
 			return 4;
 		}
 	}
-	cout<<"Everything done"<<endl;
+	if(processes.size())
+		cout<<"Everything done"<<endl;
 	return 0;
 }

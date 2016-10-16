@@ -31,3 +31,9 @@
 
 # Kastia client
 kclient_v1
+
+# Generate files
+*.gen
+
+# Stackdump
+*.stackdump
