@@ -1,119 +1,165 @@
 #include "objectfile.hpp"
 #include <vector>
+#include <map>
 #include <iostream>
 using namespace std;
 
 
 ObjectFile::ObjectFile(unsigned const char* dt, unsigned long len){
 	done=false;
-	data.append((char*)dt,len);
 	string buf((char*)dt,len);
-	size_t d;
-	d=sizeof(IMAGE_FILE_HEADER);
-	if(buf.size()>=d){
-		memcpy(&header, buf.substr(0,d).data(), d);
-		buf.erase(0,d);
-	}else{
-		cout<<"not enough bytes to read header"<<endl;
-		return;
-	}
-	size_t string_table=header.PointerToSymbolTable;
-	header.PointerToSymbolTable-=d;
-	while(rsyms.size()<header.NumberOfSymbols){
-		//cout<<(void*)buf[header.PointerToSymbolTable]<<(void*)buf[header.PointerToSymbolTable+1]<<endl;
-		IMAGE_SYMBOL sym;
-		d=18;//sizeof(IMAGE_SYMBOL);
-		string_table+=d;
-		if(buf.size()>=d){
-			memcpy(&sym, buf.substr(header.PointerToSymbolTable,d).data(), d);
-			buf.erase(header.PointerToSymbolTable,d);
-		}else{
-			cout<<"not enough bytes to read symbol "<<rsyms.size()<<"/"<<header.NumberOfSymbols<<endl;
+	IMAGE_SECTION_HEADER sec;
+	std::map <size_t, size_t> relocation_pos_size;
+	string now_need;
+	size_t pos, size_buf;
+	int state = 0;
+	pos = 0;
+	size_buf = sizeof(IMAGE_FILE_HEADER);
+	size_t index;
+	size_t count_relocations;
+
+	while (!done) {
+		if (buf.size() < (pos+size_buf)) {
+			cout<<"not enough data"<<endl;
 			return;
 		}
-		IMAGE_REAL_SYMBOL trs;
-		if(sym.N.LongName[0]==0){
-			trs.offset=sym.N.LongName[1];
-			trs.name="";
-		}else{
-			trs.offset=0;
-			trs.name=(char*)sym.N.ShortName;
-		}
-		trs.value=sym.Value;
-		trs.section=(unsigned short)sym.SectionNumber;
-		rsyms.push_back(trs);
-		for(int aux=0;aux<(int)sym.NumberOfAuxSymbols;aux++){
-			IMAGE_REAL_SYMBOL symc={0};
-			switch(sym.StorageClass){
-				case 0x67:{
-					string tmp;
-					string t;
-					do{
-						t=buf.substr(header.PointerToSymbolTable,6);
-						buf.erase(header.PointerToSymbolTable,6);
-						tmp+=t;
-					}while(t[0]!=0 && buf.size()>=6);
-					string_table+=tmp.size();
-					rsyms.push_back(symc);
-				}break;
-				case 0x02:
-					buf.erase(header.PointerToSymbolTable,18);
-					string_table+=18;
-					rsyms.push_back(symc);
-				break;
-				case 0x03:
-					buf.erase(header.PointerToSymbolTable,18);
-					string_table+=18;
-					rsyms.push_back(symc);
-				break;
-			}
+		now_need = buf.substr(pos,size_buf);
+		pos += size_buf;
+		switch (state) {
+			case 0://image_file_header
+				//cout<<"image_file_header"<<endl;
+				memcpy(&header, &now_need[0], size_buf);
+				state = 1;
+				size_buf = sizeof(IMAGE_SECTION_HEADER);
+			break;
+			case 1://image_section_header
+				//cout<<"image_section_header"<<endl;
+				memcpy(&sec, &now_need[0], size_buf);
+				count_relocations += sec.NumberOfRelocations;
+				sections.push_back(sec);
+				if (sections.size() >= header.NumberOfSections) {
+					state = 2;
+					size_buf = 0;
+				}
+			break;
+			case 2://start_section
+				//cout<<"start_section"<<endl;
+				index = 0;
+				if(index < sections.size()){
+					pos = sections[0].PointerToRawData;
+					if (pos == 0)
+						size_buf = 0;
+					else
+						size_buf = sections[0].SizeOfRawData;
+				}
+				state = 3;
+			break;
+			case 3://section
+				if(index < sections.size()){
+						//cout<<"section pos "<<(void*)pos<<" sbuf "<<(void*)size_buf<<" "<<index<<"/"<<sections.size()<<endl;
+						rsecs.push_back(image.size());
+						if (sections[index].PointerToRawData == 0) {
+							now_need = string(sections[index].SizeOfRawData, 0);
+						}
+						if (sections[index].PointerToRelocations != 0 && sections[index].NumberOfRelocations > 0) {
+							relocation_pos_size[sections[index].PointerToRelocations] = sections[index].NumberOfRelocations + 1;
+						}
+						image.append(now_need);
+						index++;
+				}
+				pos = 0;
+				size_buf = 0;
+				state = 4;
+				if (index < sections.size()) {
+					pos = sections[index].PointerToRawData;
+					size_buf = sections[index].SizeOfRawData;
+					state = 3;
+				}
+			break;
+			case 4:{//start_relocation
+				std::map <size_t, size_t>::iterator fr;
+				if (relocation_pos_size.size() > 0 && (fr=relocation_pos_size.begin())->second > 0) {
+					state = 5;
+					pos = fr->first;
+					size_buf = sizeof(IMAGE_RELOCATION);
+					fr->second--;
+				} else {
+					state = 6;
+				}
+			}break;
+			case 5:{//relocation
+				std::map <size_t, size_t>::iterator fr;
+				if (relocation_pos_size.size() > 0 && (fr=relocation_pos_size.begin())->second > 0) {
+					IMAGE_RELOCATION rel;
+					memcpy(&rel, &now_need[0], size_buf);
+					//cout<<"relocation"<<endl;
+					relocations.push_back(rel);
+					fr->second--;
+					if(fr->second == 0){
+						relocation_pos_size.erase(fr);
+					}
+				} else {
+					pos = 0;
+					size_buf = 0;
+					state = 6;
+				}
+			}break;
+			case 6://start_symbols
+				//cout<<"start symbol"<<endl;
+				if (rsyms.size() < header.NumberOfSymbols) {
+					pos = header.PointerToSymbolTable;
+					size_buf = sizeof(IMAGE_SYMBOL);
+					state = 8;
+					index = 1;
+				} else {
+					pos = 0;
+					size_buf = 0;
+					state = 9;
+				}
+			break;
+			case 8:{//symbols
+				//cout<<"symbol"<<endl;
+				if (rsyms.size() < header.NumberOfSymbols) {
+					IMAGE_SYMBOL sym;
+					IMAGE_REAL_SYMBOL rsym;
+					memcpy(&sym, &now_need[0], size_buf);
+					if(index==0){
+						if (sym.N.LongName[0]==0){
+							rsym.offset = sym.N.LongName[1];
+							rsym.name = "";
+						} else {
+							rsym.offset = 0;
+							rsym.name = (char*)sym.N.ShortName;
+						}
+						rsym.value = sym.Value;
+						rsym.section = (unsigned short)sym.SectionNumber;
+						index = (size_t)(unsigned char)sym.NumberOfAuxSymbols;
+						rsym.good = true;
+					}else{
+						rsym.good = false;
+						index--;
+					}
+					rsyms.push_back(rsym);
+				}else{
+					pos = 0;
+					size_buf = 0;
+					state = 9;
+				}
+			}break;
+			case 9://start string table
+			case 10://read string table
+				done = true;
+			break;
 		}
 	}
-	buf.erase(header.PointerToSymbolTable,len-string_table);
+	/*
 	for(size_t i=0;i<rsyms.size();i++){
 		if(rsyms[i].name.empty() && rsyms[i].offset!=0){
 			char* cp = (char*)&dt[string_table+rsyms[i].offset];
 			rsyms[i].name=cp;
 		}
 	}
-	size_t deleted_space=0;
-	for(unsigned int i=0;i<header.NumberOfSections;i++){
-		IMAGE_SECTION_HEADER sec;
-		d=sizeof(IMAGE_SECTION_HEADER);
-		if(buf.size()>=d){
-			memcpy(&sec, buf.substr(0,d).data(), d);
-			buf.erase(0,d);
-		}else{
-			cout<<"not enough bytes to read section "<<i<<"/"<<header.NumberOfSections<<endl;
-			return;
-		}
-		deleted_space+=sec.SizeOfRawData;
-		sections.push_back(sec);
-	}
-	buf.erase(0,deleted_space);
-	d=sizeof(IMAGE_RELOCATION);
-	while(buf.size()>=d){
-		IMAGE_RELOCATION rel;
-		if(buf.size()>=d){
-			memcpy(&rel, buf.substr(0,d).data(), d);
-			buf.erase(0,d);
-		}else{
-			cout<<"not enough bytes to read relocation"<<endl;
-			return;
-		}
-		relocations.push_back(rel);
-	}
-	for(size_t i=0;i<sections.size();i++){
-		rsecs.push_back(image.size());
-		//cout<<"sec "<<i<<" = "<<image.size()<<endl;
-		if (sections[i].PointerToRawData!=0 && sections[i].SizeOfRawData!=0) {
-			//image.append(dt[sections[i].PointerToRawData], sections[i].SizeOfRawData);
-			for(size_t di=0;di<sections[i].SizeOfRawData;di++){
-				image.push_back(data[sections[i].PointerToRawData+di]);
-			}
-		}
-	}
-	done=true;
+	*/
 }
 unsigned long ObjectFile::size(){
 	return image.size();
@@ -126,7 +172,7 @@ void ObjectFile::remap(void* _base){
 	for(size_t i=0;i<relocations.size();i++){
 		switch(relocations[i].Type){
 			case 0x06:{
-				//cout<<"rel"<<endl;
+				cout<<"rel"<<endl;
 				unsigned long d=rsecs[rsyms[relocations[i].SymbolTableIndex].section-1]+
 					rsyms[relocations[i].SymbolTableIndex].value;
 				unsigned long b;
@@ -138,6 +184,7 @@ void ObjectFile::remap(void* _base){
 				//cout<<"at "<<(void*)relocations[i].VirtualAddress<<endl;
 			}break;
 			case 0x14:
+				cout<<"dir"<<endl;
 
 			break;
 		}
@@ -156,4 +203,12 @@ void* ObjectFile::getAddress(std::string name){
 	}
 	return 0;
 	//return (void*)(((unsigned long)base)+0xE6);
+}
+void ObjectFile::setAddress(std::string name, unsigned long address){
+	for(size_t i=0;i<rsyms.size();i++){
+		if(rsyms[i].name==name){
+			memcpy(&image[rsecs[rsyms[i].section-1]+rsyms[i].value],&address,4);
+			//return (void*)(((unsigned long)base)+rsecs[rsyms[i].section-1]+rsyms[i].value);
+		}
+	}
 }

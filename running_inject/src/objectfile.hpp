@@ -34,19 +34,20 @@ typedef IMAGE_SYMBOL UNALIGNED *PIMAGE_SYMBOL;
 };
 */
 struct IMAGE_REAL_SYMBOL{
+	bool good;
 	unsigned long offset;
 	std::string name;
 	unsigned long value;
 	unsigned int section;
 };
 class ObjectFile{
-	std::string data;
+	//std::string data;
 	std::string image;
 	unsigned long base;
 
 	IMAGE_FILE_HEADER header;
 	std::vector<IMAGE_SECTION_HEADER> sections;
-	std::vector<IMAGE_SYMBOL> symbols;
+	//std::vector<IMAGE_SYMBOL> symbols;
 	std::vector<IMAGE_RELOCATION> relocations;
 	bool done;
 
@@ -59,4 +60,5 @@ public:
 	const char* map();
 	void* getAddress(std::string name);
 	void remap(void* baseaddress);
+	void setAddress(std::string name, unsigned long address);
 };
