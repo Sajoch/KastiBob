@@ -60,5 +60,5 @@ public:
 	const char* map();
 	void* getAddress(std::string name);
 	void remap(void* baseaddress);
-	void setAddress(std::string name, unsigned long address);
+	void setAddress(std::string name, size_t address);
 };

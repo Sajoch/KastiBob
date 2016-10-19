@@ -28,12 +28,13 @@ bool inject(int pid){
 		cout<<"VirtualAllocEx "<<pid<<" failed"<<endl;
 		return false;
 	}
-	injecter.setAddress("_addr_GetProcAddress",0xDEADBEEB);
-	injecter.setAddress("_addr_LoadLibrary",0xDEADBEED);
-	injecter.setAddress("_addr_GetModuleHandle",0xDEADBEEF);
+	
+	//injecter.setAddress("_addr_GetProcAddress",0xDEADBEEB);
+	//injecter.setAddress("_addr_LoadLibrary",gpa);
+	//injecter.setAddress("_addr_GetModuleHandle",0xDEADBEEF);
 	injecter.remap(proc_injected_memory);
 	void* RemoteThreadFunc=injecter.getAddress("_RemoteThread");
-	
+
 	if(!WriteProcessMemory(hProc, proc_injected_memory, injecter.map(), injecter.size(), 0)){
 		cout<<"WriteProcessMemory "<<pid<<" failed"<<endl;
 		return false;

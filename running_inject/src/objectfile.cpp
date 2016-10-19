@@ -17,6 +17,7 @@ ObjectFile::ObjectFile(unsigned const char* dt, unsigned long len){
 	size_buf = sizeof(IMAGE_FILE_HEADER);
 	size_t index;
 	size_t count_relocations;
+	size_t string_table;
 
 	while (!done) {
 		if (buf.size() < (pos+size_buf)) {
@@ -141,25 +142,44 @@ ObjectFile::ObjectFile(unsigned const char* dt, unsigned long len){
 					}
 					rsyms.push_back(rsym);
 				}else{
-					pos = 0;
+					string_table = pos - size_buf;
 					size_buf = 0;
 					state = 9;
 				}
 			}break;
 			case 9://start string table
-			case 10://read string table
-				done = true;
+				index = 0;
+				state = 10;
+			case 10:
+				//cout<<"index "<<index<<endl;
+				if (index < rsyms.size()) {
+					if (rsyms[index].good && rsyms[index].offset != 0 && rsyms[index].name.empty()){
+						pos = string_table + rsyms[index].offset;
+						size_buf = 1;
+						state = 11;
+					}else{
+						index++;
+					}
+				} else {
+					done = true;
+				}
 			break;
+			case 11:{//read string table
+				//cout<<"read at "<<pos<<endl;
+				char c = now_need[0];
+				size_buf = 1;
+				if(c==0){
+					//cout<<"close"<<endl;
+					index++;
+					state = 10;
+					pos = 0;
+					size_buf = 0;
+				}else{
+					rsyms[index].name+=c;
+				}
+			}break;
 		}
 	}
-	/*
-	for(size_t i=0;i<rsyms.size();i++){
-		if(rsyms[i].name.empty() && rsyms[i].offset!=0){
-			char* cp = (char*)&dt[string_table+rsyms[i].offset];
-			rsyms[i].name=cp;
-		}
-	}
-	*/
 }
 unsigned long ObjectFile::size(){
 	return image.size();
@@ -172,7 +192,7 @@ void ObjectFile::remap(void* _base){
 	for(size_t i=0;i<relocations.size();i++){
 		switch(relocations[i].Type){
 			case 0x06:{
-				cout<<"rel"<<endl;
+				//cout<<"rel"<<endl;
 				unsigned long d=rsecs[rsyms[relocations[i].SymbolTableIndex].section-1]+
 					rsyms[relocations[i].SymbolTableIndex].value;
 				unsigned long b;
@@ -204,10 +224,10 @@ void* ObjectFile::getAddress(std::string name){
 	return 0;
 	//return (void*)(((unsigned long)base)+0xE6);
 }
-void ObjectFile::setAddress(std::string name, unsigned long address){
+void ObjectFile::setAddress(std::string name, size_t address){
 	for(size_t i=0;i<rsyms.size();i++){
 		if(rsyms[i].name==name){
-			memcpy(&image[rsecs[rsyms[i].section-1]+rsyms[i].value],&address,4);
+			memcpy(&image[rsecs[rsyms[i].section-1]+rsyms[i].value], &address, sizeof(size_t));
 			//return (void*)(((unsigned long)base)+rsecs[rsyms[i].section-1]+rsyms[i].value);
 		}
 	}
