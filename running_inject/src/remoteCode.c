@@ -79,11 +79,8 @@ unsigned int RemoteThread(void* arg){
 	HMODULE(*_LoadLibrary)(LPCTSTR) = addr_LoadLibrary;
 	HMODULE(*_GetModuleHandle)(LPCTSTR) = addr_GetModuleHandle;
 	int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT);
-	//int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT) = (int(*)(HWND, LPCTSTR, LPCTSTR, UINT)) addr_MessageBox;//addr_MessageBox;
-	//MessageBox(0,"Halo","Hello World!", MB_OK);
 	HMODULE hDllUser32 = _LoadLibrary("User32.dll");
 	_MessageBox=(void*)_GetProcAddress(hDllUser32,"MessageBoxA");
-	//print(_MessageBox);
 	_MessageBox(0,"Halo","Hello World!", MB_OK);
 	return 0;
 }
