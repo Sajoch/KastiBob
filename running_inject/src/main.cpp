@@ -9,6 +9,32 @@ using namespace std;
 extern unsigned long remoteCode_length;
 extern unsigned const char* remoteCode_data;
 
+bool getModules(std::vector<MODULEENTRY32>& modules, int pid){
+	//std::vector<MODULEENTRY32> modules;
+	HANDLE hModuleSnap = INVALID_HANDLE_VALUE;
+	MODULEENTRY32 me32;
+	me32.dwSize = sizeof( MODULEENTRY32 );
+	hModuleSnap = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32, pid );
+	if( hModuleSnap == INVALID_HANDLE_VALUE ) {
+		return false;
+	}
+	if( !Module32First( hModuleSnap, &me32 ) ) {
+		CloseHandle( hModuleSnap );     // Must clean up the snapshot object!
+		return false;
+	}
+	do {
+	  modules.push_back(me32);
+	} while( Module32Next( hModuleSnap, &me32 ) );
+	return true;
+	//CloseHandle( hModuleSnap );
+	/*
+	for (std::vector<MODULEENTRY32>::iterator it = modules.begin(); it != modules.end(); ++it) {
+		if ( it->szModule == "Kernel32.dll" ) {
+
+		}
+	}*/
+}
+
 bool inject(int pid){
 	//TODO inject
 	HANDLE hProc=OpenProcess(
@@ -28,10 +54,22 @@ bool inject(int pid){
 		cout<<"VirtualAllocEx "<<pid<<" failed"<<endl;
 		return false;
 	}
-	
+
+	std::vector<MODULEENTRY32> modules;
+	getModules(modules, pid);
+	HMODULE hKernel32 = 0;
+	void* baseKernel32 = 0;
+	for (std::vector<MODULEENTRY32>::iterator it = modules.begin(); it != modules.end(); ++it) {
+		if (strcmp(it->szModule, "KERNEL32.DLL")==0) {
+			hKernel32 = it->hModule;
+			baseKernel32 = it->modBaseAddr;
+			break;
+		}
+	}
 	//injecter.setAddress("_addr_GetProcAddress",0xDEADBEEB);
 	//injecter.setAddress("_addr_LoadLibrary",gpa);
 	//injecter.setAddress("_addr_GetModuleHandle",0xDEADBEEF);
+	injecter.setAddress("_addr_baseKernel32",(size_t)baseKernel32);
 	injecter.remap(proc_injected_memory);
 	void* RemoteThreadFunc=injecter.getAddress("_RemoteThread");
 
