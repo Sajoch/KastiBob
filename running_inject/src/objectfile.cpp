@@ -217,7 +217,7 @@ void ObjectFile::remap(void* _base){
 void* ObjectFile::getAddress(std::string name){
 	for(size_t i=0;i<rsyms.size();i++){
 		if(rsyms[i].name==name){
-			return (void*)(((unsigned long)base)+rsecs[rsyms[i].section-1]+rsyms[i].value);
+			return (void*)(base+rsecs[rsyms[i].section-1]+rsyms[i].value);
 		}
 		//cout<<i<<" "<<rsyms[i].name<<" value "<<rsyms[i].value<<" sec "<<rsyms[i].section<<endl;
 	}
