@@ -188,7 +188,7 @@ const char* ObjectFile::map(){
 	return image.c_str();
 }
 void ObjectFile::remap(void* _base){
-	base=(unsigned long)_base;
+	base=(size_t)_base;
 	for(size_t i=0;i<relocations.size();i++){
 		switch(relocations[i].Type){
 			case 0x06:{

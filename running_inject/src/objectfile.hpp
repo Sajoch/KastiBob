@@ -43,7 +43,7 @@ struct IMAGE_REAL_SYMBOL{
 class ObjectFile{
 	//std::string data;
 	std::string image;
-	unsigned long base;
+	size_t base;
 
 	IMAGE_FILE_HEADER header;
 	std::vector<IMAGE_SECTION_HEADER> sections;

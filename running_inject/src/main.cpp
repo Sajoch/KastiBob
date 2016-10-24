@@ -57,11 +57,9 @@ bool inject(int pid){
 
 	std::vector<MODULEENTRY32> modules;
 	getModules(modules, pid);
-	HMODULE hKernel32 = 0;
 	void* baseKernel32 = 0;
 	for (std::vector<MODULEENTRY32>::iterator it = modules.begin(); it != modules.end(); ++it) {
 		if (strcmp(it->szModule, "KERNEL32.DLL")==0) {
-			hKernel32 = it->hModule;
 			baseKernel32 = it->modBaseAddr;
 			break;
 		}
@@ -77,9 +75,9 @@ bool inject(int pid){
 		cout<<"WriteProcessMemory "<<pid<<" failed"<<endl;
 		return false;
 	}
-	cout<<"base "<<proc_injected_memory<<endl;
-	cout<<"ep "<<RemoteThreadFunc<<endl;
-	cin.get();
+	//cout<<"base "<<proc_injected_memory<<endl;
+	//cout<<"ep "<<RemoteThreadFunc<<endl;
+	//cin.get();
 	HANDLE hRThread=CreateRemoteThread(hProc, 0, 0, (LPTHREAD_START_ROUTINE)RemoteThreadFunc, 0, 0, 0);
 	if(!hRThread){
 		cout<<"CreateRemoteThread "<<pid<<" failed"<<endl;
