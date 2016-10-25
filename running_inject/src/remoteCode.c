@@ -52,12 +52,18 @@ int loadFunction(){
 
 unsigned int RemoteThread(void* arg){
 	loadFunction();
-	FARPROC(*_GetProcAddress)(HMODULE,LPCSTR) = (void*)addr_GetProcAddress;
-	HMODULE(*_LoadLibrary)(LPCTSTR) = (void*)addr_LoadLibrary;
-	HMODULE(*_GetModuleHandle)(LPCTSTR) = (void*)addr_GetModuleHandle;
-	int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT);
-	//HMODULE hDllUser32 = _LoadLibrary("User32.dll");
-	//_MessageBox=(void*)_GetProcAddress(hDllUser32,"MessageBoxA");
-	_LoadLibrary("Kasti_re.dll");
+	FARPROC(*myGetProcAddress)(HMODULE,LPCSTR) = (void*)addr_GetProcAddress;
+	HMODULE(*myLoadLibrary)(LPCTSTR) = (void*)addr_LoadLibrary;
+	HMODULE(*myGetModuleHandle)(LPCTSTR) = (void*)addr_GetModuleHandle;
+	DWORD(*myGetLastError)(void);
+	//int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT);
+	//HMODULE(*myLoadLibraryEx)(LPCTSTR lpFileName, HANDLE hFile, DWORD dwFlags);
+	//HMODULE hDllUser32 = myLoadLibrary("User32.dll");
+	myGetLastError=(void*)myGetProcAddress((HMODULE)addr_baseKernel32,"GetLastError");
+	if (myLoadLibrary("/Kasti_re.dll") != 0) {
+		return 1;
+	}else{
+		return myGetLastError();
+	}
 	return 0;
 }
