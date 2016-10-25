@@ -1,0 +1,18 @@
+KastiBob
+nick postaci
+nazwe
+jakies glupoty
+menu
+	Healing	(trzeba zmierzyc delay)
+		prio 1 	hp 	mana potrzebna	jaki czar/hotkey
+		prio 2
+		prio 3
+
+		hp potion		ile hp	
+		mana potion	ile many
+
+		uh 	ile hp
+
+
+	Cavebot + Targeting
+	
