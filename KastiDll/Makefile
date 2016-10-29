@@ -1,20 +1,20 @@
-LINE_CPP_O=$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
+LINE_CPP_O=$(CXX32) -c -Wall -o $@ $(CPPFLAG) $<
 obj/%.o: src/%.cpp %
 	$(LINE_CPP_O)
 obj/%.o: src/%.cpp
 	$(LINE_CPP_O)
 
-CXX=i686-w64-mingw32-g++
-
 PROGRAM=Kasti_re.dll
 CPPFLAG= --std=c++11 -DBUILDING_DLL
 
-all: $(PROGRAM)
+all: obj $(PROGRAM)
+obj:
+	mkdir -p obj
 
 obj/main.o: src/main.cpp
 
 $(PROGRAM): obj/main.o
-	$(CXX) -shared $^ -o $@
+	$(CXX32) -shared $^ -o $@ $(CPPFLAG) -static-libgcc -static-libstdc++
 
 test: all
 	cp $(PROGRAM) ../kclient_v1/.

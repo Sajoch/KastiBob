@@ -31,6 +31,7 @@
 
 # Kastia client
 kclient_v1
+kclient_v2.zip
 
 # Generate files
 *.gen
