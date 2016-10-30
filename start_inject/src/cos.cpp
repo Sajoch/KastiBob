@@ -7,6 +7,8 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	/*
+	//http://www.kasteria.pl/update/kasti.php
+	//update check
 	//acc dupad dupad1
 	https://otland.net/threads/tibia-8-0-address-list.235/
 	do nich dodac 0x27440
