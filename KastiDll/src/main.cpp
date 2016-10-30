@@ -1,4 +1,7 @@
 #include <windows.h>
+#include <string>
+
+using namespace std;
 
 #ifdef BUILDING_DLL
 	#define DLL __declspec(dllexport)
@@ -6,8 +9,14 @@
 	#define DLL __declspec(dllimport)
 #endif
 
+int ep_main() {
+	HMODULE baseAddress = GetModuleHandle(0);
+	string ret = "Text: ";
+	ret += to_string((unsigned int)baseAddress);
+	MessageBoxA(0, ret.c_str(), "Hello World!", MB_OK);
+}
+
+
 extern "C" int DLL init(){
-	int test=123;
-	MessageBoxA(0,"Hello World!","Hello World!",MB_OK);
-  return 1;
+  return ep_main();
 }
