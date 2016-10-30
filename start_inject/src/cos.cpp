@@ -7,6 +7,7 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	/*
+	//acc dupad dupad1
 	https://otland.net/threads/tibia-8-0-address-list.235/
 	do nich dodac 0x27440
 
@@ -14,7 +15,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	<ZAJEBISCIE WAZNE INFO>
 	0x00392E50 //if connected 8 else 0
 
-	
+
 	ping	0x100300A8	lub		0x10028100
 
 
@@ -24,18 +25,24 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	<CHARACTER INFO>
-	Player_ID 			00x0635F10
-	Stamina 			0x00635EE4	 - max to 3360minut czyli 56 godzin
-	max hp				0x00635F0C
-	hp					0x00635F0C
-	max mana			0x00635EEC
-	mana				0x00635EF0
-	lvl					0x00635F00
-	% lvl				0x00635EF8
-	exp					0x00635F04
+	fishing         0x235ED0 - 10
+	TARGET_BL_ID    0x235ED4 - 0
+	                0x235ED8 - 0
+	target          0x235EDC - 0
+	cap					    0x235EE0 - 33650
+	Stamina 			  0x235EE4 - 3360 max to 3360minut czyli 56 godzin
+	soul				    0x235EE8 - 200
+	max mana			  0x235EEC - 0
+	mana				    0x235EF0 - 0
+	MagicPerc       0x235EF4 - 0
+	% lvl           0x235EF8 - 0
+	magic lvl       0x235EFC - 0
+	lvl					    0x235F00 - 1
+	exp					    0x235F04 - 0
+	max hp				  0x235F08 - 150
+	hp					    0x235F0C - 150
+	Player_ID 			0x235F10 - 268871689 //to tylko instancja, zawsze jest unikatowy
 	exp/h				0x006404A4
-	soul				0x00635EE8
-	cap					0x00635EE0
 
 
 	<SKILLS>
@@ -59,9 +66,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	<XYZ>
-	x		0x00645538
-	y		0x00645534
-	z		0x00645530
+	z		0x245530
+	y		0x245534
+	x		0x245538
 	goto x	0x00792E8C
 	goto y	0x00635F50
 
@@ -97,10 +104,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	Battlelist_Begin = 0x00635F70
 	Battlelist_End =	0x0063BD30
 
-	
+
 	'' in-game
 	IS_INGAME = 0x0078E238
-	
+
 	'' current window
 	CURRENT_WINDOW = 0x00640CF4
 
@@ -114,7 +121,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	'' statusbar
 	STATUSBAR_TEXT (string) - 0x007D66D8
 	STATUSBAR_TIMER			  0x007D66D4
-	
+
 	'' level spy
 	LEVELSPY_NOP = 0x004EB760
 	LEVELSPY_ABOVE = 0x004EB75C
@@ -133,7 +140,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	SEE_ID =		0x0078E5E0
 	SEE_COUNT =		0x0078E2E4
 	SEE_Z =			0x0078E240
-	
+
 	'' mouse (fishing)
 	MOUSE_ID = 0x0078E298
 
@@ -142,7 +149,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	TARGET_TYPE =			0x00635EDF
 	TARGET_BATTLELIST_ID =	0x00635ED4
 	TARGET_BATTLELIST_TYPE =0x00635ED7
-	
+
 
 	<PLAYER FLAG>
 	0x00635E98
@@ -159,7 +166,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	paralyzed - 20
 	poisoned - 1
 	nothing - 0
-	
+
 
 	<CONTAINER STRUCTURE>
 	ISOPEN                          0 < 0 = Closed; 1 = Open >
@@ -218,4 +225,3 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	return 0;
 }
-
