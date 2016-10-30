@@ -63,10 +63,11 @@ int ep_main() {
 	//ret += to_string((unsigned int)baseAddress);
 	//MessageBoxA(0, ret.c_str(), "Hello World!", MB_OK);
 	char* tibia_info = (char*)(baseAddress+0x2421C8);
-	char* rsa_public_key = (char*)(baseAddress+0x1B2610);
+	char* rsa_n_num = (char*)(baseAddress+0x1B2610);
 	//0x1571a2 - move big int - propable rsa
-	//edit rsa public key
-	change_memory(&rsa_public_key[0], (void*)"1", 2);
+	//edit rsa n number
+	//e is 65537
+	change_memory(&rsa_n_num[0], (void*)"1", 2);
 	//Tibia
 	//Kasti
 	memcpy(&tibia_info[0], &ret[0], ret.size());
