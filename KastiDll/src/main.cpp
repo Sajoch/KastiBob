@@ -6,7 +6,8 @@
 	#define DLL __declspec(dllimport)
 #endif
 
-extern "C" BOOLEAN DLL DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved){
-	MessageBoxA(0,"asd","ads",MB_OK);
-  return TRUE;
- }
+extern "C" int DLL init(){
+	int test=123;
+	MessageBoxA(0,"Hello World!","Hello World!",MB_OK);
+  return 1;
+}

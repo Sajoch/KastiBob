@@ -43,7 +43,7 @@ int loadFunction(){
 			addr_GetProcAddress = addr_baseKernel32 + *func;
 		}else if (Mstrcmp(name, "LoadLibraryA")){
 			addr_LoadLibrary = addr_baseKernel32 + *func;
-		}else if (Mstrcmp(name, "GetModuleHandle")){
+		}else if (Mstrcmp(name, "GetModuleHandleA")){
 			addr_GetModuleHandle = addr_baseKernel32 + *func;
 		}
 	}
@@ -51,19 +51,30 @@ int loadFunction(){
 }
 
 unsigned int RemoteThread(void* arg){
-	loadFunction();
+	if(loadFunction() != 0){
+		return 3;
+	}
 	FARPROC(*myGetProcAddress)(HMODULE,LPCSTR) = (void*)addr_GetProcAddress;
 	HMODULE(*myLoadLibrary)(LPCTSTR) = (void*)addr_LoadLibrary;
 	HMODULE(*myGetModuleHandle)(LPCTSTR) = (void*)addr_GetModuleHandle;
-	DWORD(*myGetLastError)(void);
+	int(*myInit)();
+	if(!addr_GetModuleHandle || !addr_LoadLibrary || !addr_GetProcAddress)
+		return 4;
+	//DWORD(*myGetLastError)(void);
 	//int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT);
 	//HMODULE(*myLoadLibraryEx)(LPCTSTR lpFileName, HANDLE hFile, DWORD dwFlags);
-	//HMODULE hDllUser32 = myLoadLibrary("User32.dll");
-	myGetLastError=(void*)myGetProcAddress((HMODULE)addr_baseKernel32,"GetLastError");
-	if (myLoadLibrary("/Kasti_re.dll") != 0) {
+/*	HMODULE hKasti_re = myGetModuleHandle("Kasti_re.dll");
+	if (hKasti_re){
+		myFreeLibrary(hKasti_re);
+		return 5;
+	}*/
+	//myFreeLibrary=(void*)myGetProcAddress((HMODULE)addr_baseKernel32,"FreeLibrary");
+	HMODULE hKasti_re = myLoadLibrary("Kasti_re.dll");
+	if (!hKasti_re)
 		return 1;
-	}else{
-		return myGetLastError();
-	}
+	myInit=(void*)myGetProcAddress(hKasti_re, "init");
+	if (!hKasti_re)
+		return 6;
+	myInit();
 	return 0;
 }

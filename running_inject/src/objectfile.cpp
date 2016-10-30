@@ -20,6 +20,7 @@ ObjectFile::ObjectFile(unsigned const char* dt, unsigned long len){
 	size_t string_table;
 
 	while (!done) {
+		//cout<<"state "<<state<<endl;
 		if (buf.size() < (pos+size_buf)) {
 			cout<<"not enough data"<<endl;
 			return;
@@ -89,15 +90,20 @@ ObjectFile::ObjectFile(unsigned const char* dt, unsigned long len){
 				}
 			}break;
 			case 5:{//relocation
+				//TODO few problems
 				std::map <size_t, size_t>::iterator fr;
 				if (relocation_pos_size.size() > 0 && (fr=relocation_pos_size.begin())->second > 0) {
 					IMAGE_RELOCATION rel;
 					memcpy(&rel, &now_need[0], size_buf);
 					//cout<<"relocation"<<endl;
 					relocations.push_back(rel);
+					//cout<<"count "<<(pos-fr->first)<<" = "<<fr->second<<endl;
 					fr->second--;
 					if(fr->second == 0){
 						relocation_pos_size.erase(fr);
+						pos = 0;
+						size_buf = 0;
+						state = 4;
 					}
 				} else {
 					pos = 0;
@@ -204,6 +210,7 @@ void ObjectFile::remap(void* _base){
 				//cout<<"at "<<(void*)relocations[i].VirtualAddress<<endl;
 			}break;
 			case 0x14:
+				//TODO what to do here?
 				cout<<"dir"<<endl;
 
 			break;

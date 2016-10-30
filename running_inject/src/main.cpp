@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <TlHelp32.h>
+#include <algorithm>
 #include "objectfile.hpp"
 using namespace std;
 
@@ -36,7 +37,9 @@ bool getModules(std::vector<MODULEENTRY32>& modules, int pid){
 }
 
 bool inject(int pid){
-	//TODO inject
+	//TODO transform to other compare function
+	string kernel_dll = "kernel32.dll";
+	transform(kernel_dll.begin(), kernel_dll.end(), kernel_dll.begin(), ::tolower);
 	HANDLE hProc=OpenProcess(
 		PROCESS_CREATE_THREAD|PROCESS_QUERY_INFORMATION|PROCESS_VM_OPERATION|PROCESS_VM_WRITE|PROCESS_VM_READ,
 		FALSE,
@@ -59,7 +62,10 @@ bool inject(int pid){
 	getModules(modules, pid);
 	void* baseKernel32 = 0;
 	for (std::vector<MODULEENTRY32>::iterator it = modules.begin(); it != modules.end(); ++it) {
-		if (strcmp(it->szModule, "KERNEL32.DLL")==0) {
+		string mod_name = it->szModule;
+		//TODO transform
+		transform(mod_name.begin(), mod_name.end(), mod_name.begin(), ::tolower);
+		if (mod_name == kernel_dll) {
 			baseKernel32 = it->modBaseAddr;
 			break;
 		}
@@ -67,6 +73,7 @@ bool inject(int pid){
 	//injecter.setAddress("_addr_GetProcAddress",0xDEADBEEB);
 	//injecter.setAddress("_addr_LoadLibrary",gpa);
 	//injecter.setAddress("_addr_GetModuleHandle",0xDEADBEEF);
+	//cout<<"kernel addr "<<baseKernel32<<endl;
 	injecter.setAddress("_addr_baseKernel32",(size_t)baseKernel32);
 	injecter.remap(proc_injected_memory);
 	void* RemoteThreadFunc=injecter.getAddress("_RemoteThread");

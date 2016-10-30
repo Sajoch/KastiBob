@@ -13,7 +13,13 @@ mdll: minject
 test_dll: mdll
 	make -C KastiDll test
 
+clean:
+	make -C KastiDll clean
+	make -C running_inject clean
+
+start_kclient: kclient_v1
+	cd kclient_v1; ./Kasti.exe&
 kclient_v2.zip:
 		wget http://web.kasteria.pl/files/kclient_v2.zip -D kclient_v2.zip
-getclient: kclient_v2.zip
+kclient_v1: kclient_v2.zip
 	unzip kclient_v2.zip
