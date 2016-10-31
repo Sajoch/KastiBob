@@ -67,7 +67,15 @@ int ep_main() {
 	//0x1571a2 - move big int - propable rsa
 	//edit rsa n number
 	//e is 65537
-	change_memory(&rsa_n_num[0], (void*)"1", 2);
+	//p - 269
+	//q - 271
+	//n - 72899
+	//φ(n) - 268*270 = 72360
+	//d - (d*n)%φ(n)=1
+	//d - (d*65537)%72360=1
+	//d - 13193
+	string m_n = "72899";
+	change_memory(&rsa_n_num[0], (void*)m_n.data(), m_n.size());
 	//Tibia
 	//Kasti
 	memcpy(&tibia_info[0], &ret[0], ret.size());
