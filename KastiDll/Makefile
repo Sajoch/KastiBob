@@ -11,13 +11,14 @@ all: obj $(PROGRAM)
 obj:
 	mkdir -p obj
 
-obj/main.o: src/main.cpp
+obj/main.o: src/main.cpp src/console.hpp
+obj/console.o: src/console.cpp src/console.hpp
 
-$(PROGRAM): obj/main.o
+$(PROGRAM): obj/main.o obj/console.o
 	$(CXX32) -shared $^ -o $@ $(CPPFLAG)
 
 test: all
-	cp $(PROGRAM) ../kclient_v1/.
+	(cp $(PROGRAM) ../kclient_v1/. || true)
 	../running_inject/KastiBob_run.exe Kasti.exe
 
 clean:

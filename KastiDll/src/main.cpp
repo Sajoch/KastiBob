@@ -1,8 +1,7 @@
 #include <windows.h>
-#include <io.h>
-#include <fcntl.h>
 #include <string>
 #include <iostream>
+#include "console.hpp"
 
 using namespace std;
 
@@ -19,47 +18,14 @@ bool change_memory(void* dest, void* src, size_t size){
 	VirtualProtect(dest, size, oldP, &oldP);
 	return true;
 }
-void openconsole() {
-	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
-  int consoleHandleR, consoleHandleW ;
-  long stdioHandle;
-  FILE *fptr;
 
-  AllocConsole();
-  std::string strW = "KastiBob_re Console";
-  SetConsoleTitle( strW.c_str() );
-
-  EnableMenuItem(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE , MF_GRAYED);
-  DrawMenuBar(GetConsoleWindow());
-
-  GetConsoleScreenBufferInfo( GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo );
-
-  stdioHandle = (long)GetStdHandle( STD_INPUT_HANDLE );
-  consoleHandleR = _open_osfhandle( stdioHandle, _O_TEXT );
-  fptr = _fdopen( consoleHandleR, "r" );
-  *stdin = *fptr;
-  setvbuf( stdin, NULL, _IONBF, 0 );
-
-  stdioHandle = (long) GetStdHandle( STD_OUTPUT_HANDLE );
-  consoleHandleW = _open_osfhandle( stdioHandle, _O_TEXT );
-  fptr = _fdopen( consoleHandleW, "w" );
-  *stdout = *fptr;
-  setvbuf( stdout, NULL, _IONBF, 0 );
-
-  stdioHandle = (long)GetStdHandle( STD_ERROR_HANDLE );
-  *stderr = *fptr;
-  setvbuf( stderr, NULL, _IONBF, 0 );
-
-	freopen_s(&fptr, "CONOUT$", "w", stdout);
-	freopen_s(&fptr, "CONIN$", "r", stdin);
-}
 
 int ep_main() {
 	unsigned int baseAddress = (unsigned int)GetModuleHandle(0);
-	//openconsole();
-	//cout<<"Welcome in KastiBob_re"<<endl;
+	openconsole();
+	cout<<"Welcome in KastiBob_re"<<endl;
 	//2421C8 -start
-	string ret = "KastiBob_re module\n\nTibia Windows Client\n\nhttps://github.com/Sajoch/KastiBob";
+	string ret = "KastiBob_re module\nTibia Windows Client\n\nhttps://github.com/Sajoch/\nKastiBob2";
 	//ret += to_string((unsigned int)baseAddress);
 	//MessageBoxA(0, ret.c_str(), "Hello World!", MB_OK);
 	char* tibia_info = (char*)(baseAddress+0x2421C8);
@@ -74,7 +40,7 @@ int ep_main() {
 	//d - (d*n)%φ(n)=1
 	//d - (d*65537)%72360=1
 	//d - 13193
-	string m_n = "72899";
+	string m_n = "1";
 	change_memory(&rsa_n_num[0], (void*)m_n.data(), m_n.size());
 	//Tibia
 	//Kasti

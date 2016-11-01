@@ -1,0 +1,69 @@
+95 00 //length
+3a 44 39 6d //checksum
+01 //protocolID
+02 00 //OS
+27 4e //version
+e6 d7 7f 46
+74 9e 7f 46
+d3 c3 e5 4a
+80
+88 ef 19 00
+00
+
+/*
+ca 2a b5 b5 e7 92 97 6d 85 bc bc 38 4e 44 11 8c
+f8 df 8c 51 31 e5 e6 d5 76 90 d7 d7 83 44 0a c2
+4c 04 98 c2 11 ef 21 67 40 23 1e ed 3d b7 b6 24
+ef 07 b2 0a 0a 09 a6 42 a0 bb 39 15 52 09 27 3f
+1f 12 08 eb a3 cd ac 36 fa 2c 57 ba 0b a7 55 ec
+da 21 32 e1 54 8b ea 08 bf 74 6e 66 72 35 c4 36
+4c 62 4b 81 b3 aa 52 6e 9f 4f 4a 44 a0 28 44 20
+2f e9 af e0 6c 84 6e e3 e2 a8 f6 2b 6b 21 df af
+*/
+
+
+95 00
+2a 4e 27 12
+01
+02 00
+27 4e
+e6 d7 7f 46
+74 9e 7f 46
+d3 c3 e5 4a
+48 08 94 8c 35 4d 30 ad f3 93 e7 1d ab a8 72 eb
+ea fc ae 5f d1 dd f0 36 6d c6 73 59 86 fc 82 f4
+e5 e7 e7 7a cb 46 7a 31 6f a4 39 2d 12 73 db 25
+cd e5 f0 e7 4d a3 d7 f6 f1 4f 6f bf a7 fa 8f 22
+89 a4 f1 53 a9 57 40 32 92 4c 39 90 98 6e 9d 0a
+d0 09 3d 97 19 c3 4a 0b 3e fe d5 7d e7 e3 58 ad
+96 56 3f f2 d8 f2 37 50 7d 46 16 b3 3c 54 30 ed
+f2 d8 01 f9 d7 fc f7 a8 85 17 40 71 e7 82 93 47
+
+95 00
+b1 46 d6 00
+01
+02 00
+27 4e
+e6 d7 7f 46 74
+9e 7f 46 d3 c3
+e5 4a
+00 99 3d 76 74 4f 98 9c 5e 6f e2 49 4b ce a0 5e
+e7 08 ed 96 bc 92 9b 0e 22 f5 44 a3 57 53 a4 2f
+78 86 7b 58 7a e3 32 a0 82 ef 1f f5 dd e5 ab d3
+be da 10 9b 74 0f 28 5e 4b 73 c9 b8 6b 83 42 e4
+c6 77 69 f2 22 8b 5c 91 57 00 7f 47 e5 16 0c e3
+ae 9b 16 85 39 80 e3 4a 0e 8f d1 3a 66 b1 07 7c
+99 b4 f6 80 fd 48 d4 ab f6 44 09 1c 7b 74 38 69
+7d 1e 2a 56 9d 47 75 e8 a1 d5 c1 b8 2f 81 b9 11
+
+@echo off
+timeout 1
+move /y update.exe Kasti.exe
+move /y update.spr Kasti.spr
+move /y update.pic Kasti.pic
+move /y update.dat Kasti.dat
+move /y update.dll kasti.dll
+move /y updatecam.exe KastiCamPlayer.exe
+start "" .\Kasti.exe
+
+109120132967399429278860960508995541528237502902798129123468757937266291492576446330739696001110603907230888610072655818825358503429057592827629436413108566029093628212635953836686562675849720620786279431090218017681061521755056710823876476444260558147179707119674283982419152118103759076030616683978566631413

@@ -43,3 +43,4 @@ kclient_v2.zip
 KastiBob/gui/build-KastiBob-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug/
 KastiBob/gui/build-kastibobgui-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug/
 *.pro.user*
+node_modules

@@ -60,16 +60,15 @@ unsigned int RemoteThread(void* arg){
 	int(*myInit)();
 	if(!addr_GetModuleHandle || !addr_LoadLibrary || !addr_GetProcAddress)
 		return 4;
-	//DWORD(*myGetLastError)(void);
-	//int(*_MessageBox)(HWND, LPCTSTR, LPCTSTR, UINT);
-	//HMODULE(*myLoadLibraryEx)(LPCTSTR lpFileName, HANDLE hFile, DWORD dwFlags);
-/*	HMODULE hKasti_re = myGetModuleHandle("Kasti_re.dll");
+	BOOL(*myFreeLibrary)(HMODULE) = (void*)myGetProcAddress((HMODULE)addr_baseKernel32,"FreeLibrary");
+	if(!myFreeLibrary)
+		return 5;
+	HMODULE hKasti_re = myGetModuleHandle("Kasti_re.dll");
 	if (hKasti_re){
 		myFreeLibrary(hKasti_re);
-		return 5;
-	}*/
-	//myFreeLibrary=(void*)myGetProcAddress((HMODULE)addr_baseKernel32,"FreeLibrary");
-	HMODULE hKasti_re = myLoadLibrary("Kasti_re.dll");
+		return 7;
+	}
+	hKasti_re = myLoadLibrary("Kasti_re.dll");
 	if (!hKasti_re)
 		return 1;
 	myInit=(void*)myGetProcAddress(hKasti_re, "init");
