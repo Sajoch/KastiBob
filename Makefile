@@ -12,7 +12,8 @@ mdll: minject
 	make -C KastiDll all
 test_dll: mdll
 	make -C KastiDll test
-
+logic:
+	make -C KastiBob/logic test
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean
