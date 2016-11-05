@@ -70,7 +70,8 @@ start "" .\Kasti.exe
 
 
 7c 01 //length
-fd b6 30 72 29 74 fc 42 ce 02 58 79 5f 41 1d 97
+fd b6 30 72
+29 74 fc 42 ce 02 58 79 5f 41 1d 97
 b0 fa 06 ed 4f ca 2e 55 95 f5 98 0b 8f a6 0e a4
 1e 64 be 82 11 bb ba a7 20 80 2c 94 2f 9a 63 43
 1c f5 d3 50 00 68 30 c7 6c 57 1d 1a e5 c1 7b 7b
