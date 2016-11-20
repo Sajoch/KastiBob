@@ -18,7 +18,7 @@ uint32_t Client::pic_signature = 0x4AE5C3D3;
 
 int main(){
 	srand(time(0));
-	Client kastiClient("91.134.189.246:7171", 20007, 2, "dupad", "dupad1");
+	Client kastiClient("91.134.189.246:7171", 20007, 2, "dupad2", "dupad2");
 	while(kastiClient.tick()){
 		Sleep(1);
 	}

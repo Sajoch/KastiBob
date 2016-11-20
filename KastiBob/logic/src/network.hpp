@@ -23,7 +23,7 @@ public:
 	NetworkManager(std::string ip);
 	~NetworkManager();
 	void addPacket(NetworkPacket p);
-	void addPacket(NetworkPacket& p);
+	void addPacketR(NetworkPacket& p);
 	bool getPacket(NetworkPacket& p);
 	int tick();
 };

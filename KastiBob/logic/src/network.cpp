@@ -13,7 +13,7 @@ recv_offset(0)
 NetworkManager::~NetworkManager(){
 	sock.shutdown();
 }
-void NetworkManager::addPacket(NetworkPacket& p){
+void NetworkManager::addPacketR(NetworkPacket& p){
 	p.add_header();
 	send_buffer.append(p.getData());
 }
