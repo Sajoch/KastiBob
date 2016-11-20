@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cinttypes>
+#include "cipher.hpp"
 
 class NetworkPacket {
 	friend class NetworkManager;
@@ -25,5 +26,13 @@ public:
 	std::string& getData();
 	size_t getSize();
 	void resize(size_t len);
+	void xteaDecrypt(XTEAcipher& xtea);
+	
+	static uint8_t peekUint8(std::string& b);
+	static uint16_t peekUint16(std::string& b);
+	static uint32_t peekUint32(std::string& b);
+	static void addUint8(std::string& b, uint8_t v);
+	static void addUint16(std::string& b, uint16_t v);
+	static void addUint32(std::string& b, uint32_t v);
 };
 #endif

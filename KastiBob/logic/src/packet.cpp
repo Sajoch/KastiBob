@@ -1,6 +1,37 @@
 #include "packet.hpp"
-
+#include <iostream>
 NetworkPacket::NetworkPacket(){}
+
+void NetworkPacket::addUint32(std::string& b, uint32_t v){
+	b.push_back((v)&0xff);
+	b.push_back((v>>8)&0xff);
+	b.push_back((v>>16)&0xff);
+	b.push_back((v>>24)&0xff);
+}
+
+uint8_t NetworkPacket::peekUint8(std::string& b){
+	uint8_t ret;
+	ret = (b[0]&0xff);
+	return ret;
+}
+uint16_t NetworkPacket::peekUint16(std::string& b){
+	uint16_t ret;
+	ret = (b[1]&0xff);
+	ret<<=8;
+	ret |= (b[0]&0xff);
+	return ret;
+}
+uint32_t NetworkPacket::peekUint32(std::string& b){
+	uint32_t ret;
+	ret =  (b[3]&0xff);
+	ret <<= 8;
+	ret |= (b[2]&0xff);
+	ret <<= 8;
+	ret |= (b[1]&0xff);
+	ret <<= 8;
+	ret |= (b[0]&0xff);
+	return ret;
+}
 void NetworkPacket::addUint8(uint8_t a){
 	buffer.push_back(a);
 }
@@ -48,18 +79,17 @@ void NetworkPacket::add_header(){
 }
 
 uint8_t NetworkPacket::getUint8() {
-	uint8_t a = buffer[0];
+	uint8_t a = peekUint8(buffer);
 	buffer.erase(buffer.begin());
 	return a;
 }
 uint16_t NetworkPacket::getUint16() {
-	uint16_t a = ((buffer[1] >> 8) & 0xff00) | (buffer[0] & 0xff);
+	uint16_t a = peekUint16(buffer);
 	buffer.erase(buffer.begin(), buffer.begin()+2);
 	return a;
 }
 uint32_t NetworkPacket::getUint32() {
-	uint16_t a = ((buffer[3] >> 24) & 0xff000000) | ((buffer[2] >> 16) & 0xff0000) |
-							 ((buffer[1] >> 8) & 0xff00) | (buffer[0] & 0xff);
+	uint32_t a = peekUint32(buffer);
 	buffer.erase(buffer.begin(), buffer.begin()+4);
 	return a;
 }
@@ -79,4 +109,7 @@ size_t NetworkPacket::getSize() {
 }
 void NetworkPacket::resize(size_t len) {
 	return buffer.resize(len);
+}
+void NetworkPacket::xteaDecrypt(XTEAcipher& xtea){
+	xtea.decrypt(buffer);
 }

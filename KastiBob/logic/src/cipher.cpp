@@ -1,7 +1,7 @@
 #include "cipher.hpp"
 #include <cstdlib>
 #include <string.h>
-
+#include "packet.hpp"
 //RSA
 
 RSAcipher::RSAcipher(const char* m, const char* e){
@@ -43,6 +43,23 @@ uint32_t XTEAcipher::getKey(uint32_t idx){
 void XTEAcipher::encrypt(){
 
 }
-void XTEAcipher::decrypt(){
-
+void XTEAcipher::decrypt(std::string& buf){
+	uint32_t v0, v1;
+	std::string retbuf;
+	while(buf.size()>=8){
+		v0 = NetworkPacket::peekUint32(buf);
+		buf.erase(buf.begin(), buf.begin()+4);
+		v1 = NetworkPacket::peekUint32(buf);
+		buf.erase(buf.begin(), buf.begin()+4);
+		uint32_t delta = 0x61C88647;
+		uint32_t sum = 0xC6EF3720;
+		for(int32_t i = 0; i < 32; i++) {
+			v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + _keys[sum>>11 & 3]);
+			sum += delta;
+			v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + _keys[sum & 3]);
+		}
+		NetworkPacket::addUint32(retbuf, v0); 
+		NetworkPacket::addUint32(retbuf, v1); 
+	}
+	buf = retbuf;
 }

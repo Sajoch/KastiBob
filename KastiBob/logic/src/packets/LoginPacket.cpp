@@ -1,13 +1,14 @@
 #include "LoginPacket.hpp"
 
 LoginPacket::LoginPacket(std::string login, std::string password,
-	uint16_t tibiaversion, uint16_t ostype, RSAcipher& rsa, XTEAcipher& xtea){
+	uint16_t tibiaversion, uint16_t ostype, uint32_t dat_signature,
+	uint32_t spr_signature, uint32_t pic_signature, RSAcipher& rsa, XTEAcipher& xtea){
 		addUint8(1);
 		addUint16(ostype);
 		addUint16(tibiaversion);
-		addUint32(0x467FD7E6);
-		addUint32(0x467F9E74);
-		addUint32(0x4AE5C3D3);
+		addUint32(dat_signature);
+		addUint32(spr_signature);
+		addUint32(pic_signature);
 		size_t rsa_offset = getSize();
 		addUint8(0);
 		addUint32(xtea.getKey(0));

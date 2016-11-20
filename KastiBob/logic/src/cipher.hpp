@@ -19,6 +19,6 @@ public:
 	XTEAcipher(uint32_t keys[4]);
 	uint32_t getKey(uint32_t idx);
 	void encrypt();
-	void decrypt();
+	void decrypt(std::string& buf);
 };
 #endif
