@@ -26,10 +26,7 @@ void RSAcipher::encrypt(char* p){
 
 //XTEA
 XTEAcipher::XTEAcipher(){
-	_keys[0]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
-	_keys[1]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
-	_keys[2]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
-	_keys[3]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
+	generateKeys();
 }
 XTEAcipher::XTEAcipher(uint32_t keys[4]){
 	_keys[0] = keys[0];
@@ -39,6 +36,12 @@ XTEAcipher::XTEAcipher(uint32_t keys[4]){
 }
 uint32_t XTEAcipher::getKey(uint32_t idx){
 	return _keys[idx];
+}
+void XTEAcipher::generateKeys(){
+	_keys[0]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
+	_keys[1]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
+	_keys[2]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
+	_keys[3]=((rand()%0xff)<<24)|((rand()%0xff)<<16)|((rand()%0xff)<<8)|(rand()%0xff);
 }
 void XTEAcipher::encrypt(){
 

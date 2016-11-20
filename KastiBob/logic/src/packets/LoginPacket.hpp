@@ -6,11 +6,17 @@
 
 class LoginPacket: public NetworkPacket
 {
-	std::string _login;
-	std::string _password;
 public:
+	//login server
 	LoginPacket(std::string login, std::string password,
 		uint16_t tibiaversion, uint16_t ostype, uint32_t dat_signature,
-		uint32_t spr_signature, uint32_t pic_signature, RSAcipher& rsa, XTEAcipher& xtea);
+		uint32_t spr_signature, uint32_t pic_signature, 
+		RSAcipher& rsa, XTEAcipher& xtea);
+	//game server
+	LoginPacket(std::string login, std::string password,
+		uint16_t tibiaversion, uint16_t ostype, uint32_t dat_signature,
+		uint32_t spr_signature, uint32_t pic_signature, 
+		uint32_t data[5], std::string name,
+		RSAcipher& rsa, XTEAcipher& xtea);
 };
 #endif

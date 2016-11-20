@@ -12,10 +12,14 @@ enum class ClientState;
 class Character{
 	std::string nick;
 	std::string world;
-	uint32_t ip;
+	uint16_t oip[4];
 	uint16_t port;
+	bool valid;
 public:
+	Character();
 	Character(std::string _nick, std::string _world, uint32_t _ip, uint16_t _port);
+	bool isValid();
+	std::string getAddress();
 };
 
 class Client{
@@ -28,16 +32,20 @@ class Client{
 	static uint32_t pic_signature;
 	ClientState state;
 	
-	Character* currenct_character;
+	Character currenct_character;
 	std::vector<Character> characters;
 	uint16_t premiumDays;
 	
+	uint8_t verify_data[5];
 	NetworkPacket incoming_packet;
 	uint16_t version;
 	uint16_t os;
 	std::string login;
 	std::string password;
-	NetworkManager conn;
+	NetworkManager* conn;
+	bool xtea_crypted;
+	void newConnection(std::string ip);
+	void closeConnection();
 	void idle();
 	
 	void parseSelfAppear(NetworkPacket& p);
@@ -46,6 +54,7 @@ class Client{
 	void parseFYIMessage(NetworkPacket& p);
 	void parseWaitingList(NetworkPacket& p);
 	void parsePing(NetworkPacket& p);
+	void parseInit(NetworkPacket& p);
 	void parseDeath(NetworkPacket& p);
 	void parseCanReportBugs(NetworkPacket& p);
 	void parseMapDescription(NetworkPacket& p);

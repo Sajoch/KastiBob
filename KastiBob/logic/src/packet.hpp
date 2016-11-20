@@ -28,6 +28,8 @@ public:
 	void resize(size_t len);
 	void xteaDecrypt(XTEAcipher& xtea);
 	
+	void dump();
+	
 	static uint8_t peekUint8(std::string& b);
 	static uint16_t peekUint16(std::string& b);
 	static uint32_t peekUint32(std::string& b);

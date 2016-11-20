@@ -57,7 +57,8 @@ int NetworkManager::tick() {
 		}
 		return 0;
 	} 
-	else if(sock.poll(0, Socket::SELECT_READ) && (rsize = sock.available())>0){
+	else if(sock.poll(0, Socket::SELECT_READ)){
+		rsize = sock.available();
 		int buffer_size = recv_buffer.size() - recv_offset;
 		if(buffer_size<rsize){
 			recv_buffer.resize(recv_buffer.size() + rsize);

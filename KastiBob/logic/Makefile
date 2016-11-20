@@ -2,7 +2,7 @@ obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -lws2_32 -lgmp -lpocoNet -lpocoFoundation
+CPPFLAG= --std=c++11 -ggdb -lgmp -lpocoNet -lpocoFoundation
 
 all: obj $(PROGRAM)
 obj:
@@ -19,6 +19,9 @@ obj/main.o: src/main.cpp src/client.hpp
 $(PROGRAM): $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -o $@ $(CPPFLAG)
+
+debug: all
+	gdb $(PROGRAM)
 
 test: all
 	./$(PROGRAM)

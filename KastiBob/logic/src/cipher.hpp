@@ -17,6 +17,7 @@ class XTEAcipher{
 public:
 	XTEAcipher();
 	XTEAcipher(uint32_t keys[4]);
+	void generateKeys();
 	uint32_t getKey(uint32_t idx);
 	void encrypt();
 	void decrypt(std::string& buf);
