@@ -20,6 +20,7 @@ public:
 	Character(std::string _nick, std::string _world, uint32_t _ip, uint16_t _port);
 	bool isValid();
 	std::string getAddress();
+	std::string getName();
 };
 
 class Client{

@@ -6,7 +6,7 @@
 using namespace std;
 
 enum class ClientState { 
-	NONE, LOGIN, ENTER_GAME, GAME, INIT_GAME,
+	NONE, LOGIN, ENTER_GAME, GAME,
 };
 Character::Character():
 port(0), valid(false)
@@ -33,6 +33,9 @@ string Character::getAddress(){
 	str<<oip[0]<<"."<<oip[1]<<"."<<oip[2]<<"."<<oip[3]<<":"<<port;
 	return str.str();
 }
+std::string Character::getName(){
+	return nick;
+}
 Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	rsa(rsa_m_n, rsa_e_n),
 	version(_version), os(_os),
@@ -55,14 +58,16 @@ void Client::closeConnection(){
 	conn = 0;
 }
 void Client::idle(){
-	if(xtea_crypted)
+	if(xtea_crypted){
 		incoming_packet.xteaDecrypt(xtea);
+	}
 	uint16_t len = incoming_packet.getUint16();
 	uint16_t real_len = incoming_packet.getSize();
-	if(real_len != len && (real_len - len) > 3){		
+	if(real_len < len){
 		cout<<"wrong size after XTea decrypt, expected "<<len<<" but has "<<real_len<<endl;
 		return;
 	}
+	incoming_packet.resize(len);
 	uint16_t packetType;
 	while(true){
 		switch(state){
@@ -71,6 +76,7 @@ void Client::idle(){
 				closeConnection();
 			}break;
 			case ClientState::LOGIN:{
+				cout<<"login"<<endl;
 				state = ClientState::NONE;
 				closeConnection();
 				do{
@@ -122,6 +128,7 @@ void Client::idle(){
 					newConnection(currenct_character.getAddress());
 					xtea_crypted = false;
 					state = ClientState::GAME;
+					cout<<"enter to game"<<endl;
 				}
 				else {
 					state = ClientState::NONE;
@@ -132,6 +139,7 @@ void Client::idle(){
 					state = ClientState::NONE;
 					closeConnection();
 				}
+				incoming_packet.dump();
 				packetType = incoming_packet.getUint8();
 				switch(packetType){
 					case 0x0A:
@@ -282,9 +290,6 @@ void Client::idle(){
 						cout<<"unknown packet type "<<packetType<<endl;
 				}
 			}break;
-			case ClientState::INIT_GAME:{
-				conn->addPacket(LoginPacket(login, password, version, os, dat_signature, spr_signature, pic_signature, rsa, xtea));
-			}break;
 		}
 		break;
 	}
@@ -330,7 +335,16 @@ void Client::parseInit(NetworkPacket& p){
 		for(int i=0;i<5;i++){
 			verify_data[i] = p.getUint8();
 		}
-		state = ClientState::INIT_GAME;
+		cout<<"login to game server"<<endl;
+		xtea.generateKeys();
+		xtea_crypted = true;
+		conn->addPacket(
+			LoginPacket(login, password, 
+				version, os, 
+				dat_signature, spr_signature, pic_signature, 
+				verify_data, currenct_character.getName(), 
+				rsa, xtea)
+			);
 	}
 	else{
 		state = ClientState::NONE;

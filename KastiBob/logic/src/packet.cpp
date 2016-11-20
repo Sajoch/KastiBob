@@ -117,4 +117,5 @@ void NetworkPacket::xteaDecrypt(XTEAcipher& xtea){
 void NetworkPacket::dump(){
 	for(size_t i=0;i<buffer.size();i++)
 		std::cout<<((void*)(uint32_t)(uint8_t)buffer[i])<<" ";
+	std::cout<<std::endl<<"==================="<<std::endl;
 }

@@ -17,6 +17,7 @@ logic:
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean
+	make -C KastiBob/logic clean
 
 start_kclient: kclient_v1
 	cd kclient_v1; ./Kasti.exe&

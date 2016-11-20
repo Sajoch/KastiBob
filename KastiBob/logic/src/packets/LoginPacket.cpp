@@ -23,9 +23,9 @@ LoginPacket::LoginPacket(std::string login, std::string password,
 LoginPacket::LoginPacket(std::string login, std::string password,
 	uint16_t tibiaversion, uint16_t ostype, uint32_t dat_signature,
 	uint32_t spr_signature, uint32_t pic_signature, 
-	uint32_t data[5], std::string name,
+	uint8_t data[5], std::string name,
 	RSAcipher& rsa, XTEAcipher& xtea){
-		addUint8(0x0A);
+		addUint8(0x08);
 		addUint16(ostype);
 		addUint16(tibiaversion);
 		size_t rsa_offset = getSize();
@@ -35,8 +35,8 @@ LoginPacket::LoginPacket(std::string login, std::string password,
 		addUint32(xtea.getKey(2));
 		addUint32(xtea.getKey(3));
 		addUint8(0);
-		addTString(name);
 		addTString(login);
+		addTString(name);
 		addTString(password);
 		for(int i=0;i<5;i++){
 			addUint8(data[i]);
