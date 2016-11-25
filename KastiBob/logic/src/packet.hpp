@@ -27,6 +27,7 @@ public:
 	size_t getSize();
 	void resize(size_t len);
 	void xteaDecrypt(XTEAcipher& xtea);
+	void xteaEncrypt(XTEAcipher& xtea);
 	
 	void dump();
 	

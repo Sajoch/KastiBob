@@ -1,6 +1,7 @@
 #include "client.hpp"
 #include <iostream>
 #include "packets/LoginPacket.hpp"
+#include "packets/PingPacket.hpp"
 #include <sstream>
 
 using namespace std;
@@ -329,9 +330,8 @@ void Client::parseWaitingList(NetworkPacket& p){
 	
 }
 void Client::parsePing(NetworkPacket& p){
-	NetworkPacket resp;
-	resp.addUint8(0x1e);
-	conn->addPacketR(resp);
+	conn->addPacket(PingPacket(xtea));
+	cout<<"send ping"<<endl;
 }
 void Client::parseInit(NetworkPacket& p){
 	if(p.getSize()>=5){

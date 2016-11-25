@@ -19,7 +19,7 @@ public:
 	XTEAcipher(uint32_t keys[4]);
 	void generateKeys();
 	uint32_t getKey(uint32_t idx);
-	void encrypt();
+	void encrypt(std::string& buf);
 	void decrypt(std::string& buf);
 };
 #endif

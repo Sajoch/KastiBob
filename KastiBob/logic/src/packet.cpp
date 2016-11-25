@@ -113,6 +113,10 @@ void NetworkPacket::resize(size_t len) {
 void NetworkPacket::xteaDecrypt(XTEAcipher& xtea){
 	xtea.decrypt(buffer);
 }
+void NetworkPacket::xteaEncrypt(XTEAcipher& xtea){
+	buffer.insert(buffer.cend(), (8-(buffer.size()%8)), 0xAC);
+	xtea.encrypt(buffer);
+}
 
 void NetworkPacket::dump(){
 	for(size_t i=0;i<buffer.size();i++)
