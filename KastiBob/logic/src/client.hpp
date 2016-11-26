@@ -6,8 +6,8 @@
 #include "cipher.hpp"
 #include "packet.hpp"
 #include "network.hpp"
+#include "utils.hpp"
 
-enum class ClientState;
 
 class Character{
 	std::string nick;
@@ -123,6 +123,7 @@ class Client{
 	void parseAddMapMarker(NetworkPacket& p);
 	
 public:
+	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p);
 	int tick();
 };

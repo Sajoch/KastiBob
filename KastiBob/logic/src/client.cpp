@@ -2,13 +2,11 @@
 #include <iostream>
 #include "packets/LoginPacket.hpp"
 #include "packets/PingPacket.hpp"
+#include "packets/MovePacket.hpp"
 #include <sstream>
 
 using namespace std;
 
-enum class ClientState { 
-	NONE, LOGIN, ENTER_GAME, GAME,
-};
 Character::Character():
 port(0), valid(false)
 {
@@ -496,6 +494,7 @@ void Client::parseCreatureSpeak(NetworkPacket& p){
 	uint16_t level = p.getUint16();
 	uint16_t type = p.getUint16();
 	cout<<"speak "<<unkSpeak<<" "<<name<<" "<<level<<" "<<type<<endl;
+	move(ClientDirectory::NORTH);
 }
 void Client::parseChannelList(NetworkPacket& p){
 	
@@ -568,4 +567,8 @@ void Client::parseShowTutorial(NetworkPacket& p){
 }
 void Client::parseAddMapMarker(NetworkPacket& p){
 	
+}
+
+void Client::move(ClientDirectory dir){
+	conn->addPacket(MovePacket(dir, xtea));
 }
