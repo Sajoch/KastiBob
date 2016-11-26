@@ -21,6 +21,7 @@ bool change_memory(void* dest, void* src, size_t size){
 
 int(*WS_send)(int, char*, int, int);
 int*(*xtea_encrypt_ret)(int*, int*);
+int*(*xtea_decrypt_ret)(int*, int*);
 
 void showBuffer(char* buf, int size){
 	string buffer(buf, size);
@@ -33,8 +34,13 @@ void showBuffer(char* buf, int size){
 	}
 }
 void showHex(char* buf, size_t len){
-	for(size_t i=0;i<len;i++)
-		cout<<(void*)(uint8_t)buf[i]<<" ";
+	const char abc[] = "0123456789ABCDEF";
+	uint8_t c;
+	for(size_t i=0;i<len;i++){
+		c = buf[i];
+		cout<<"0x"<<abc[(c>>4)&0x0f]<<abc[(c)&0x0f]<<" ";
+		//cout<<(void*)(uint8_t)<<" ";
+	}
 	cout<<endl;
 }
 
@@ -46,8 +52,15 @@ int __stdcall sendWrapper(int sock, char* buf, int size, int flag){
 }
 
 int* xtea_encryptWrapper(int* buf, int* keys){
+	cout<<"wrte ";
 	showHex((char*)buf, 8);
 	return xtea_encrypt_ret(buf, keys);
+}
+int* xtea_decryptWrapper(int* buf, int* keys){
+	int* ret = xtea_decrypt_ret(buf, keys);
+	cout<<"read ";
+	showHex((char*)ret, 8);
+	return ret;
 }
 
 
@@ -73,7 +86,17 @@ int ep_main() {
 		memcpy(&hook[1], (void*)&xtea_encrypt_add, 4);
 		change_memory(&xtea_encrypt_func[0],(void*)hook,5);
 	}
-	
+	//hook xtea_decrypt
+	{
+		xtea_decrypt_ret = (int*(*)(int*, int*))(baseAddress+0x1500b0);
+		char* xtea_decrypt_func = (char*)(baseAddress+0x15023d);
+		cout<<"xtea_decrypt "<<(void*)xtea_decrypt_func<<endl;
+		unsigned char hook[] = {0xE8, 0x6E, 0xFF, 0xFF, 0xFF};
+		hook[0] = 0xE8;
+		uint32_t xtea_decrypt_add = (uint32_t)&xtea_decryptWrapper - (uint32_t)xtea_decrypt_func - 5;
+		memcpy(&hook[1], (void*)&xtea_decrypt_add, 4);
+		change_memory(&xtea_decrypt_func[0],(void*)hook,5);
+	}
 	//hook send
 	HMODULE ws2 = GetModuleHandle("ws2_32.dll");
 	WS_send = (int(*)(int, char*, int, int))GetProcAddress(ws2, "send");
