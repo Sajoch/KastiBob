@@ -7,7 +7,7 @@
 #include "packet.hpp"
 #include "network.hpp"
 #include "utils.hpp"
-
+#include <chrono>
 
 class Character{
 	std::string nick;
@@ -37,6 +37,15 @@ class Client{
 	std::vector<Character> characters;
 	uint16_t premiumDays;
 	
+	uint32_t id;
+	bool canReportBugs;
+	std::chrono::seconds AntyIdle_duration;
+	std::chrono::system_clock::time_point lastAntyIdle;
+	uint32_t x;
+	uint32_t y;
+	uint32_t z;
+	ClientDirectory dir;
+	
 	uint8_t verify_data[5];
 	NetworkPacket incoming_packet;
 	uint16_t version;
@@ -47,6 +56,7 @@ class Client{
 	bool xtea_crypted;
 	void newConnection(std::string ip);
 	void closeConnection();
+	void recv();
 	void idle();
 	
 	void parseSelfAppear(NetworkPacket& p);

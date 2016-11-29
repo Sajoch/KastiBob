@@ -52,13 +52,13 @@ int __stdcall sendWrapper(int sock, char* buf, int size, int flag){
 }
 
 int* xtea_encryptWrapper(int* buf, int* keys){
-	cout<<"wrte ";
+	cout<<"write< ";
 	showHex((char*)buf, 8);
 	return xtea_encrypt_ret(buf, keys);
 }
 int* xtea_decryptWrapper(int* buf, int* keys){
 	int* ret = xtea_decrypt_ret(buf, keys);
-	cout<<"read ";
+	cout<<"read> ";
 	showHex((char*)ret, 8);
 	return ret;
 }

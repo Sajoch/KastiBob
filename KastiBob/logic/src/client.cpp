@@ -6,6 +6,7 @@
 #include <sstream>
 
 using namespace std;
+using namespace std::chrono;
 
 Character::Character():
 port(0), valid(false)
@@ -40,6 +41,8 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	version(_version), os(_os),
 	login(l), password(p)
 {
+	lastAntyIdle = chrono::system_clock::now();
+	AntyIdle_duration = chrono::seconds(1);
 	conn = 0;
 	newConnection(ip);
 	state = ClientState::LOGIN;
@@ -56,7 +59,7 @@ void Client::closeConnection(){
 	delete conn;
 	conn = 0;
 }
-void Client::idle(){
+void Client::recv(){
 	if(xtea_crypted){
 		incoming_packet.xteaDecrypt(xtea);
 	}
@@ -140,9 +143,10 @@ void Client::idle(){
 				}
 				packetType = incoming_packet.getUint8();
 				switch(packetType){
-					/*case 0x0A:
-						return parseSelfAppear(incoming_packet);
-					case 0x0B:
+					case 0x0A:
+						parseSelfAppear(incoming_packet);
+					break;
+					/*case 0x0B:
 						return parseGMActions(incoming_packet);
 					case 0x14:
 						return parseErrorMessage(incoming_packet);
@@ -151,9 +155,11 @@ void Client::idle(){
 					case 0x16:
 						return parseWaitingList(incoming_packet);*/
 					case 0x1E:
-						return parsePing(incoming_packet);
+						parsePing(incoming_packet);
+					break;
 					case 0x1F:
-						return parseInit(incoming_packet);
+						parseInit(incoming_packet);
+					break;
 					/*case 0x28:
 						return parseDeath(incoming_packet);
 					case 0x32:
@@ -171,13 +177,17 @@ void Client::idle(){
 					case 0x69:
 						return parseUpdateTile(incoming_packet);*/
 					case 0x6A:
-						return parseTileAddThing(incoming_packet);
-					/*case 0x6B:
-						return parseTileTransformThing(incoming_packet);*/
+						parseTileAddThing(incoming_packet);
+					break;
+					case 0x6B:
+						parseTileTransformThing(incoming_packet);
+					break;
 					case 0x6C:
-						return parseTileRemoveThing(incoming_packet);
+						parseTileRemoveThing(incoming_packet);
+					break;
 					case 0x6D:
-						return parseCreatureMove(incoming_packet);
+						parseCreatureMove(incoming_packet);
+					break;
 					/*case 0x6E:
 						return parseOpenContainer(incoming_packet);
 					case 0x6F:
@@ -199,20 +209,24 @@ void Client::idle(){
 					case 0x7F:
 						return parseSafeTradeClose(incoming_packet);*/
 					case 0x82:
-						return parseWorldLight(incoming_packet);
-					/*case 0x83:
-						return parseMagicEffect(incoming_packet);
-					case 0x84:
+						parseWorldLight(incoming_packet);
+					break;
+					case 0x83:
+						parseMagicEffect(incoming_packet);
+					break;
+					/*case 0x84:
 						return parseAnimatedText(incoming_packet);
 					case 0x85:
 						return parseDistanceShot(incoming_packet);
 					case 0x86:
 						return parseCreatureSquare(incoming_packet);*/
 					case 0x8C:
-						return parseCreatureHealth(incoming_packet);
-					/*case 0x8D:
-						return parseCreatureLight(incoming_packet);
-					case 0x8E:
+						parseCreatureHealth(incoming_packet);
+					break;
+					case 0x8D:
+						parseCreatureLight(incoming_packet);
+					break;
+					/*case 0x8E:
 						return parseCreatureOutfit(incoming_packet);
 					case 0x8F:
 						return parseCreatureSpeed(incoming_packet);
@@ -235,7 +249,8 @@ void Client::idle(){
 					case 0xA3:
 						return parsePlayerCancelAttack(incoming_packet);*/
 					case 0xAA:
-						return parseCreatureSpeak(incoming_packet);
+						parseCreatureSpeak(incoming_packet);
+					break;
 					/*case 0xAB:
 						return parseChannelList(incoming_packet);
 					case 0xAC:
@@ -287,10 +302,24 @@ void Client::idle(){
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
 						incoming_packet.dump();
+						return;
+				}
+				if(incoming_packet.getSize()>0){
+					continue;
 				}
 			}break;
 		}
 		break;
+	}
+}
+
+void Client::idle(){
+	system_clock::time_point now = chrono::system_clock::now();
+	seconds elapsed = chrono::duration_cast<chrono::seconds>(now - lastAntyIdle);
+	//chrono::seconds antyafk_elapse_sec = chrono::duration_cast<chrono::seconds>  = now - lastAntyIdle;
+	if(elapsed > AntyIdle_duration){
+		move(ClientDirectory::STOP);
+		lastAntyIdle = now;
 	}
 }
 
@@ -305,14 +334,18 @@ int Client::tick(){
 	}
 	else if(st == 2){
 		if(conn->getPacket(incoming_packet)){
-			idle();
+			recv();
 		}
+	}else{
+		idle();
 	}
 	return 1;
 }
 
 void Client::parseSelfAppear(NetworkPacket& p){
-	
+	id = p.getUint32();
+	p.getUint16();
+	canReportBugs = p.getUint8()==1?true:false;
 }
 void Client::parseGMActions(NetworkPacket& p){
 	
@@ -376,10 +409,10 @@ void Client::parseUpdateTile(NetworkPacket& p){
 	
 }
 void Client::parseTileAddThing(NetworkPacket& p){
-	
+	cout<<"add thing"<<endl;
 }
 void Client::parseTileTransformThing(NetworkPacket& p){
-	
+	move(ClientDirectory::WEST);
 }
 void Client::parseTileRemoveThing(NetworkPacket& p){
 	uint16_t x = p.getUint16();
@@ -436,7 +469,7 @@ void Client::parseWorldLight(NetworkPacket& p){
 	cout<<"world color "<<color<<" and level "<<level<<endl;
 }
 void Client::parseMagicEffect(NetworkPacket& p){
-	
+	move(ClientDirectory::NORTH);
 }
 void Client::parseAnimatedText(NetworkPacket& p){
 	
@@ -453,7 +486,7 @@ void Client::parseCreatureHealth(NetworkPacket& p){
 	cout<<"npc "<<id<<" have "<<percent<<"% hp"<<endl;
 }
 void Client::parseCreatureLight(NetworkPacket& p){
-	
+	move(ClientDirectory::WEST);
 }
 void Client::parseCreatureOutfit(NetworkPacket& p){
 	
@@ -494,7 +527,7 @@ void Client::parseCreatureSpeak(NetworkPacket& p){
 	uint16_t level = p.getUint16();
 	uint16_t type = p.getUint16();
 	cout<<"speak "<<unkSpeak<<" "<<name<<" "<<level<<" "<<type<<endl;
-	move(ClientDirectory::NORTH);
+	move(ClientDirectory::SOUTH);
 }
 void Client::parseChannelList(NetworkPacket& p){
 	
