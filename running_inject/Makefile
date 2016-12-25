@@ -13,7 +13,7 @@ obj/objectfile.o: src/objectfile.cpp src/objectfile.hpp
 obj/main.o: src/main.cpp src/objectfile.hpp
 
 obj/remoteCode.o: src/remoteCode.c
-	$(GCC32) -o $@ -c $^
+	$(GCC32) --std=c11 -o $@ -c $^
 
 obj/remoteCode.h.gen: obj/remoteCode.o
 	../bin2c/bin2c $< > $@

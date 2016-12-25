@@ -1,7 +1,14 @@
-export CXX=x86_64-w64-mingw32-g++
-export GCC=x86_64-w64-mingw32-gcc
-export CXX32=i686-w64-mingw32-g++
-export GCC32=i686-w64-mingw32-gcc
+ifeq ($(OS),LINUX)
+	CROSS_COMPILE=
+	CROSS_COMPILE32=
+else
+	CROSS_COMPILE=x86_64-w64-mingw32-
+	CROSS_COMPILE32=i686-w64-mingw32-
+endif
+export CXX=$(CROSS_COMPILE)g++
+export GCC=$(CROSS_COMPILE)gcc
+export CXX32=$(CORSS_COMPILE32)g++
+export GCC32=$(CORSS_COMPILE32)gcc
 mbin2c:
 	make -C bin2c all
 minject: mbin2c

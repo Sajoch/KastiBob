@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string>
 #include <map>
-#include <TlHelp32.h>
+#include <tlhelp32.h>
 #include <algorithm>
 #include "objectfile.hpp"
 using namespace std;
