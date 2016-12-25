@@ -1,7 +1,5 @@
-//WINDOWS
-
-//#include <winsock2.h>
-
+#include <chrono>
+#include <thread>
 #include <iostream>
 #include <string>
 #include "client.hpp"
@@ -22,7 +20,8 @@ int main(){
 	srand(time(0));
 	Client kastiClient("91.134.189.246:7171", 20007, 2, "dupad2", "dupad2");
 	while(kastiClient.tick()){
-		Sleep(1);
+		//C++11 compability
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
   return 0;
 }

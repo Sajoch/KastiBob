@@ -114,12 +114,15 @@ void NetworkPacket::xteaDecrypt(XTEAcipher& xtea){
 	xtea.decrypt(buffer);
 }
 void NetworkPacket::xteaEncrypt(XTEAcipher& xtea){
-	buffer.insert(buffer.cend(), (8-(buffer.size()%8)), 0xAC);
+	buffer.append((8-(buffer.size()%8)), 0xAC);
 	xtea.encrypt(buffer);
 }
 
 void NetworkPacket::dump(){
-	for(size_t i=0;i<buffer.size();i++)
-		std::cout<<((void*)(uint32_t)(uint8_t)buffer[i])<<" ";
+	static const char hex[] = "0123456789abcdef";
+	for(size_t i=0;i<buffer.size();i++){
+		uint8_t byte = buffer[i];
+		std::cout<<"0x"<<hex[(byte>>4)&0xf]<<hex[byte&0xf]<<" ";
+	}
 	std::cout<<std::endl<<"==================="<<std::endl;
 }
