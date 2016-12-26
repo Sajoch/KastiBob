@@ -1,5 +1,6 @@
 //https://gist.github.com/albertz/1551304
 //Author albertz
+//Changed
 #include <stdio.h>
 
 int main(int argc, char** argv) {
