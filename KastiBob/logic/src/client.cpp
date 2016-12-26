@@ -3,6 +3,7 @@
 #include "packets/LoginPacket.hpp"
 #include "packets/PingPacket.hpp"
 #include "packets/MovePacket.hpp"
+
 #include <sstream>
 
 using namespace std;
@@ -118,7 +119,7 @@ void Client::recv(){
 						}break;
 					}
 				}while(incoming_packet.getSize()>=1);
-				
+
 				if(state != ClientState::NONE){
 					continue;
 				}
@@ -142,6 +143,7 @@ void Client::recv(){
 					closeConnection();
 				}
 				packetType = incoming_packet.getUint8();
+				cout<<packetType<<endl;
 				switch(packetType){
 					case 0x0A:
 						parseSelfAppear(incoming_packet);
@@ -164,9 +166,10 @@ void Client::recv(){
 						return parseDeath(incoming_packet);
 					case 0x32:
 						return parseCanReportBugs(incoming_packet);
+					*/
 					case 0x64:
 						return parseMapDescription(incoming_packet);
-					case 0x65:
+					/*case 0x65:
 						return parseMoveNorth(incoming_packet);
 					case 0x66:
 						return parseMoveEast(incoming_packet);
@@ -348,17 +351,17 @@ void Client::parseSelfAppear(NetworkPacket& p){
 	canReportBugs = p.getUint8()==1?true:false;
 }
 void Client::parseGMActions(NetworkPacket& p){
-	
+
 }
 void Client::parseErrorMessage(NetworkPacket& p){
 	string error = p.getTString();
 	cout<<"Error: "<<error<<endl;
 }
 void Client::parseFYIMessage(NetworkPacket& p){
-	
+
 }
 void Client::parseWaitingList(NetworkPacket& p){
-	
+
 }
 void Client::parsePing(NetworkPacket& p){
 	conn->addPacket(PingPacket(xtea));
@@ -370,13 +373,14 @@ void Client::parseInit(NetworkPacket& p){
 			verify_data[i] = p.getUint8();
 		}
 		cout<<"login to game server"<<endl;
+		gMap = Ground(mapViewX, mapViewY);
 		xtea.generateKeys();
 		xtea_crypted = true;
 		conn->addPacket(
-			LoginPacket(login, password, 
-				version, os, 
-				dat_signature, spr_signature, pic_signature, 
-				verify_data, currenct_character.getName(), 
+			LoginPacket(login, password,
+				version, os,
+				dat_signature, spr_signature, pic_signature,
+				verify_data, currenct_character.getName(),
 				rsa, xtea)
 			);
 	}
@@ -385,28 +389,35 @@ void Client::parseInit(NetworkPacket& p){
 	}
 }
 void Client::parseDeath(NetworkPacket& p){
-	
+
 }
 void Client::parseCanReportBugs(NetworkPacket& p){
-	
+
 }
 void Client::parseMapDescription(NetworkPacket& p){
-	
+	if(p.getSize() < 5) {
+		state = ClientState::NONE;
+		return;
+	}
+	x = p.getUint16();
+	y = p.getUint16();
+	z = p.getUint8();
+	cout<<"hero ("<<x<<","<<y<<","<<z<<")"<<endl;
 }
 void Client::parseMoveNorth(NetworkPacket& p){
-	
+
 }
 void Client::parseMoveEast(NetworkPacket& p){
-	
+
 }
 void Client::parseMoveSouth(NetworkPacket& p){
-	
+
 }
 void Client::parseMoveWest(NetworkPacket& p){
-	
+
 }
 void Client::parseUpdateTile(NetworkPacket& p){
-	
+
 }
 void Client::parseTileAddThing(NetworkPacket& p){
 	cout<<"add thing"<<endl;
@@ -415,13 +426,22 @@ void Client::parseTileTransformThing(NetworkPacket& p){
 	move(ClientDirectory::WEST);
 }
 void Client::parseTileRemoveThing(NetworkPacket& p){
+	if(p.getSize()<6) {
+		state = ClientState::NONE;
+		return;
+	}
 	uint16_t x = p.getUint16();
 	uint16_t y = p.getUint16();
 	uint16_t z = p.getUint8();
 	uint16_t stackPos = p.getUint8();
+	gMap.removeCreature(x, y, z, stackPos);
 	cout<<"remove from "<<x<<","<<y<<","<<z<<" ("<<stackPos<<")"<<endl;
 }
 void Client::parseCreatureMove(NetworkPacket& p){
+	if(p.getSize()<11) {
+		state = ClientState::NONE;
+		return;
+	}
 	uint16_t old_x = p.getUint16();
 	uint16_t old_y = p.getUint16();
 	uint16_t old_z = p.getUint8();
@@ -429,58 +449,68 @@ void Client::parseCreatureMove(NetworkPacket& p){
 	uint16_t new_x = p.getUint16();
 	uint16_t new_y = p.getUint16();
 	uint16_t new_z = p.getUint8();
+	gMap.moveCreature(old_x, old_y, old_z, old_stackPos, new_x, new_y, new_z);
 	cout<<"move from "<<old_x<<","<<old_y<<","<<old_z<<" ("<<old_stackPos<<")"
 		<<" to "<<new_x<<","<<new_y<<","<<new_z<<endl;
-	
+
 }
 void Client::parseOpenContainer(NetworkPacket& p){
-	
+
 }
 void Client::parseCloseContainer(NetworkPacket& p){
-	
+
 }
 void Client::parseContainerAddItem(NetworkPacket& p){
-	
+
 }
 void Client::parseContainerUpdateItem(NetworkPacket& p){
-	
+
 }
 void Client::parseContainerRemoveItem(NetworkPacket& p){
-	
+
 }
 void Client::parseInventorySetSlot(NetworkPacket& p){
-	
+
 }
 void Client::parseInventoryResetSlot(NetworkPacket& p){
-	
+
 }
 void Client::parseSafeTradeRequestAck(NetworkPacket& p){
-	
+
 }
 void Client::parseSafeTradeRequestNoAck(NetworkPacket& p){
-	
+
 }
 void Client::parseSafeTradeClose(NetworkPacket& p){
-	
+
 }
 void Client::parseWorldLight(NetworkPacket& p){
+	if(p.getSize()>=2){
+		state = ClientState::NONE;
+		return;
+	}
 	uint16_t level = p.getUint8();
 	uint16_t color = p.getUint8();
+	gMap.parseLight(level, color);
 	cout<<"world color "<<color<<" and level "<<level<<endl;
 }
 void Client::parseMagicEffect(NetworkPacket& p){
 	move(ClientDirectory::NORTH);
 }
 void Client::parseAnimatedText(NetworkPacket& p){
-	
+
 }
 void Client::parseDistanceShot(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureSquare(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureHealth(NetworkPacket& p){
+	if(p.getSize()<5){
+		state = ClientState::NONE;
+		return;
+	}
 	uint32_t id = p.getUint32();
 	uint16_t percent = p.getUint8();
 	cout<<"npc "<<id<<" have "<<percent<<"% hp"<<endl;
@@ -489,39 +519,43 @@ void Client::parseCreatureLight(NetworkPacket& p){
 	move(ClientDirectory::WEST);
 }
 void Client::parseCreatureOutfit(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureSpeed(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureSkulls(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureShields(NetworkPacket& p){
-	
+
 }
 void Client::parseCreaturePassable(NetworkPacket& p){
-	
+
 }
 void Client::parseItemTextWindow(NetworkPacket& p){
-	
+
 }
 void Client::parseHouseTextWindow(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerStats(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerSkills(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerIcons(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerCancelAttack(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatureSpeak(NetworkPacket& p){
+	if(p.getSize()<7){
+		state = ClientState::NONE;
+		return;
+	}
 	uint32_t unkSpeak = p.getUint32();
 	string name = p.getTString();
 	uint16_t level = p.getUint16();
@@ -530,76 +564,76 @@ void Client::parseCreatureSpeak(NetworkPacket& p){
 	move(ClientDirectory::SOUTH);
 }
 void Client::parseChannelList(NetworkPacket& p){
-	
+
 }
 void Client::parseOpenChannel(NetworkPacket& p){
-	
+
 }
 void Client::parseOpenPrivatePlayerChat(NetworkPacket& p){
-	
+
 }
 void Client::parseOpenRuleViolation(NetworkPacket& p){
-	
+
 }
 void Client::parseRuleViolationAF(NetworkPacket& p){
-	
+
 }
 void Client::parseRuleViolationB0(NetworkPacket& p){
-	
+
 }
 void Client::parseRuleViolationB1(NetworkPacket& p){
-	
+
 }
 void Client::parseCreatePrivateChannel(NetworkPacket& p){
-	
+
 }
 void Client::parseClosePrivateChannel(NetworkPacket& p){
-	
+
 }
 void Client::parseTextMessage(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerCancelWalk(NetworkPacket& p){
-	
+
 }
 void Client::parseFloorChangeUp(NetworkPacket& p){
-	
+
 }
 void Client::parseFloorChangeDown(NetworkPacket& p){
-	
+
 }
 void Client::parseOutfitWindow(NetworkPacket& p){
-	
+
 }
 void Client::parseVipState(NetworkPacket& p){
-	
+
 }
 void Client::parseVipLogin(NetworkPacket& p){
-	
+
 }
 void Client::parseVipLogout(NetworkPacket& p){
-	
+
 }
 void Client::parseQuestList(NetworkPacket& p){
-	
+
 }
 void Client::parseQuestPartList(NetworkPacket& p){
-	
+
 }
 void Client::parseOpenShopWindow(NetworkPacket& p){
-	
+
 }
 void Client::parsePlayerCash(NetworkPacket& p){
-	
+
 }
 void Client::parseCloseShopWindow(NetworkPacket& p){
-	
+
 }
 void Client::parseShowTutorial(NetworkPacket& p){
-	
+
 }
 void Client::parseAddMapMarker(NetworkPacket& p){
-	
+
 }
 
 void Client::move(ClientDirectory dir){

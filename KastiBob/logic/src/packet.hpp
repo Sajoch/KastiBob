@@ -21,16 +21,16 @@ public:
 	uint8_t getUint8();
 	uint16_t getUint16();
 	uint32_t getUint32();
-	std::string getTString();
+	std::string getTString(); //TODO split to peak size
 
 	std::string& getData();
 	size_t getSize();
 	void resize(size_t len);
 	void xteaDecrypt(XTEAcipher& xtea);
 	void xteaEncrypt(XTEAcipher& xtea);
-	
+
 	void dump();
-	
+
 	static uint8_t peekUint8(std::string& b);
 	static uint16_t peekUint16(std::string& b);
 	static uint32_t peekUint32(std::string& b);

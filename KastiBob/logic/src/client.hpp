@@ -8,6 +8,7 @@
 #include "network.hpp"
 #include "utils.hpp"
 #include <chrono>
+#include "ground.hpp"
 
 class Character{
 	std::string nick;
@@ -31,21 +32,24 @@ class Client{
 	static uint32_t dat_signature;
 	static uint32_t spr_signature;
 	static uint32_t pic_signature;
+	static uint32_t mapViewX;
+	static uint32_t mapViewY;
 	ClientState state;
-	
+
 	Character currenct_character;
 	std::vector<Character> characters;
 	uint16_t premiumDays;
-	
+
 	uint32_t id;
 	bool canReportBugs;
 	std::chrono::seconds AntyIdle_duration;
 	std::chrono::system_clock::time_point lastAntyIdle;
+	Ground gMap;
 	uint32_t x;
 	uint32_t y;
 	uint32_t z;
 	ClientDirectory dir;
-	
+
 	uint8_t verify_data[5];
 	NetworkPacket incoming_packet;
 	uint16_t version;
@@ -58,7 +62,7 @@ class Client{
 	void closeConnection();
 	void recv();
 	void idle();
-	
+
 	void parseSelfAppear(NetworkPacket& p);
 	void parseGMActions(NetworkPacket& p);
 	void parseErrorMessage(NetworkPacket& p);
@@ -131,7 +135,7 @@ class Client{
 	void parseCloseShopWindow(NetworkPacket& p);
 	void parseShowTutorial(NetworkPacket& p);
 	void parseAddMapMarker(NetworkPacket& p);
-	
+
 public:
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p);
