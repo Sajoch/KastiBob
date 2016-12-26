@@ -20,6 +20,7 @@ bool change_memory(void* dest, void* src, size_t size){
 }
 
 int(*WS_send)(int, char*, int, int);
+int(*WS_connect)(SOCKET, sockaddr, int);
 int*(*xtea_encrypt_ret)(int*, int*);
 int*(*xtea_decrypt_ret)(int*, int*);
 
@@ -44,6 +45,10 @@ void showHex(char* buf, size_t len){
 	cout<<endl;
 }
 
+int __stdcall connectWrapper(int sock, sockaddr sa, int nl){
+	int s = WS_connct(sock, sa, nl);
+	cout<<"call "<<s<<" = connect("<<sock<<","<<"sa"<<","<<nl<<");"<<endl;
+}
 
 int __stdcall sendWrapper(int sock, char* buf, int size, int flag){
 	int ret = WS_send(sock, buf, size, flag);
@@ -74,7 +79,25 @@ int ep_main() {
 	//MessageBoxA(0, ret.c_str(), "Hello World!", MB_OK);
 	char* tibia_info = (char*)(baseAddress+0x2421C8);
 	char* rsa_n_num = (char*)(baseAddress+0x1B2610);
-	
+
+	//hook connect for ip and port
+	{
+		HMODULE ws2 = GetModuleHandle("ws2_32.dll");
+		WS_connect = (int(*)(SOCKET, sockaddr, int))GetProcAddress(ws2, "connect");
+		if(WS_connect != 0){
+			char* fromConnect = (char*)(baseAddress+0x177F3F);
+			//TODO address and asm
+			unsigned char hook[] = {0xFF, 0x15, 0x08, 0x26, 0x5B, 0x00};
+			hook[0] = 0xE8;
+			uint32_t sendWrapper_add = (uint32_t)&sendWrapper - (uint32_t)fromPingSend - 5;
+			memcpy(&hook[1], (void*)&sendWrapper_add, 4);
+			hook[5] = 0x90;
+			cout<<"wrapper "<<(void*)&sendWrapper<<endl;
+			cout<<"rva "<<(void*)sendWrapper_add<<endl;
+			change_memory(&fromConneect[0],(void*)hook,6);
+		}
+	}
+
 	//hook xtea_encrypt
 	{
 		xtea_encrypt_ret = (int*(*)(int*, int*))(baseAddress+0x14ff80);

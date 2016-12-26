@@ -9,6 +9,7 @@
 #include "utils.hpp"
 #include <chrono>
 #include "ground.hpp"
+#include "outfit.hpp"
 
 class Character{
 	std::string nick;
@@ -49,6 +50,7 @@ class Client{
 	uint32_t x;
 	uint32_t y;
 	uint32_t z;
+	Outfit apperance;
 	ClientDirectory dir;
 
 	uint8_t verify_data[5];

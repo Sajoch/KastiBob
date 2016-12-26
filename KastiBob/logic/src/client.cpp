@@ -537,7 +537,19 @@ void Client::parseCreatureLight(NetworkPacket& p){
 	move(ClientDirectory::WEST);
 }
 void Client::parseCreatureOutfit(NetworkPacket& p){
-
+	if(p.getSize()<4){
+		state = ClientState::NONE;
+		return;
+	}
+	uint32_t id = p.getUint32();
+	//HACK
+	(void)id;
+	//Outfit& tmpOut = gMap.getCreatureByID(id).getOutfit();
+	Outfit tmpOut;
+	if(!tmpOut.fromMsg(p)){
+		state = ClientState::NONE;
+		return;
+	}
 }
 void Client::parseCreatureSpeed(NetworkPacket& p){
 
