@@ -2,7 +2,7 @@ obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -ggdb -lgmp -lpocoNet -lpocoFoundation
+CPPFLAG= --std=c++11 -ggdb -lgmp -lPocoNet -lPocoFoundation
 
 all: obj $(PROGRAM)
 obj:
