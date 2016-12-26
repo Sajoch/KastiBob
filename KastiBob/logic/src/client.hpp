@@ -25,7 +25,7 @@ public:
 	std::string getName();
 };
 
-class Client{
+class Client: public Creature{
 	XTEAcipher xtea;
 	RSAcipher rsa;
 	static const char* rsa_e_n;
@@ -42,16 +42,10 @@ class Client{
 	uint16_t premiumDays;
 
 	uint16_t drawSpeed;
-	uint32_t id;
 	bool canReportBugs;
 	std::chrono::seconds AntyIdle_duration;
 	std::chrono::system_clock::time_point lastAntyIdle;
 	Ground gMap;
-	uint32_t x;
-	uint32_t y;
-	uint32_t z;
-	Outfit apperance;
-	ClientDirectory dir;
 
 	uint8_t verify_data[5];
 	NetworkPacket incoming_packet;
