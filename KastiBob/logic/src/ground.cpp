@@ -24,6 +24,12 @@ bool Ground::parseMap(){
   return false;
 }
 
+bool Ground::parseLight(uint16_t lvl, uint16_t color){
+  lightLevel = lvl;
+  lightColor = color;
+  return true;
+}
+
 int Ground::getMap(std::vector<Square> sqs, int32_t x, int32_t y, int32_t z){
   int32_t px, py, mx, my;
   px = x - rangeX;

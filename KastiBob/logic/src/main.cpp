@@ -20,7 +20,9 @@ uint32_t Client::mapViewY = 8;
 
 int main(){
 	srand(time(0));
-	Client kastiClient("91.134.189.246:7171", 20007, 2, "dupad2", "dupad2");
+	//178.32.162.105
+	std::string addr = "91.134.189.246:7171";
+	Client kastiClient(addr, 20007, 2, "dupad2", "dupad2");
 	while(kastiClient.tick()){
 		//C++11 compability
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));

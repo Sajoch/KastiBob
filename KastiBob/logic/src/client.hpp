@@ -40,6 +40,7 @@ class Client{
 	std::vector<Character> characters;
 	uint16_t premiumDays;
 
+	uint16_t drawSpeed;
 	uint32_t id;
 	bool canReportBugs;
 	std::chrono::seconds AntyIdle_duration;

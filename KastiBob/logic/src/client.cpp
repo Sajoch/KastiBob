@@ -150,9 +150,10 @@ void Client::recv(){
 					break;
 					/*case 0x0B:
 						return parseGMActions(incoming_packet);
+					*/
 					case 0x14:
 						return parseErrorMessage(incoming_packet);
-					case 0x15:
+					/*case 0x15:
 						return parseFYIMessage(incoming_packet);
 					case 0x16:
 						return parseWaitingList(incoming_packet);*/
@@ -201,11 +202,12 @@ void Client::recv(){
 						return parseContainerUpdateItem(incoming_packet);
 					case 0x72:
 						return parseContainerRemoveItem(incoming_packet);
+					*/
 					case 0x78:
 						return parseInventorySetSlot(incoming_packet);
 					case 0x79:
 						return parseInventoryResetSlot(incoming_packet);
-					case 0x7D:
+					/*case 0x7D:
 						return parseSafeTradeRequestAck(incoming_packet);
 					case 0x7E:
 						return parseSafeTradeRequestNoAck(incoming_packet);
@@ -346,8 +348,13 @@ int Client::tick(){
 }
 
 void Client::parseSelfAppear(NetworkPacket& p){
+	if(p.getSize()<7){
+		state = ClientState::NONE;
+		return;
+	}
 	id = p.getUint32();
-	p.getUint16();
+	drawSpeed = p.getUint16();
+
 	canReportBugs = p.getUint8()==1?true:false;
 }
 void Client::parseGMActions(NetworkPacket& p){
@@ -368,25 +375,24 @@ void Client::parsePing(NetworkPacket& p){
 	cout<<"send ping"<<endl;
 }
 void Client::parseInit(NetworkPacket& p){
-	if(p.getSize()>=5){
-		for(int i=0;i<5;i++){
-			verify_data[i] = p.getUint8();
-		}
-		cout<<"login to game server"<<endl;
-		gMap = Ground(mapViewX, mapViewY);
-		xtea.generateKeys();
-		xtea_crypted = true;
-		conn->addPacket(
-			LoginPacket(login, password,
-				version, os,
-				dat_signature, spr_signature, pic_signature,
-				verify_data, currenct_character.getName(),
-				rsa, xtea)
-			);
-	}
-	else{
+	if(p.getSize()<5){
 		state = ClientState::NONE;
+		return;
 	}
+	for(int i=0;i<5;i++){
+		verify_data[i] = p.getUint8();
+	}
+	cout<<"login to game server"<<endl;
+	gMap = Ground(mapViewX, mapViewY);
+	xtea.generateKeys();
+	xtea_crypted = true;
+	conn->addPacket(
+		LoginPacket(login, password,
+			version, os,
+			dat_signature, spr_signature, pic_signature,
+			verify_data, currenct_character.getName(),
+			rsa, xtea)
+		);
 }
 void Client::parseDeath(NetworkPacket& p){
 
@@ -470,10 +476,22 @@ void Client::parseContainerRemoveItem(NetworkPacket& p){
 
 }
 void Client::parseInventorySetSlot(NetworkPacket& p){
-
+	if(p.getSize()<4){
+		state = ClientState::NONE;
+		return;
+	}
+	uint16_t slotId = p.getUint8();
+	uint16_t itemId = p.getUint16();
+	uint16_t attr = p.getUint8();
+	cout<<"new item on slot"<<slotId<<" id "<<itemId<<" attr "<<attr<<endl;
 }
 void Client::parseInventoryResetSlot(NetworkPacket& p){
-
+	if(p.getSize()<1){
+		state = ClientState::NONE;
+		return;
+	}
+	uint16_t slotId = p.getUint8();
+	cout<<"reset slot"<<slotId<<endl;
 }
 void Client::parseSafeTradeRequestAck(NetworkPacket& p){
 
@@ -552,7 +570,7 @@ void Client::parsePlayerCancelAttack(NetworkPacket& p){
 
 }
 void Client::parseCreatureSpeak(NetworkPacket& p){
-	if(p.getSize()<7){
+	if(p.getSize()<10){
 		state = ClientState::NONE;
 		return;
 	}
