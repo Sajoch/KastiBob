@@ -17,13 +17,18 @@ SOURCES += main.cpp\
     healer.cpp \
     alerts.cpp \
     cavebot.cpp \
-    trainer.cpp
+    trainer.cpp \
+    ../../running_inject/src/main.cpp \
+    ../../running_inject/src/objectfile.cpp \
+    ../../running_inject/src/remoteCode_string.cpp \
+    ../../running_inject/src/remoteCode.c
 
 HEADERS  += mainwindow.h \
     healer.h \
     alerts.h \
     cavebot.h \
-    trainer.h
+    trainer.h \
+    ../../running_inject/src/objectfile.hpp
 
 FORMS    += mainwindow.ui \
     healer.ui \
