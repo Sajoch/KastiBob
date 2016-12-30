@@ -24,11 +24,14 @@ mdll: minject
 test_dll: mdll
 	make -C KastiDll test
 logic:
-	make -C KastiBob/logic test
+	make -C app/logic test
+gui:
+	make -C app/KastiBobGui test
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean
-	make -C KastiBob/logic clean
+	make -C app/logic clean
+	make -C app/KastiBobGui clean
 
 start_kclient: kclient_v1
 	cd kclient_v1; ./Kasti.exe&
