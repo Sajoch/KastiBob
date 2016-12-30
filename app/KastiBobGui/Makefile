@@ -11,31 +11,32 @@ uis_cpp:
 	mkdir -p uis_cpp
 
 all: obj uis_cpp $(PROGRAM)
-RSC=index.html style.css main.js
+RSC=index.html style.css main.js render.js jquery-3.1.1.min.js \
+		jquery-ui.min.js
 ORSC=$(patsubst %,files/%,$(RSC))
-obj/resource.cpp: resource.qrc $(ORSC)
+obj/resource.gen.cpp: resource.qrc $(ORSC)
 	rcc resource.qrc -o $@
 
 OBJS=main charselect loginform gamewindow jsbrige \
 		 resource
-uis_cpp/%.h :
+uis_cpp/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
 
-uis_cpp/charselect.h: uis/charselect.ui
-uis_cpp/loginform.h: uis/loginform.ui
-uis_cpp/gamewindow.h: uis/gamewindow.ui
-obj/resource.o: obj/resource.cpp
-obj/charselect.o: charselect.cpp charselect.h uis_cpp/charselect.h
-obj/loginform.o: loginform.cpp loginform.h uis_cpp/loginform.h
+uis_cpp/charselect.gen.h: uis/charselect.ui
+uis_cpp/loginform.gen.h: uis/loginform.ui
+uis_cpp/gamewindow.gen.h: uis/gamewindow.ui
+obj/resource.o: obj/resource.gen.cpp
+obj/charselect.o: charselect.cpp charselect.h
+obj/loginform.o: loginform.cpp loginform.h
 obj/gamewindow.o: gamewindow.cpp gamewindow.h
 obj/jsbrige.o: jsbrige.cpp jsbrige.h
 obj/main.o: main.cpp charselect.h loginform.h gamewindow.h
 
 #headers
-gamewindow.h: uis_cpp/gamewindow.h
-charselect.h: uis_cpp/charselect.h
-loginform.h: uis_cpp/loginform.h
+gamewindow.h: uis_cpp/gamewindow.gen.h
+charselect.h: uis_cpp/charselect.gen.h
+loginform.h: uis_cpp/loginform.gen.h
 
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 
