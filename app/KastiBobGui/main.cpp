@@ -1,15 +1,16 @@
 #include "loginform.h"
-#include "charselect.h"
-#include "gamewindow.h"
 #include <QtWidgets/QApplication>
+#include <QtCore/QLibrary>
+#include <QtCore/QTimer>
+#include "src/client.hpp"
+
+Client* tclient;
+QTimer *logic_loop;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //LoginForm w;
-    //CharSelect w;
-    GameWindow w;
-    w.show();
-
+    LoginForm* tmp = new LoginForm();
+    tmp->show();
     return a.exec();
 }

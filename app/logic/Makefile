@@ -2,8 +2,9 @@ obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -ggdb -lgmp -lPocoNet -lPocoFoundation
+CPPFLAG= --std=c++11 -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL
 
+dll: obj $(PROGRAM).dll
 all: obj $(PROGRAM)
 obj:
 	mkdir -p obj
@@ -29,7 +30,12 @@ obj/main.o: src/main.cpp src/client.hpp
 $(PROGRAM): $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -o $@ $(CPPFLAG)
-
+$(PROGRAM).dll: $(OBJECTS)
+	@echo "============ Compile" $@ "=============="
+	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
+$(PROGRAM).so: $(OBJECTS)
+	@echo "============ Compile" $@ "=============="
+	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
 debug: all
 	gdb $(PROGRAM)
 
@@ -38,4 +44,4 @@ test: all
 
 clean:
 	@(rm obj/* || true)
-	@(rm $(PROGRAM) || true)
+	@(rm $(PROGRAM) $(PROGRAM).so $(PROGRAM).dll || true)

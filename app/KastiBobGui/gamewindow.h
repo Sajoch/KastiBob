@@ -2,22 +2,20 @@
 #define _GAMEWINDOW_H
 #include "uis_cpp/gamewindow.gen.h"
 #include <QtWidgets/QMainWindow>
-#include "jsbrige.h"
 
 
-class GameWindow : public QMainWindow
-
-{
-
-  void attachObject();
-
+class GameWindow : public QMainWindow{
 public:
     explicit GameWindow(QWidget *parent = 0);
     ~GameWindow();
 
+    void logout();
+    void charSelect();
+
 private:
     Ui_GameWindow* ui;
-    JSBrige* brige;
+    class JSBridge* bridge;
+    void attachObject();
 };
 
 #endif // _GAMEWINDOW_H

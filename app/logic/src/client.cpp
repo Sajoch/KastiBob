@@ -60,6 +60,24 @@ void Client::closeConnection(){
 	delete conn;
 	conn = 0;
 }
+void Client::loginListener(std::function<void(int)> cb){
+	changeStateFunc = cb;
+	//changeStateFunc(1);
+}
+void Client::listChars(std::function<void(std::string, size_t)> cb){
+	size_t s = characters.size();
+	for(size_t i=0;i<s;i++){
+		cb(characters[i].getName(), i);
+	}
+}
+bool Client::setChar(size_t id){
+	if(id<characters.size()){
+		current_character = characters[id];
+		state = ClientState::ENTER_GAME;
+		return true;
+	}
+	return false;
+}
 void Client::recv(){
 	if(xtea_crypted){
 		incoming_packet.xteaDecrypt(xtea);
@@ -77,6 +95,7 @@ void Client::recv(){
 			case ClientState::NONE:{
 				cout<<"none"<<endl;
 				closeConnection();
+				changeStateFunc(5);
 			}break;
 			case ClientState::LOGIN:{
 				cout<<"login"<<endl;
@@ -88,6 +107,7 @@ void Client::recv(){
 						case 0x0A:{ //Error message
 							std::string errormsg = incoming_packet.getTString();
 							cout<<"Error: "<<errormsg<<endl;
+							changeStateFunc(2);
 						}break;
 						case 0x0B:{ //For your information
 							std::string infomsg = incoming_packet.getTString();
@@ -115,7 +135,7 @@ void Client::recv(){
 								characters.push_back(Character(charName, world, ip, port));
 							}
 							premiumDays = incoming_packet.getUint16();
-							state = ClientState::ENTER_GAME;
+							state = ClientState::WAIT_TO_ENTER;
 						}break;
 					}
 				}while(incoming_packet.getSize()>=1);
@@ -124,11 +144,12 @@ void Client::recv(){
 					continue;
 				}
 			}break;
+			case ClientState::WAIT_TO_ENTER:
+				changeStateFunc(4);
+			break;
 			case ClientState::ENTER_GAME:{
-				if (!currenct_character.isValid() && characters.size()>0){
-					//TODO auto select character
-					currenct_character = characters[0];
-					newConnection(currenct_character.getAddress());
+				if (!current_character.isValid() && characters.size()>0){
+					newConnection(current_character.getAddress());
 					xtea_crypted = false;
 					state = ClientState::GAME;
 					cout<<"enter to game"<<endl;
@@ -138,7 +159,7 @@ void Client::recv(){
 				}
 			}break;
 			case ClientState::GAME:{
-				if(!currenct_character.isValid()){
+				if(!current_character.isValid()){
 					state = ClientState::NONE;
 					closeConnection();
 				}
@@ -390,7 +411,7 @@ void Client::parseInit(NetworkPacket& p){
 		LoginPacket(login, password,
 			version, os,
 			dat_signature, spr_signature, pic_signature,
-			verify_data, currenct_character.getName(),
+			verify_data, current_character.getName(),
 			rsa, xtea)
 		);
 }

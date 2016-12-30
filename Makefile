@@ -26,6 +26,7 @@ test_dll: mdll
 logic:
 	make -C app/logic test
 gui:
+	make -C app/logic dll
 	make -C app/KastiBobGui test
 clean:
 	make -C KastiDll clean

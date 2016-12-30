@@ -3,15 +3,18 @@
 
 #include "uis_cpp/loginform.gen.h"
 #include <QtWidgets/QDialog>
+#include <QtGui/QKeyEvent>
 
-class LoginForm : public QDialog
-{
-
-
+class LoginForm : public QDialog{
 public:
-    explicit LoginForm(QWidget *parent = 0);
-    ~LoginForm();
-
+  explicit LoginForm(QWidget *parent = 0);
+  ~LoginForm();
+  void login();
+  void exit();
+  void selectServer();
+  void keyPressEvent(QKeyEvent *e);
+  void changeLoginState(int a);
+signals:
 private:
   Ui_LoginForm* ui;
 };

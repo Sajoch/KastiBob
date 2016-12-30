@@ -3,15 +3,17 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
+#include <functional>
+#include "dll.h"
 #include "cipher.hpp"
 #include "packet.hpp"
 #include "network.hpp"
 #include "utils.hpp"
-#include <chrono>
 #include "ground.hpp"
 #include "outfit.hpp"
 
-class Character{
+class API Character{
 	std::string nick;
 	std::string world;
 	uint16_t oip[4];
@@ -25,7 +27,7 @@ public:
 	std::string getName();
 };
 
-class Client: public Creature{
+class API Client: public Creature{
 	XTEAcipher xtea;
 	RSAcipher rsa;
 	static const char* rsa_e_n;
@@ -37,7 +39,7 @@ class Client: public Creature{
 	static uint32_t mapViewY;
 	ClientState state;
 
-	Character currenct_character;
+	Character current_character;
 	std::vector<Character> characters;
 	uint16_t premiumDays;
 
@@ -45,6 +47,7 @@ class Client: public Creature{
 	bool canReportBugs;
 	std::chrono::seconds AntyIdle_duration;
 	std::chrono::system_clock::time_point lastAntyIdle;
+	std::function<void(int)> changeStateFunc;
 	Ground gMap;
 
 	uint8_t verify_data[5];
@@ -137,5 +140,8 @@ public:
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p);
 	int tick();
+	void loginListener(std::function<void(int)> cb);
+	void listChars(std::function<void(std::string, size_t)> cb);
+	bool setChar(size_t id);
 };
 #endif

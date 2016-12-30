@@ -4,8 +4,7 @@ var Render = new (function(){
   var index;
   var ctx = null;
   function render(){
-    index = 0;
-    for(;index<list.length;index++)
+    for(index = 0;index<list.length;index++)
       list[index](ctx);
     if(running)
       requestAnimationFrame(render);

@@ -8,7 +8,7 @@ void Error(std::string text, std::string file, int line);
 #define DEBUG(text) Error(text, __FILE__, __LINE__);
 
 enum class ClientState {
-	NONE, LOGIN, ENTER_GAME, GAME,
+	NONE, LOGIN, WAIT_TO_ENTER, ENTER_GAME, GAME,
 };
 enum class ClientDirectory {
 	STOP,

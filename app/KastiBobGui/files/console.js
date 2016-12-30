@@ -29,8 +29,8 @@ var Console = new(function(){
     log(arguments);
   };
 
-  this.error = function(){
-    log(arguments);
+  this.error = function(e){
+    log([e.message+": "+e.stack]);
     show();
   };
 

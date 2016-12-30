@@ -69,7 +69,7 @@
        <widget class="QWebView" name="webView">
         <property name="url">
          <url>
-          <string>about:blank</string>
+          <string>qrc:/index.html</string>
          </url>
         </property>
        </widget>

@@ -35,10 +35,13 @@ function onload(){
   }
   function start(){
     try{
-      Render.start();
+      //Render.start();
       $loading.remove();
+      Keys.getNextKey(function(kcode, mod, key){
+        Keys.registerHotkey(kcode, function(){alert("Key: "+mod+key)}, mod);
+      });
     }catch(e){
-      Console.error(e.stack);
+      Console.error(e);
     }
   }
   var $head_el = log("Loading files...");
