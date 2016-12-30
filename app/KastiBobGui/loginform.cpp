@@ -20,13 +20,13 @@ LoginForm::LoginForm(QWidget *parent) :
   connect(ui->pushButton, &QPushButton::clicked, this, exit);
 }
 
-void LoginForm::changeLoginState(int a){
+void LoginForm::changeLoginState(int a, std::string msg){
   switch(a){
     case 1:
       ui->label->setText(QApplication::translate("LoginForm", "logging", 0));
     break;
     case 2:
-      ui->label->setText(QApplication::translate("LoginForm", "wrong password", 0));
+      ui->label->setText(msg.c_str());
     break;
     case 3:
       ui->label->setText(QApplication::translate("LoginForm", "connection problem", 0));
@@ -50,15 +50,16 @@ void LoginForm::login(){
   QString p = ui->lineEdit->text();
   std::string ls = l.toUtf8().constData();
   std::string ps = p.toUtf8().constData();
-  changeLoginState(1);
+  changeLoginState(1, "");
   logic_loop = new QTimer();
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
   tclient = new Client(sa, 20007, 2, ls, ps);
-  tclient->loginListener([&](int a){
-    changeLoginState(a);
+  tclient->loginListener([&](int a, std::string msg){
+    changeLoginState(a, msg);
   });
   connect(logic_loop, &QTimer::timeout, [&](){
-      if(!tclient->tick()){
+      if(tclient->tick()==0){
+        logic_loop->stop();
         delete logic_loop;
       }
   });

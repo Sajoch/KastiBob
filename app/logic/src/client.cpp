@@ -60,7 +60,7 @@ void Client::closeConnection(){
 	delete conn;
 	conn = 0;
 }
-void Client::loginListener(std::function<void(int)> cb){
+void Client::loginListener(std::function<void(int, std::string)> cb){
 	changeStateFunc = cb;
 	//changeStateFunc(1);
 }
@@ -93,12 +93,10 @@ void Client::recv(){
 	while(true){
 		switch(state){
 			case ClientState::NONE:{
-				cout<<"none"<<endl;
 				closeConnection();
-				changeStateFunc(5);
+				changeStateFunc(3, "");
 			}break;
 			case ClientState::LOGIN:{
-				cout<<"login"<<endl;
 				state = ClientState::NONE;
 				closeConnection();
 				do{
@@ -106,8 +104,8 @@ void Client::recv(){
 					switch(packetType){
 						case 0x0A:{ //Error message
 							std::string errormsg = incoming_packet.getTString();
-							cout<<"Error: "<<errormsg<<endl;
-							changeStateFunc(2);
+							changeStateFunc(2, errormsg);
+							state = ClientState::NONE;
 						}break;
 						case 0x0B:{ //For your information
 							std::string infomsg = incoming_packet.getTString();
@@ -120,10 +118,12 @@ void Client::recv(){
 						case 0x1E: //Patching exe/dat/spr messages
 						case 0x1F:
 						case 0x20:
-							cout<<"need to patch"<<endl;
+							changeStateFunc(2, "need to patch");
+							state = ClientState::NONE;
 						break;
 						case 0x28: //Select other login server
-							cout<<"Select other login server"<<endl;
+							changeStateFunc(2, "Select other login server");
+							state = ClientState::NONE;
 						break;
 						case 0x64:{ //character list
 							uint16_t nchars = incoming_packet.getUint8();
@@ -139,13 +139,12 @@ void Client::recv(){
 						}break;
 					}
 				}while(incoming_packet.getSize()>=1);
-
 				if(state != ClientState::NONE){
 					continue;
 				}
 			}break;
 			case ClientState::WAIT_TO_ENTER:
-				changeStateFunc(4);
+				changeStateFunc(4, "");
 			break;
 			case ClientState::ENTER_GAME:{
 				if (!current_character.isValid() && characters.size()>0){
@@ -355,7 +354,7 @@ int Client::tick(){
 	}
 	int st = conn->tick();
 	if(st == 1){
-		cout<<"socket error"<<endl;
+		changeStateFunc(5, "");
 		return 0;
 	}
 	else if(st == 2){

@@ -17,8 +17,8 @@ GameWindow::GameWindow(QWidget *parent) :
     QWebPage* page = ui->webView->page();
     QWebFrame* frame = page->mainFrame();
     page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    attachObject();
-    //connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this, &GameWindow::attachObject);
+    frame->addToJavaScriptWindowObject("JSBridge", bridge);
+    connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this, &GameWindow::attachObject);
 }
 void GameWindow::attachObject(){
   QWebPage* page = ui->webView->page();

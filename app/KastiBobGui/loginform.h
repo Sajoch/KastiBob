@@ -13,7 +13,7 @@ public:
   void exit();
   void selectServer();
   void keyPressEvent(QKeyEvent *e);
-  void changeLoginState(int a);
+  void changeLoginState(int a, std::string msg);
 signals:
 private:
   Ui_LoginForm* ui;

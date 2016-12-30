@@ -47,9 +47,6 @@ gamewindow.h: uis_cpp/gamewindow.gen.h
 charselect.h: uis_cpp/charselect.gen.h
 loginform.h: uis_cpp/loginform.gen.h
 moc_h/jsbridge.gen.h: jsbridge.h
-moc_h/gamewindow.gen.h: gamewindow.h
-moc_h/loginform.gen.h: loginform.h
-moc_h/charselect.gen.h: charselect.h
 
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 
