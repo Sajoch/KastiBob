@@ -17,7 +17,8 @@ moc_h:
 
 all: obj uis_cpp moc_h $(PROGRAM)
 RSC=index.html style.css main.js render.js jquery-3.1.1.min.js \
-		jquery-ui.min.js communication.js console.js img.js keys.js
+		jquery-ui.min.js communication.js console.js img.js keys.js \
+		ui.js
 ORSC=$(patsubst %,files/%,$(RSC))
 obj/resource.gen.cpp: resource.qrc $(ORSC)
 	rcc resource.qrc -o $@

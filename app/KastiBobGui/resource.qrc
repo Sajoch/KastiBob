@@ -10,5 +10,6 @@
   <file alias="img.js">files/img.js</file>
   <file alias="console.js">files/console.js</file>
   <file alias="keys.js">files/keys.js</file>
+  <file alias="ui.js">files/ui.js</file>
 </qresource>
 </RCC>

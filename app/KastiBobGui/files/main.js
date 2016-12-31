@@ -1,5 +1,13 @@
-window.addEventListener("load", onload);
 window.addEventListener("resize", onresize);
+var loadWindow = false;
+window.addEventListener("load", function(){loadWindow=true;});
+function start(){
+  if(loadWindow){
+    onload();
+  }else{
+    window.addEventListener("load", onload);
+  }
+}
 
 function reload(){
   window.location.reload();
@@ -7,7 +15,7 @@ function reload(){
 
 function onload(){
   onresize();
-  var need_files = ["render.js", "communication.js", "img.js", "console.js", "keys.js"];
+  var need_files = ["render.js", "communication.js", "img.js", "console.js", "keys.js", "ui.js"];
   var $loading = $("<div>").addClass("loading").appendTo("body");
   var $log = $("<div>").appendTo($loading);
   var loading_files = 0;
@@ -33,14 +41,16 @@ function onload(){
       start();
     }
   }
+
   function start(){
     try{
       //Render.start();
       $loading.remove();
-      Keys.registerHotkey(87, Communication.moveUp, "normal");
-      Keys.registerHotkey(65, Communication.moveLeft, "normal");
-      Keys.registerHotkey(68, Communication.moveRight, "normal");
-      Keys.registerHotkey(83, Communication.moveDown, "normal");
+      Keys.registerHotkey(87, ui.moveUp, "normal");
+      Keys.registerHotkey(65, ui.moveLeft, "normal");
+      Keys.registerHotkey(68, ui.moveRight, "normal");
+      Keys.registerHotkey(83, ui.moveDown, "normal");
+      setInterval(ui.loop, 1);
       /*Keys.getNextKey(function(kcode, mod, key){
         console.log(kcode, mod, key);
         Keys.registerHotkey(kcode, function(){alert("Key: "+mod+key)}, mod);

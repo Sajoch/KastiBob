@@ -22,6 +22,7 @@ void GameWindow::load(){
   QWebPage* page = ui->webView->page();
   QWebFrame* frame = page->mainFrame();
   frame->addToJavaScriptWindowObject("JSBridge", bridge);
+  frame->evaluateJavaScript("start();");
 }
 
 void GameWindow::logout(){

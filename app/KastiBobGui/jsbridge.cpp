@@ -34,10 +34,10 @@ void JSBridge::move(int dir){
       tclient->move(ClientDirectory::SOUTH);
     break;
     case 3://left
-      tclient->move(ClientDirectory::EAST);
+      tclient->move(ClientDirectory::WEST);
     break;
     case 4://right
-      tclient->move(ClientDirectory::WEST);
+      tclient->move(ClientDirectory::EAST);
     break;
   }
 }
