@@ -1,12 +1,14 @@
-#include "loginform.h"
-#include "charselect.h"
 #include <functional>
 #include <QtWidgets/QApplication>
 #include <QtCore/QTimer>
+#include "loginform.h"
 #include "src/client.hpp"
 
 extern Client* tclient;
 extern QTimer *logic_loop;
+void GoToLoginForm();
+void GoToCharSelect();
+void GoToGameWindow();
 
 LoginForm::LoginForm(QWidget *parent) :
     QDialog(parent)
@@ -18,6 +20,10 @@ LoginForm::LoginForm(QWidget *parent) :
   ui->comboBox->addItem("Tibijka.net", "178.32.162.105:7171");
   connect(ui->pushButton_2, &QPushButton::clicked, this, login);
   connect(ui->pushButton, &QPushButton::clicked, this, exit);
+}
+
+void LoginForm::load(){
+  ui->retranslateUi(this);
 }
 
 void LoginForm::changeLoginState(int a, std::string msg){
@@ -33,11 +39,7 @@ void LoginForm::changeLoginState(int a, std::string msg){
     break;
     case 4:
       ui->label->setText(QApplication::translate("LoginForm", "logged", 0));
-      QTimer::singleShot(1, [&](){
-        CharSelect* tmp = new CharSelect();
-        delete this;
-        tmp->show();
-      });
+      GoToCharSelect();
     break;
     default:
       ui->label->setText(QApplication::translate("LoginForm", "unexpected error", 0));
@@ -51,8 +53,10 @@ void LoginForm::login(){
   std::string ls = l.toUtf8().constData();
   std::string ps = p.toUtf8().constData();
   changeLoginState(1, "");
-  logic_loop = new QTimer();
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
+  if(tclient!=0){
+    delete tclient;
+  }
   tclient = new Client(sa, 20007, 2, ls, ps);
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);

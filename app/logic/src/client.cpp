@@ -45,6 +45,7 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	lastAntyIdle = chrono::system_clock::now();
 	AntyIdle_duration = chrono::seconds(1);
 	conn = 0;
+	afterRecvFunc = [](){};
 	newConnection(ip);
 	state = ClientState::LOGIN;
 	xtea_crypted = true;
@@ -62,7 +63,9 @@ void Client::closeConnection(){
 }
 void Client::loginListener(std::function<void(int, std::string)> cb){
 	changeStateFunc = cb;
-	//changeStateFunc(1);
+}
+void Client::afterRecv(std::function<void(void)> cb){
+	afterRecvFunc = cb;
 }
 void Client::listChars(std::function<void(std::string, size_t)> cb){
 	size_t s = characters.size();
@@ -73,8 +76,15 @@ void Client::listChars(std::function<void(std::string, size_t)> cb){
 bool Client::setChar(size_t id){
 	if(id<characters.size()){
 		current_character = characters[id];
-		state = ClientState::ENTER_GAME;
-		return true;
+		if (current_character.isValid()){
+			newConnection(current_character.getAddress());
+			xtea_crypted = false;
+			state = ClientState::GAME;
+			return true;
+		} else {
+			state = ClientState::NONE;
+			return false;
+		}
 	}
 	return false;
 }
@@ -145,6 +155,7 @@ void Client::recv(){
 			}break;
 			case ClientState::WAIT_TO_ENTER:
 				changeStateFunc(4, "");
+				cout<<"wait"<<endl;
 			break;
 			case ClientState::ENTER_GAME:{
 				if (!current_character.isValid() && characters.size()>0){
@@ -154,6 +165,7 @@ void Client::recv(){
 					cout<<"enter to game"<<endl;
 				}
 				else {
+					cout<<"no valid"<<endl;
 					state = ClientState::NONE;
 				}
 			}break;
@@ -163,7 +175,6 @@ void Client::recv(){
 					closeConnection();
 				}
 				packetType = incoming_packet.getUint8();
-				cout<<packetType<<endl;
 				switch(packetType){
 					case 0x0A:
 						parseSelfAppear(incoming_packet);
@@ -190,7 +201,7 @@ void Client::recv(){
 					*/
 					case 0x64:
 						return parseMapDescription(incoming_packet);
-					/*case 0x65:
+					case 0x65:
 						return parseMoveNorth(incoming_packet);
 					case 0x66:
 						return parseMoveEast(incoming_packet);
@@ -198,7 +209,7 @@ void Client::recv(){
 						return parseMoveSouth(incoming_packet);
 					case 0x68:
 						return parseMoveWest(incoming_packet);
-					case 0x69:
+					/*case 0x69:
 						return parseUpdateTile(incoming_packet);*/
 					case 0x6A:
 						parseTileAddThing(incoming_packet);
@@ -294,9 +305,10 @@ void Client::recv(){
 						return parseCreatePrivateChannel(incoming_packet);
 					case 0xB3:
 						return parseClosePrivateChannel(incoming_packet);
+					*/
 					case 0xB4:
 						return parseTextMessage(incoming_packet);
-					case 0xB5:
+					/*case 0xB5:
 						return parsePlayerCancelWalk(incoming_packet);
 					case 0xBE:
 						return parseFloorChangeUp(incoming_packet);
@@ -343,7 +355,7 @@ void Client::idle(){
 	seconds elapsed = chrono::duration_cast<chrono::seconds>(now - lastAntyIdle);
 	//chrono::seconds antyafk_elapse_sec = chrono::duration_cast<chrono::seconds>  = now - lastAntyIdle;
 	if(elapsed > AntyIdle_duration){
-		move(ClientDirectory::STOP);
+		//move(ClientDirectory::STOP);
 		lastAntyIdle = now;
 	}
 }
@@ -360,6 +372,7 @@ int Client::tick(){
 	else if(st == 2){
 		if(conn->getPacket(incoming_packet)){
 			recv();
+			afterRecvFunc();
 		}
 	}else{
 		idle();
@@ -381,6 +394,10 @@ void Client::parseGMActions(NetworkPacket& p){
 
 }
 void Client::parseErrorMessage(NetworkPacket& p){
+	if(p.getSize()<2 && p.getSize()<p.peakTStringSize()){
+		state = ClientState::NONE;
+		return;
+	}
 	string error = p.getTString();
 	cout<<"Error: "<<error<<endl;
 }
@@ -392,7 +409,6 @@ void Client::parseWaitingList(NetworkPacket& p){
 }
 void Client::parsePing(NetworkPacket& p){
 	conn->addPacket(PingPacket(xtea));
-	cout<<"send ping"<<endl;
 }
 void Client::parseInit(NetworkPacket& p){
 	if(p.getSize()<5){
@@ -446,10 +462,42 @@ void Client::parseUpdateTile(NetworkPacket& p){
 
 }
 void Client::parseTileAddThing(NetworkPacket& p){
-	cout<<"add thing"<<endl;
+	if(p.getSize()<9){
+		state = ClientState::NONE;
+		return;
+	}
+	uint16_t x = p.getUint16();
+	uint16_t y = p.getUint16();
+	uint16_t z = p.getUint8();
+	uint16_t stackId = p.getUint8();
+	uint16_t itemId = p.getUint16();
+	uint16_t attr = p.getUint8();
+	(void)x;
+	(void)y;
+	(void)z;
+	(void)stackId;
+	(void)itemId;
+	(void)attr;
+	cout<<"add thing "<<itemId<<endl;
 }
 void Client::parseTileTransformThing(NetworkPacket& p){
-	move(ClientDirectory::WEST);
+	if(p.getSize()<9){
+		state = ClientState::NONE;
+		return;
+	}
+	uint16_t x = p.getUint16();
+	uint16_t y = p.getUint16();
+	uint16_t z = p.getUint8();
+	uint16_t stackId = p.getUint8();
+	uint16_t itemId = p.getUint16();
+	uint16_t attr = p.getUint8();
+	(void)x;
+	(void)y;
+	(void)z;
+	(void)stackId;
+	(void)itemId;
+	(void)attr;
+	cout<<"transform thing "<<itemId<<endl;
 }
 void Client::parseTileRemoveThing(NetworkPacket& p){
 	if(p.getSize()<6) {
@@ -533,7 +581,7 @@ void Client::parseWorldLight(NetworkPacket& p){
 	cout<<"world color "<<color<<" and level "<<level<<endl;
 }
 void Client::parseMagicEffect(NetworkPacket& p){
-	move(ClientDirectory::NORTH);
+
 }
 void Client::parseAnimatedText(NetworkPacket& p){
 
@@ -551,10 +599,20 @@ void Client::parseCreatureHealth(NetworkPacket& p){
 	}
 	uint32_t id = p.getUint32();
 	uint16_t percent = p.getUint8();
-	cout<<"npc "<<id<<" have "<<percent<<"% hp"<<endl;
+	(void)id;
+	(void)percent;
 }
 void Client::parseCreatureLight(NetworkPacket& p){
-	move(ClientDirectory::WEST);
+	if(p.getSize()<6){
+		state = ClientState::NONE;
+		return;
+	}
+	uint32_t id = p.getUint32();
+	uint16_t lvl = p.getUint8();
+	uint16_t color = p.getUint8();
+	(void)id;
+	(void)lvl;
+	(void)color;
 }
 void Client::parseCreatureOutfit(NetworkPacket& p){
 	if(p.getSize()<4){
@@ -607,11 +665,14 @@ void Client::parseCreatureSpeak(NetworkPacket& p){
 		return;
 	}
 	uint32_t unkSpeak = p.getUint32();
+	if(p.getSize()<2 && p.getSize()<(p.peakTStringSize()+2)){
+		state = ClientState::NONE;
+		return;
+	}
 	string name = p.getTString();
 	uint16_t level = p.getUint16();
 	uint16_t type = p.getUint16();
 	cout<<"speak "<<unkSpeak<<" "<<name<<" "<<level<<" "<<type<<endl;
-	move(ClientDirectory::SOUTH);
 }
 void Client::parseChannelList(NetworkPacket& p){
 
@@ -641,7 +702,17 @@ void Client::parseClosePrivateChannel(NetworkPacket& p){
 
 }
 void Client::parseTextMessage(NetworkPacket& p){
-
+	if(p.getSize()<1){
+		state = ClientState::NONE;
+		return;
+	}
+	uint16_t type = p.getUint8();
+	if(p.getSize()<2 && p.getSize()<(p.peakTStringSize()+2)){
+		state = ClientState::NONE;
+		return;
+	}
+	std::string msg = p.getTString();
+	cout<<"type: "<<type<<": "<<msg<<endl;
 }
 void Client::parsePlayerCancelWalk(NetworkPacket& p){
 

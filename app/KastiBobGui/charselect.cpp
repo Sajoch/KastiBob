@@ -1,10 +1,12 @@
+#include <QtCore/QTimer>
 #include "charselect.h"
-#include "gamewindow.h"
-#include "loginform.h"
 #include "src/client.hpp"
 
 extern Client* tclient;
 extern QTimer *logic_loop;
+void GoToLoginForm();
+void GoToCharSelect();
+void GoToGameWindow();
 
 CharSelect::CharSelect(QWidget *parent) :
     QDialog(parent){
@@ -12,6 +14,12 @@ CharSelect::CharSelect(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->pushButton, &QPushButton::clicked, this, logout);
   connect(ui->pushButton_2, &QPushButton::clicked, this, enter);
+}
+
+void CharSelect::load(){
+  while(ui->comboBox->count()>0){
+    ui->comboBox->removeItem(0);
+  }
   tclient->listChars([&](std::string name, size_t id){
     ui->comboBox->addItem(name.c_str(), id);
   });
@@ -20,18 +28,14 @@ CharSelect::CharSelect(QWidget *parent) :
 void CharSelect::enter(){
   size_t id = ui->comboBox->currentData().toULongLong();
   if(tclient->setChar(id)){
-    GameWindow* tmp = new GameWindow();
-    delete this;
-    tmp->show();
+    GoToGameWindow();
   }else{
     logout();
   }
 }
 
 void CharSelect::logout(){
-  LoginForm* tmp = new LoginForm();
-  delete this;
-  tmp->show();
+  GoToLoginForm();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {

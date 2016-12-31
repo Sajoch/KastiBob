@@ -11,6 +11,7 @@ public:
 
     void logout();
     void charSelect();
+    void load();
 
 private:
     Ui_GameWindow* ui;

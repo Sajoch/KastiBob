@@ -1,44 +1,38 @@
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWebKitWidgets/QWebPage>
 #include <QtCore/QUrl>
-#include "charselect.h"
 #include "gamewindow.h"
-#include "loginform.h"
 #include "jsbridge.h"
+
+void GoToLoginForm();
+void GoToCharSelect();
+void GoToGameWindow();
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent)
 {
     ui = new Ui_GameWindow();
     ui->setupUi(this);
-    bridge = new JSBridge(this);
-    bridge->setGW(this);
-
     QWebPage* page = ui->webView->page();
-    QWebFrame* frame = page->mainFrame();
     page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    frame->addToJavaScriptWindowObject("JSBridge", bridge);
-    connect(frame, &QWebFrame::javaScriptWindowObjectCleared, this, &GameWindow::attachObject);
 }
-void GameWindow::attachObject(){
+void GameWindow::load(){
+  bridge = new JSBridge(this);
+  bridge->setGW(this);
   QWebPage* page = ui->webView->page();
   QWebFrame* frame = page->mainFrame();
   frame->addToJavaScriptWindowObject("JSBridge", bridge);
 }
 
 void GameWindow::logout(){
-  LoginForm* tmp = new LoginForm();
-  delete this;
-  tmp->show();
+  GoToLoginForm();
 }
 
 void GameWindow::charSelect(){
-  CharSelect* tmp = new CharSelect();
-  delete this;
-  tmp->show();
+  GoToCharSelect();
 }
 
 GameWindow::~GameWindow(){
-    delete bridge;
-    delete ui;
+  delete bridge;
+  delete ui;
 }

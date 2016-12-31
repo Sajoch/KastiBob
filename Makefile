@@ -28,6 +28,9 @@ logic:
 gui:
 	make -C app/logic dll
 	make -C app/KastiBobGui test
+dgui:
+	make -C app/logic dll
+	make -C app/KastiBobGui debug
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean

@@ -9,6 +9,7 @@ class LoginForm : public QDialog{
 public:
   explicit LoginForm(QWidget *parent = 0);
   ~LoginForm();
+  void load();
   void login();
   void exit();
   void selectServer();

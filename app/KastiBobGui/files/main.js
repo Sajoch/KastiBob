@@ -37,9 +37,14 @@ function onload(){
     try{
       //Render.start();
       $loading.remove();
-      Keys.getNextKey(function(kcode, mod, key){
+      Keys.registerHotkey(87, Communication.moveUp, "normal");
+      Keys.registerHotkey(65, Communication.moveLeft, "normal");
+      Keys.registerHotkey(68, Communication.moveRight, "normal");
+      Keys.registerHotkey(83, Communication.moveDown, "normal");
+      /*Keys.getNextKey(function(kcode, mod, key){
+        console.log(kcode, mod, key);
         Keys.registerHotkey(kcode, function(){alert("Key: "+mod+key)}, mod);
-      });
+      });*/
     }catch(e){
       Console.error(e);
     }

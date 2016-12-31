@@ -22,7 +22,7 @@ public:
 	uint16_t getUint16();
 	uint32_t getUint32();
 	std::string getTString(); //TODO split to peak size
-
+	size_t peakTStringSize();
 	std::string& getData();
 	size_t getSize();
 	void resize(size_t len);

@@ -11,6 +11,7 @@ public:
     ~CharSelect();
     void enter();
     void logout();
+    void load();
     void keyPressEvent(QKeyEvent *e);
 private:
   Ui_CharSelect* ui;

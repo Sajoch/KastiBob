@@ -48,6 +48,7 @@ class API Client: public Creature{
 	std::chrono::seconds AntyIdle_duration;
 	std::chrono::system_clock::time_point lastAntyIdle;
 	std::function<void(int, std::string)> changeStateFunc;
+	std::function<void(void)> afterRecvFunc;
 	Ground gMap;
 
 	uint8_t verify_data[5];
@@ -142,6 +143,7 @@ public:
 	int tick();
 	void loginListener(std::function<void(int, std::string)> cb);
 	void listChars(std::function<void(std::string, size_t)> cb);
+	void afterRecv(std::function<void(void)> cb);
 	bool setChar(size_t id);
 };
 #endif
