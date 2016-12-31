@@ -24,7 +24,7 @@ obj/resource.gen.cpp: resource.qrc $(ORSC)
 	rcc resource.qrc -o $@
 
 OBJS=main charselect loginform gamewindow jsbridge \
-		 resource
+		 resource file spriteLoader
 uis_cpp/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
@@ -42,6 +42,8 @@ obj/loginform.o: loginform.cpp loginform.h uis_cpp/loginform.gen.h \
 obj/gamewindow.o: gamewindow.cpp uis_cpp/gamewindow.gen.h gamewindow.h
 obj/jsbridge.o: jsbridge.cpp moc_h/jsbridge.gen.h gamewindow.h
 obj/main.o: main.cpp loginform.h
+obj/file.o: file.cpp file.hpp
+obj/spriteLoader.o: spriteLoader.cpp spriteLoader.hpp file.hpp
 
 #headers
 gamewindow.h: uis_cpp/gamewindow.gen.h
