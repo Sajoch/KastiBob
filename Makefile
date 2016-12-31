@@ -25,6 +25,8 @@ test_dll: mdll
 	make -C KastiDll test
 logic:
 	make -C app/logic test
+sprunpack:
+	make -C app/sprunpack test
 gui:
 	make -C app/logic dll
 	make -C app/KastiBobGui test
