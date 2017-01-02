@@ -18,7 +18,7 @@ GameWindow::GameWindow(QWidget *parent) :
 }
 void GameWindow::load(){
   bridge = new JSBridge(this);
-  bridge->setGW(this);
+  bridge->setGW(this, ui->webView);
   QWebPage* page = ui->webView->page();
   QWebFrame* frame = page->mainFrame();
   frame->addToJavaScriptWindowObject("JSBridge", bridge);
@@ -31,6 +31,10 @@ void GameWindow::logout(){
 
 void GameWindow::charSelect(){
   GoToCharSelect();
+}
+
+bool GameWindow::close(){
+  return true;
 }
 
 GameWindow::~GameWindow(){

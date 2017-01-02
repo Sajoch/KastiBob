@@ -24,6 +24,7 @@ friend class Client;
   Outfit apperance;
   ClientDirectory directory;
 public:
+  Creature();
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();

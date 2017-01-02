@@ -140,6 +140,7 @@ class API Client: public Creature{
 public:
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p);
+	~Client();
 	int tick();
 	void loginListener(std::function<void(int, std::string)> cb);
 	void listChars(std::function<void(std::string, size_t)> cb);

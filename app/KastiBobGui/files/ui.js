@@ -43,6 +43,12 @@ var ui = new(function(){
     }
     return null;
   }
+  this.setHeroPos = function(pos){
+    var con = $("#heroPos");
+    con.find(".posX").text(pos.x);
+    con.find(".posY").text(pos.y);
+    con.find(".posZ").text(pos.z);
+  }
   this.loop = function(){
     if(walkCooldown==0){
       var dir = null;

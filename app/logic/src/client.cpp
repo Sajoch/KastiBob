@@ -25,7 +25,6 @@ nick(_nick), world(_world), port(_port), valid(true)
 	oip[2]=(_ip>>16)&0xff;
 	oip[3]=(_ip>>24)&0xff;
 }
-
 bool Character::isValid(){
 	return valid;
 }
@@ -37,6 +36,7 @@ string Character::getAddress(){
 std::string Character::getName(){
 	return nick;
 }
+
 Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	rsa(rsa_m_n, rsa_e_n),
 	version(_version), os(_os),
@@ -50,6 +50,9 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	state = ClientState::LOGIN;
 	xtea_crypted = true;
 	conn->addPacket(LoginPacket(login, password, version, os, dat_signature, spr_signature, pic_signature, rsa, xtea));
+}
+Client::~Client(){
+	closeConnection();
 }
 void Client::newConnection(std::string ip){
 	if(conn != 0){
@@ -74,7 +77,13 @@ void Client::listChars(std::function<void(std::string, size_t)> cb){
 	}
 }
 bool Client::setChar(size_t id){
-	if(id<characters.size()){
+	if(id == -1){
+		if(state == ClientState::GAME){
+			closeConnection();
+		}
+		current_character = Character();
+		state = ClientState::WAIT_TO_ENTER;
+	}else if(id<characters.size()){
 		current_character = characters[id];
 		if (current_character.isValid()){
 			newConnection(current_character.getAddress());
@@ -175,19 +184,25 @@ void Client::recv(){
 					closeConnection();
 				}
 				packetType = incoming_packet.getUint8();
+				cout<<"packet "<<packetType<<endl;
 				switch(packetType){
 					case 0x0A:
 						parseSelfAppear(incoming_packet);
 					break;
 					/*case 0x0B:
-						return parseGMActions(incoming_packet);
+						parseGMActions(incoming_packet);
+					break;
 					*/
 					case 0x14:
-						return parseErrorMessage(incoming_packet);
+						parseErrorMessage(incoming_packet);
+					break;
 					/*case 0x15:
-						return parseFYIMessage(incoming_packet);
+						parseFYIMessage(incoming_packet);
+					break;
 					case 0x16:
-						return parseWaitingList(incoming_packet);*/
+						parseWaitingList(incoming_packet);
+					break;
+					*/
 					case 0x1E:
 						parsePing(incoming_packet);
 					break;
@@ -195,55 +210,74 @@ void Client::recv(){
 						parseInit(incoming_packet);
 					break;
 					/*case 0x28:
-						return parseDeath(incoming_packet);
+						parseDeath(incoming_packet);
+					break;
 					case 0x32:
-						return parseCanReportBugs(incoming_packet);
+						parseCanReportBugs(incoming_packet);
+					break;
 					*/
 					case 0x64:
-						return parseMapDescription(incoming_packet);
+						parseMapDescription(incoming_packet);
+					break;
 					case 0x65:
-						return parseMoveNorth(incoming_packet);
+						parseMoveNorth(incoming_packet);
+					break;
 					case 0x66:
-						return parseMoveEast(incoming_packet);
+						parseMoveEast(incoming_packet);
+					break;
 					case 0x67:
-						return parseMoveSouth(incoming_packet);
+						parseMoveSouth(incoming_packet);
+					break;
 					case 0x68:
-						return parseMoveWest(incoming_packet);
+						parseMoveWest(incoming_packet);
+					break;
 					/*case 0x69:
-						return parseUpdateTile(incoming_packet);*/
+						parseUpdateTile(incoming_packet);
+					break;*/
 					case 0x6A:
 						parseTileAddThing(incoming_packet);
 					break;
-					case 0x6B:
+					/*case 0x6B:
 						parseTileTransformThing(incoming_packet);
 					break;
 					case 0x6C:
 						parseTileRemoveThing(incoming_packet);
-					break;
+					break;*/
 					case 0x6D:
 						parseCreatureMove(incoming_packet);
 					break;
 					/*case 0x6E:
-						return parseOpenContainer(incoming_packet);
+						parseOpenContainer(incoming_packet);
+					break;
 					case 0x6F:
-						return parseCloseContainer(incoming_packet);
+						parseCloseContainer(incoming_packet);
+					break;
 					case 0x70:
-						return parseContainerAddItem(incoming_packet);
+						parseContainerAddItem(incoming_packet);
+					break;
 					case 0x71:
-						return parseContainerUpdateItem(incoming_packet);
+						parseContainerUpdateItem(incoming_packet);
+					break;
 					case 0x72:
-						return parseContainerRemoveItem(incoming_packet);
+						parseContainerRemoveItem(incoming_packet);
+					break;
 					*/
 					case 0x78:
-						return parseInventorySetSlot(incoming_packet);
+						parseInventorySetSlot(incoming_packet);
+					break;
 					case 0x79:
-						return parseInventoryResetSlot(incoming_packet);
+						parseInventoryResetSlot(incoming_packet);
+					break;
 					/*case 0x7D:
-						return parseSafeTradeRequestAck(incoming_packet);
+						parseSafeTradeRequestAck(incoming_packet);
+					break;
 					case 0x7E:
-						return parseSafeTradeRequestNoAck(incoming_packet);
+						parseSafeTradeRequestNoAck(incoming_packet);
+					break;
 					case 0x7F:
-						return parseSafeTradeClose(incoming_packet);*/
+						parseSafeTradeClose(incoming_packet);
+					break;
+					*/
 					case 0x82:
 						parseWorldLight(incoming_packet);
 					break;
@@ -251,11 +285,15 @@ void Client::recv(){
 						parseMagicEffect(incoming_packet);
 					break;
 					/*case 0x84:
-						return parseAnimatedText(incoming_packet);
+						parseAnimatedText(incoming_packet);
+					break;
 					case 0x85:
-						return parseDistanceShot(incoming_packet);
+						parseDistanceShot(incoming_packet);
+					break;
 					case 0x86:
-						return parseCreatureSquare(incoming_packet);*/
+						parseCreatureSquare(incoming_packet);
+					break;
+					*/
 					case 0x8C:
 						parseCreatureHealth(incoming_packet);
 					break;
@@ -263,79 +301,115 @@ void Client::recv(){
 						parseCreatureLight(incoming_packet);
 					break;
 					/*case 0x8E:
-						return parseCreatureOutfit(incoming_packet);
+						parseCreatureOutfit(incoming_packet);
+					break;
 					case 0x8F:
-						return parseCreatureSpeed(incoming_packet);
+						parseCreatureSpeed(incoming_packet);
+					break;
 					case 0x90:
-						return parseCreatureSkulls(incoming_packet);
+						parseCreatureSkulls(incoming_packet);
+					break;
 					case 0x91:
-						return parseCreatureShields(incoming_packet);
+						parseCreatureShields(incoming_packet);
+					break;
 					case 0x92:
-						return parseCreaturePassable(incoming_packet);
+						parseCreaturePassable(incoming_packet);
+					break;
 					case 0x96:
-						return parseItemTextWindow(incoming_packet);
+						parseItemTextWindow(incoming_packet);
+					break;
 					case 0x97:
-						return parseHouseTextWindow(incoming_packet);
+						parseHouseTextWindow(incoming_packet);
+					break;
 					case 0xA0:
-						return parsePlayerStats(incoming_packet);
+						parsePlayerStats(incoming_packet);
+					break;
 					case 0xA1:
-						return parsePlayerSkills(incoming_packet);
+						parsePlayerSkills(incoming_packet);
+					break;
 					case 0xA2:
-						return parsePlayerIcons(incoming_packet);
+						parsePlayerIcons(incoming_packet);
+					break;
 					case 0xA3:
-						return parsePlayerCancelAttack(incoming_packet);*/
+						parsePlayerCancelAttack(incoming_packet);
+					break;
+					*/
 					case 0xAA:
 						parseCreatureSpeak(incoming_packet);
 					break;
 					/*case 0xAB:
-						return parseChannelList(incoming_packet);
+						parseChannelList(incoming_packet);
 					case 0xAC:
-						return parseOpenChannel(incoming_packet);
+						parseOpenChannel(incoming_packet);
+					break;
 					case 0xAD:
-						return parseOpenPrivatePlayerChat(incoming_packet);
+						parseOpenPrivatePlayerChat(incoming_packet);
+					break;
 					case 0xAE:
-						return parseOpenRuleViolation(incoming_packet);
+						parseOpenRuleViolation(incoming_packet);
+					break;
 					case 0xAF:
-						return parseRuleViolationAF(incoming_packet);
+						parseRuleViolationAF(incoming_packet);
+					break;
 					case 0xB0:
-						return parseRuleViolationB0(incoming_packet);
+						parseRuleViolationB0(incoming_packet);
+					break;
 					case 0xB1:
-						return parseRuleViolationB1(incoming_packet);
+						parseRuleViolationB1(incoming_packet);
+					break;
 					case 0xB2:
-						return parseCreatePrivateChannel(incoming_packet);
+						parseCreatePrivateChannel(incoming_packet);
+					break;
 					case 0xB3:
-						return parseClosePrivateChannel(incoming_packet);
+						parseClosePrivateChannel(incoming_packet);
+					break;
 					*/
 					case 0xB4:
-						return parseTextMessage(incoming_packet);
+						parseTextMessage(incoming_packet);
+					break;
 					/*case 0xB5:
-						return parsePlayerCancelWalk(incoming_packet);
+						parsePlayerCancelWalk(incoming_packet);
+					break;
 					case 0xBE:
-						return parseFloorChangeUp(incoming_packet);
+						parseFloorChangeUp(incoming_packet);
+					break;
 					case 0xBF:
-						return parseFloorChangeDown(incoming_packet);
+						parseFloorChangeDown(incoming_packet);
+					break;
 					case 0xC8:
-						return parseOutfitWindow(incoming_packet);
+						parseOutfitWindow(incoming_packet);
+					break;
 					case 0xD2:
-						return parseVipState(incoming_packet);
+						parseVipState(incoming_packet);
+					break;
 					case 0xD3:
-						return parseVipLogin(incoming_packet);
+						parseVipLogin(incoming_packet);
+					break;
 					case 0xD4:
-						return parseVipLogout(incoming_packet);
+						parseVipLogout(incoming_packet);
+					break;
 					case 0xF0:
-						return parseQuestList(incoming_packet);
+						parseQuestList(incoming_packet);
+					break;
 					case 0xF1:
-						return parseQuestPartList(incoming_packet);
+						parseQuestPartList(incoming_packet);
+					break;
 					case 0x7A:
-						return parseOpenShopWindow(incoming_packet);
+						parseOpenShopWindow(incoming_packet);
+					break;
 					case 0x7B:
-						return parsePlayerCash(incoming_packet);
+						parsePlayerCash(incoming_packet);
+					break;
 					case 0x7C:
-						return parseCloseShopWindow(incoming_packet);
+						parseCloseShopWindow(incoming_packet);
+					break;
 					case 0xDC:
-						return parseShowTutorial(incoming_packet);
+						parseShowTutorial(incoming_packet);
+					break;
 					case 0xDD:
-						return parseAddMapMarker(incoming_packet);*/
+						parseAddMapMarker(incoming_packet);
+					break;
+					*/
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
 						incoming_packet.dump();
@@ -447,16 +521,16 @@ void Client::parseMapDescription(NetworkPacket& p){
 	cout<<"hero ("<<x<<","<<y<<","<<z<<")"<<endl;
 }
 void Client::parseMoveNorth(NetworkPacket& p){
-
+	y--;
 }
 void Client::parseMoveEast(NetworkPacket& p){
-
+	x++;
 }
 void Client::parseMoveSouth(NetworkPacket& p){
-
+	y++;
 }
 void Client::parseMoveWest(NetworkPacket& p){
-
+	x--;
 }
 void Client::parseUpdateTile(NetworkPacket& p){
 

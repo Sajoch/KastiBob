@@ -41,7 +41,7 @@ obj/loginform.o: loginform.cpp loginform.h uis_cpp/loginform.gen.h \
 	charselect.h
 obj/gamewindow.o: gamewindow.cpp uis_cpp/gamewindow.gen.h gamewindow.h
 obj/jsbridge.o: jsbridge.cpp moc_h/jsbridge.gen.h gamewindow.h
-obj/main.o: main.cpp loginform.h
+obj/main.o: main.cpp loginform.h charselect.h gamewindow.h
 obj/file.o: file.cpp file.hpp
 obj/spriteLoader.o: spriteLoader.cpp spriteLoader.hpp file.hpp
 

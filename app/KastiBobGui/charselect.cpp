@@ -26,6 +26,7 @@ void CharSelect::load(){
 }
 
 void CharSelect::enter(){
+  logic_loop->start(1);
   size_t id = ui->comboBox->currentData().toULongLong();
   if(tclient->setChar(id)){
     GoToGameWindow();
@@ -35,6 +36,8 @@ void CharSelect::enter(){
 }
 
 void CharSelect::logout(){
+  delete tclient;
+  logic_loop->stop();
   GoToLoginForm();
 }
 

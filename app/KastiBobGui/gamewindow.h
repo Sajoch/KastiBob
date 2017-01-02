@@ -12,7 +12,7 @@ public:
     void logout();
     void charSelect();
     void load();
-
+    bool close();
 private:
     Ui_GameWindow* ui;
     class JSBridge* bridge;

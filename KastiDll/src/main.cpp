@@ -1,9 +1,12 @@
 #include <windows.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include "console.hpp"
 
 using namespace std;
+
+fstream output;
 
 #ifdef BUILDING_DLL
 	#define DLL __declspec(dllexport)
@@ -39,40 +42,42 @@ void showHex(char* buf, size_t len){
 	uint8_t c;
 	for(size_t i=0;i<len;i++){
 		c = buf[i];
-		cout<<"0x"<<abc[(c>>4)&0x0f]<<abc[(c)&0x0f]<<" ";
-		//cout<<(void*)(uint8_t)<<" ";
+		output<<"0x"<<abc[(c>>4)&0x0f]<<abc[(c)&0x0f]<<" ";
+		//output<<(void*)(uint8_t)<<" ";
 	}
-	cout<<endl;
+	output<<endl;
 }
 
 int __stdcall connectWrapper(int sock, sockaddr sa, int nl){
-	int s = WS_connct(sock, sa, nl);
-	cout<<"call "<<s<<" = connect("<<sock<<","<<"sa"<<","<<nl<<");"<<endl;
+	//int s = WS_connct(sock, sa, nl);
+	//output<<"call "<<s<<" = connect("<<sock<<","<<"sa"<<","<<nl<<");"<<endl;
 }
 
 int __stdcall sendWrapper(int sock, char* buf, int size, int flag){
 	int ret = WS_send(sock, buf, size, flag);
-	cout<<"call "<<ret<<" = send("<<sock<<","<<size<<","<<flag<<");"<<endl;
+	output<<"call "<<ret<<" = send("<<sock<<","<<size<<","<<flag<<");"<<endl;
 	showBuffer(buf, size);
 }
 
 int* xtea_encryptWrapper(int* buf, int* keys){
-	cout<<"write< ";
+	output<<"write< ";
 	showHex((char*)buf, 8);
 	return xtea_encrypt_ret(buf, keys);
 }
 int* xtea_decryptWrapper(int* buf, int* keys){
 	int* ret = xtea_decrypt_ret(buf, keys);
-	cout<<"read> ";
+	output<<"read> ";
 	showHex((char*)ret, 8);
 	return ret;
 }
 
 
 int ep_main() {
+	output = fstream("log.txt", ios::out|ios::binary|ios::app);
 	unsigned int baseAddress = (unsigned int)GetModuleHandle(0);
 	openconsole();
-	cout<<"Welcome in KastiBob_re"<<endl;
+	cout<<"output "<<(output.good()?"good":"fail")<<endl;
+	output<<"Welcome in KastiBob_re"<<endl;
 	//2421C8 -start
 	string ret = "KastiBob_re module\nTibia Windows Client\n\nhttps://github.com/Sajoch/\nKastiBob2";
 	//ret += to_string((unsigned int)baseAddress);
@@ -85,24 +90,24 @@ int ep_main() {
 		HMODULE ws2 = GetModuleHandle("ws2_32.dll");
 		WS_connect = (int(*)(SOCKET, sockaddr, int))GetProcAddress(ws2, "connect");
 		if(WS_connect != 0){
-			char* fromConnect = (char*)(baseAddress+0x177F3F);
+			/*char* fromConnect = (char*)(baseAddress+0x177F3F);
 			//TODO address and asm
 			unsigned char hook[] = {0xFF, 0x15, 0x08, 0x26, 0x5B, 0x00};
 			hook[0] = 0xE8;
 			uint32_t sendWrapper_add = (uint32_t)&sendWrapper - (uint32_t)fromPingSend - 5;
 			memcpy(&hook[1], (void*)&sendWrapper_add, 4);
 			hook[5] = 0x90;
-			cout<<"wrapper "<<(void*)&sendWrapper<<endl;
-			cout<<"rva "<<(void*)sendWrapper_add<<endl;
+			output<<"wrapper "<<(void*)&sendWrapper<<endl;
+			output<<"rva "<<(void*)sendWrapper_add<<endl;
 			change_memory(&fromConneect[0],(void*)hook,6);
+			*/
 		}
 	}
-
 	//hook xtea_encrypt
 	{
 		xtea_encrypt_ret = (int*(*)(int*, int*))(baseAddress+0x14ff80);
 		char* xtea_encrypt_func = (char*)(baseAddress+0x15021d);
-		cout<<"xtea_encrypt "<<(void*)xtea_encrypt_func<<endl;
+		output<<"xtea_encrypt "<<(void*)xtea_encrypt_func<<endl;
 		unsigned char hook[] = {0xE8, 0x5E, 0xFD, 0xFF, 0xFF};
 		hook[0] = 0xE8;
 		uint32_t xtea_encrypt_add = (uint32_t)&xtea_encryptWrapper - (uint32_t)xtea_encrypt_func - 5;
@@ -113,7 +118,7 @@ int ep_main() {
 	{
 		xtea_decrypt_ret = (int*(*)(int*, int*))(baseAddress+0x1500b0);
 		char* xtea_decrypt_func = (char*)(baseAddress+0x15023d);
-		cout<<"xtea_decrypt "<<(void*)xtea_decrypt_func<<endl;
+		output<<"xtea_decrypt "<<(void*)xtea_decrypt_func<<endl;
 		unsigned char hook[] = {0xE8, 0x6E, 0xFF, 0xFF, 0xFF};
 		hook[0] = 0xE8;
 		uint32_t xtea_decrypt_add = (uint32_t)&xtea_decryptWrapper - (uint32_t)xtea_decrypt_func - 5;
@@ -130,8 +135,8 @@ int ep_main() {
 		uint32_t sendWrapper_add = (uint32_t)&sendWrapper - (uint32_t)fromPingSend - 5;
 		memcpy(&hook[1], (void*)&sendWrapper_add, 4);
 		hook[5] = 0x90;
-		cout<<"wrapper "<<(void*)&sendWrapper<<endl;
-		cout<<"rva "<<(void*)sendWrapper_add<<endl;
+		output<<"wrapper "<<(void*)&sendWrapper<<endl;
+		output<<"rva "<<(void*)sendWrapper_add<<endl;
 		change_memory(&fromPingSend[0],(void*)hook,6);
 	}
 	//0x1571a2 - move big int - propable rsa

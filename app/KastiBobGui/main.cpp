@@ -22,6 +22,7 @@ void GoToLoginForm(){
     cs->hide();
     gw->hide();
     lf->load();
+    logic_loop->stop();
   });
 }
 void GoToCharSelect(){
@@ -30,6 +31,7 @@ void GoToCharSelect(){
     lf->hide();
     gw->hide();
     cs->load();
+    logic_loop->stop();
   });
 }
 void GoToGameWindow(){
@@ -48,6 +50,12 @@ int main(int argc, char *argv[])
     cs = new CharSelect();
     gw = new GameWindow();
     logic_loop = new QTimer();
+    QObject::connect(logic_loop, &QTimer::timeout, [&](){
+      if(tclient->tick()==0){
+        logic_loop->stop();
+        delete logic_loop;
+      }
+    });
     GoToLoginForm();
     return a.exec();
 }

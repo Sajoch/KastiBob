@@ -1,13 +1,30 @@
 var Communication = new (function(){
-  JSBridge.callAfterUpdate = afterUpdate;
+  var game = {};
+  var objToSend = {};
+  //JSBridge.callAfterUpdate = afterUpdate;
   function send(){
-
+    return objToSend;
   }
-  function afterUpdate(){
-    console.log("variables was changed");
+  function isset(a){
+    return typeof a != "undefined";
+  }
+  this.update = function(data){
+    if(isset(data.hero) && !isset(game.hero)){
+      game.hero={};
+    }
+    if(isset(data.hero.pos)){
+      if(!isset(game.hero.pos)){
+        game.hero.pos={};
+      }
+      game.hero.pos.x = data.hero.pos.x;
+      game.hero.pos.y = data.hero.pos.y;
+      game.hero.pos.z = data.hero.pos.z;
+      ui.setHeroPos(game.hero.pos);
+    }
+    console.log(data);
   }
   this.getImg = function(id){
-    return false;
+    return JSBridge.getImg(id);
   };
 
   this.moveUp = function(){

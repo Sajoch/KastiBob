@@ -1,24 +1,44 @@
 #include "moc_h/jsbridge.gen.h"
 #include "gamewindow.h"
 #include "src/client.hpp"
+#include <QtCore/QVariant>
+#include <iostream>
+
+using namespace std;
 
 extern Client* tclient;
 
 JSBridge::JSBridge(QObject *parent) : QObject(parent){
   tclient->afterRecv([&](){
-    callAfterUpdate();
+    CrossCallAfterUpdate();
   });
 }
 
-void JSBridge::setGW(GameWindow* that){
+void JSBridge::setGW(GameWindow* that, QWebView* _webView){
   gamewindow = that;
+  mframe = _webView->page()->mainFrame();
+}
+
+void JSBridge::CrossCallAfterUpdate(){
+  QVariantMap hero;
+  QVariantMap pos;
+  pos["x"] = tclient->getX();
+  pos["y"] = tclient->getY();
+  pos["z"] = tclient->getZ();
+  hero["pos"] = pos;
+  QVariantMap obj;
+  obj["hero"] = hero;
+  callAfterUpdate(obj);
+
 }
 
 void JSBridge::logout(){
+  delete tclient;
   gamewindow->logout();
 }
 
 void JSBridge::charSelect(){
+  tclient->setChar(0);
   gamewindow->charSelect();
 }
 
@@ -44,13 +64,10 @@ void JSBridge::move(int dir){
 void JSBridge::look(uint32_t id){
 
 }
-
-uint32_t JSBridge::getX(){
-  return tclient->getX();
-}
-uint32_t JSBridge::getY(){
-  return tclient->getY();
-}
-void JSBridge::callAfterUpdate(){
-
+void JSBridge::callAfterUpdate(QVariant data){
+  QJsonDocument doc = QJsonDocument::fromVariant(data);
+  QString json = doc.toJson(QJsonDocument::Compact);
+  cout<<json.toStdString()<<endl;
+  QString cmd = QString("Communication.update(%1)").arg(json);
+  mframe->evaluateJavaScript(cmd);
 }

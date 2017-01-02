@@ -24,6 +24,7 @@ LoginForm::LoginForm(QWidget *parent) :
 
 void LoginForm::load(){
   ui->retranslateUi(this);
+  ui->lineEdit_2->setFocus();
 }
 
 void LoginForm::changeLoginState(int a, std::string msg){
@@ -54,18 +55,9 @@ void LoginForm::login(){
   std::string ps = p.toUtf8().constData();
   changeLoginState(1, "");
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
-  if(tclient!=0){
-    delete tclient;
-  }
   tclient = new Client(sa, 20007, 2, ls, ps);
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
-  });
-  connect(logic_loop, &QTimer::timeout, [&](){
-      if(tclient->tick()==0){
-        logic_loop->stop();
-        delete logic_loop;
-      }
   });
   logic_loop->start(1);
 }
