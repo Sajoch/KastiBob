@@ -10,12 +10,12 @@ obj:
 	mkdir -p obj
 PACKETS=Login Ping Move
 OBJS=main cipher packet network client ground square \
-		 utils outfit creature
+		 utils outfit creature thing
 
 OBJS+=$(patsubst %,%Packet,$(PACKETS))
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 PACKETHEADERS=$(patsubst %,src/packets/%Packet.hpp,$(PACKETS))
-obj/client.o: src/client.cpp src/client.hpp $(PACKETHEADERS)
+obj/client.o: src/client.cpp src/client.hpp $(PACKETHEADERS) src/thing.hpp
 obj/packet.o: src/packet.cpp src/packet.hpp
 obj/cipher.o: src/cipher.cpp src/cipher.hpp
 obj/network.o: src/network.cpp src/network.hpp
@@ -24,6 +24,7 @@ obj/square.o: src/square.cpp src/square.hpp src/utils.hpp src/creature.hpp
 obj/creature.o: src/creature.cpp src/creature.hpp
 obj/utils.o: src/utils.cpp src/utils.hpp
 obj/outfit.o: src/outfit.cpp src/outfit.hpp
+obj/thing.o: src/thing.cpp src/thing.hpp
 obj/LoginPacket.o: src/packets/LoginPacket.cpp src/packets/LoginPacket.hpp
 obj/PingPacket.o: src/packets/PingPacket.cpp src/packets/PingPacket.hpp
 obj/MovePacket.o: src/packets/MovePacket.cpp src/packets/MovePacket.hpp

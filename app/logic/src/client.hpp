@@ -37,6 +37,7 @@ class API Client: public Creature{
 	static uint32_t pic_signature;
 	static uint32_t mapViewX;
 	static uint32_t mapViewY;
+	static int32_t mapLayers;
 	ClientState state;
 
 	Character current_character;
@@ -63,7 +64,11 @@ class API Client: public Creature{
 	void closeConnection();
 	void recv();
 	void idle();
-
+	
+	bool getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h);
+	bool getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h);
+	bool getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z);
+	
 	void parseSelfAppear(NetworkPacket& p);
 	void parseGMActions(NetworkPacket& p);
 	void parseErrorMessage(NetworkPacket& p);

@@ -5,7 +5,9 @@ var ui = new(function(){
     3: false,
     4: false
   };
+  var showPanel = true;
   var walkCooldown = 0;
+  var currTiles = [];
   this.moveUp = function(e){
     if(e==1){
       walkDir[1] = true;
@@ -43,13 +45,19 @@ var ui = new(function(){
     }
     return null;
   }
+  function addTile(){
+    
+  }
+  function delTile(){
+    
+  }
   this.setHeroPos = function(pos){
     var con = $("#heroPos");
     con.find(".posX").text(pos.x);
     con.find(".posY").text(pos.y);
     con.find(".posZ").text(pos.z);
   }
-  this.loop = function(){
+  function loop(){
     if(walkCooldown==0){
       var dir = null;
       if(walkDir[1]){
@@ -69,5 +77,25 @@ var ui = new(function(){
       walkCooldown--;
     }
   };
+  function hud(ctx, size){
+    var mapWidth = size.width;
+    if(showPanel){
+      mapWidth -= 120;
+      ctx.fillStyle = "black";
+      ctx.fillRect(mapWidth, 0, 120, size.height);
+    }
+    ctx.fillStyle = "grey";
+    ctx.fillRect(0, 0, mapWidth, size.height);
+  }
+  
+  this.panelState = function(show){
+    showPanel = show?true:false;
+  }
+  
+  this.start = function(){
+    setInterval(loop, 1);
+    Render.add(hud);
+    
+  }
 
 })();

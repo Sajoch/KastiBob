@@ -1,5 +1,9 @@
 #include "spriteLoader.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 Sprite::Sprite(uint32_t off){
   offset = off;
   loaded = false;
@@ -31,6 +35,7 @@ spr(path)
     Sprite sp(spr.getUint32());
     sprites.push_back(sp);
   }
+  size_t id = 0;
   for(vector<Sprite>::iterator it=sprites.begin();it!=sprites.end();++it){
     if((*it).offset == 0)
       continue;
@@ -51,49 +56,54 @@ spr(path)
   }
 }
 
+std::string SpriteLoader::getError(){
+  return error;
+}
+
 std::string SpriteLoader::getImage(uint32_t id){
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
+    cout<<error<<endl;
     return "";
   }
   Sprite& sp = sprites[id];
   if(sp.loaded){
     return sp.getImage();
   }
+  std::string buffer(sp.size, '\0');
+  spr.goToOffset(sp.offset+5);
+  spr.readBuffer(buffer);
   size_t offset_read = 0;
   uint32_t pixelOffset = 0;
-  sp.image.resize(3*32*32, '\0');
+  sp.image.resize(4*32*32, '\0');
   while(offset_read < sp.size){
     if(!spr.possibleRead(4)){
       error = "cannot read header of sprite ";
       return "";
     }
-    uint32_t pixelscount = spr.getUint16();
-    pixelOffset += pixelscount*3;
+    uint32_t pixelscount = spr.getUint16();//blank
+    pixelOffset += pixelscount * 4;
     offset_read += 2;
     if(pixelscount > 3076){
       error = "has too big pixel transparent chunk";
       return "";
     }
-    pixelscount = spr.getUint16();
+    pixelscount = spr.getUint16();//colorized
     offset_read += 2;
     if(pixelscount > 3076){
       error = "has too big pixel chunk";
       return "";
     }
-    uint8_t rgb[3];
     if(!spr.possibleRead(3*pixelscount)){
       error = "cannot read rgb of sprite";
       return "";
     }
     for(uint16_t ip=0;ip<pixelscount;ip++){
-      rgb[0] = spr.getUint8();
-      rgb[1] = spr.getUint8();
-      rgb[2] = spr.getUint8();
-      sp.image[pixelOffset+0] = rgb[0];
-      sp.image[pixelOffset+1] = rgb[1];
-      sp.image[pixelOffset+2] = rgb[2];
-      pixelOffset++;
+      sp.image[pixelOffset+0] = spr.getUint8();
+      sp.image[pixelOffset+1] = spr.getUint8();
+      sp.image[pixelOffset+2] = spr.getUint8();
+      sp.image[pixelOffset+3] = 255;
+      pixelOffset += 4;
       offset_read += 3;
     }
   }

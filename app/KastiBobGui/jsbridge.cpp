@@ -1,4 +1,4 @@
-#include "moc_h/jsbridge.gen.h"
+#include "jsbridge.h"
 #include "gamewindow.h"
 #include "src/client.hpp"
 #include <QtCore/QVariant>
@@ -12,6 +12,7 @@ JSBridge::JSBridge(QObject *parent) : QObject(parent){
   tclient->afterRecv([&](){
     CrossCallAfterUpdate();
   });
+  sprs = new SpriteLoader("F:\\USER\\Piotr\\github\\KastiBob\\kclient_v1\\Kasti.spr");
 }
 
 void JSBridge::setGW(GameWindow* that, QWebView* _webView){
@@ -34,6 +35,7 @@ void JSBridge::CrossCallAfterUpdate(){
 
 void JSBridge::logout(){
   delete tclient;
+  delete sprs;
   gamewindow->logout();
 }
 
@@ -42,8 +44,9 @@ void JSBridge::charSelect(){
   gamewindow->charSelect();
 }
 
-QString JSBridge::getImg(size_t id){
-    return "test123";
+QString JSBridge::getImg(int id){
+  return QString::fromStdString(sprs->getImage(id));
+  cout<<sprs->getError()<<endl;
 }
 void JSBridge::move(int dir){
   switch(dir){
@@ -61,7 +64,7 @@ void JSBridge::move(int dir){
     break;
   }
 }
-void JSBridge::look(uint32_t id){
+void JSBridge::look(int id){
 
 }
 void JSBridge::callAfterUpdate(QVariant data){

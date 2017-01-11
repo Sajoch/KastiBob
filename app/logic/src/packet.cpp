@@ -101,6 +101,11 @@ std::string NetworkPacket::getTString() {
 	return ret;
 }
 
+uint16_t NetworkPacket::peekUint16(){
+	uint16_t a = peekUint16(buffer);
+	return a;
+}
+
 size_t NetworkPacket::peakTStringSize(){
 	uint16_t a = peekUint16(buffer);
 	a+=2;

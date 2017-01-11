@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
     QObject::connect(logic_loop, &QTimer::timeout, [&](){
       if(tclient->tick()==0){
         logic_loop->stop();
-        delete logic_loop;
       }
     });
     GoToLoginForm();

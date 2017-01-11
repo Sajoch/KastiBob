@@ -20,6 +20,7 @@ public:
 
 	uint8_t getUint8();
 	uint16_t getUint16();
+	uint16_t peekUint16();
 	uint32_t getUint32();
 	std::string getTString(); //TODO split to peak size
 	size_t peakTStringSize();

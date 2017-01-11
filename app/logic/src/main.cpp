@@ -17,6 +17,7 @@ uint32_t Client::spr_signature = 0x467F9E74;
 uint32_t Client::pic_signature = 0x4AE5C3D3;
 uint32_t Client::mapViewX = 8;
 uint32_t Client::mapViewY = 8;
+int32_t Client::mapLayers = 15; //0-15 = 16 layers
 
 int main(){
 	srand(time(0));

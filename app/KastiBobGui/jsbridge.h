@@ -1,11 +1,12 @@
-#ifndef JSBRIDGE_H
-#define JSBRIDGE_H
+#ifndef __JSBRIDGE_H
+#define __JSBRIDGE_H
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QJsonDocument>
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QWebFrame>
+#include "spriteLoader.hpp"
 
 class JSBridge : public QObject
 {
@@ -17,13 +18,14 @@ public:
 
   Q_INVOKABLE void logout();
   Q_INVOKABLE void charSelect();
-  Q_INVOKABLE QString getImg(size_t id);
+  Q_INVOKABLE QString getImg(int id);
   Q_INVOKABLE void move(int dir);
-  Q_INVOKABLE void look(uint32_t id);
+  Q_INVOKABLE void look(int id);
   Q_INVOKABLE void callAfterUpdate(QVariant data);
 private:
   class GameWindow* gamewindow;
   QWebFrame* mframe;
+  SpriteLoader* sprs;
 };
 
 #endif // JSBRIDGE_H

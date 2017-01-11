@@ -1,5 +1,6 @@
 #include "network.hpp"
-
+#include <Poco/Net/NetException.h>
+#include <iostream>
 using namespace std;
 using namespace Poco::Net;
 
@@ -47,29 +48,33 @@ bool NetworkManager::getPacket(NetworkPacket& p){
 }
 int NetworkManager::tick() {
 	int rsize;
-	if(sock.poll(0, Socket::SELECT_ERROR)){
-		return 1;
-	} 
-	else if(send_buffer.size()>0 && sock.poll(0, Socket::SELECT_WRITE)){
-		int sendb = sock.sendBytes(&send_buffer[0], send_buffer.size());
-		if(send > 0){
-			send_buffer.erase(send_buffer.begin(), send_buffer.begin()+sendb);
-		}
-		return 0;
-	} 
-	else if(sock.poll(0, Socket::SELECT_READ)){
-		rsize = sock.available();
-		int buffer_size = recv_buffer.size() - recv_offset;
-		if(buffer_size<rsize){
-			recv_buffer.resize(recv_buffer.size() + rsize);
-		}
-		int recvb = sock.receiveBytes(&recv_buffer[recv_offset], rsize);
-		if(recvb > 0){
-			recv_offset += recvb;
-			return 2;
-		}else{
+	try{
+		if(sock.poll(0, Socket::SELECT_ERROR)){
 			return 1;
+		} 
+		else if(send_buffer.size()>0 && sock.poll(0, Socket::SELECT_WRITE)){
+			int sendb = sock.sendBytes(&send_buffer[0], send_buffer.size());
+			if(send > 0){
+				send_buffer.erase(send_buffer.begin(), send_buffer.begin()+sendb);
+			}
+			return 0;
+		} 
+		else if(sock.poll(0, Socket::SELECT_READ)){
+			rsize = sock.available();
+			int buffer_size = recv_buffer.size() - recv_offset;
+			if(buffer_size<rsize){
+				recv_buffer.resize(recv_buffer.size() + rsize);
+			}
+			int recvb = sock.receiveBytes(&recv_buffer[recv_offset], rsize);
+			if(recvb > 0){
+				recv_offset += recvb;
+				return 2;
+			}else{
+				return 1;
+			}
 		}
+	}catch(NetException e){
+		cout<<"NetException"<<endl;
 	}
 	return 4;
 }

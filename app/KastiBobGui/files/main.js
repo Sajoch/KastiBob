@@ -14,7 +14,6 @@ function reload(){
 }
 
 function onload(){
-  onresize();
   var need_files = ["render.js", "communication.js", "img.js", "console.js", "keys.js", "ui.js"];
   var $loading = $("<div>").addClass("loading").appendTo("body");
   var $log = $("<div>").appendTo($loading);
@@ -44,17 +43,14 @@ function onload(){
 
   function start(){
     try{
-      //Render.start();
+      Render.start();
+      onresize();
       $loading.remove();
       Keys.registerHotkey(87, ui.moveUp, "normal");
       Keys.registerHotkey(65, ui.moveLeft, "normal");
       Keys.registerHotkey(68, ui.moveRight, "normal");
       Keys.registerHotkey(83, ui.moveDown, "normal");
-      setInterval(ui.loop, 1);
-      /*Keys.getNextKey(function(kcode, mod, key){
-        console.log(kcode, mod, key);
-        Keys.registerHotkey(kcode, function(){alert("Key: "+mod+key)}, mod);
-      });*/
+      ui.start();
     }catch(e){
       Console.error(e);
     }
@@ -68,6 +64,9 @@ function onload(){
 function onresize(){
   var h = window.innerHeight;
   var w = window.innerWidth;
+  if(typeof Render != "undefined"){
+    Render.resize(w, h);
+  }
   //document.body.style.width=w+"px";
   //document.body.style.height=h+"px";
 }

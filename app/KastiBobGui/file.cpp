@@ -51,3 +51,10 @@ uint8_t BinaryFile::getUint8(){
 void BinaryFile::goToOffset(size_t a){
   file.seekg(a, file.beg);
 }
+
+bool BinaryFile::readBuffer(std::string& buf){
+  if(!possibleRead(buf.size()))
+    return false;
+  file.read((char*)&buf[0], buf.size());
+  return true;
+}
