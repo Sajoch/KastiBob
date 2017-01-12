@@ -4,7 +4,7 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QLibrary>
 #include <QtCore/QTimer>
-#include "src/client.hpp"
+#include "client.hpp"
 
 Client* tclient = 0;
 QTimer *logic_loop;

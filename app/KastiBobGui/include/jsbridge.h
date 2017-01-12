@@ -6,7 +6,6 @@
 #include <QtCore/QJsonDocument>
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKitWidgets/QWebFrame>
-#include "spriteLoader.hpp"
 
 class JSBridge : public QObject
 {
@@ -25,7 +24,7 @@ public:
 private:
   class GameWindow* gamewindow;
   QWebFrame* mframe;
-  SpriteLoader* sprs;
+  class SpriteLoader* sprs;
 };
 
 #endif // JSBRIDGE_H

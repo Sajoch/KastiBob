@@ -1,7 +1,7 @@
 #ifndef _CHARSELECT_H
 #define _CHARSELECT_H
 
-#include "uis_cpp/charselect.gen.h"
+#include "charselect.gen.h"
 #include <QtWidgets/QDialog>
 #include <QtGui/QKeyEvent>
 

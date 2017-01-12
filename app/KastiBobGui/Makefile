@@ -1,6 +1,6 @@
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
 -lQt5Gui \
--L../logic -lKastiBob_logic -I../logic
+-L../logic -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
@@ -10,12 +10,12 @@ LOGIC=KastiBob_logic.dll
 
 obj:
 	mkdir -p obj
-uis_cpp:
-	mkdir -p uis_cpp
-moc_h:
-	mkdir -p moc_h
+uis_h:
+	mkdir -p uis_h
+moc_cpp:
+	mkdir -p moc_cpp
 
-all: obj uis_cpp moc_h $(PROGRAM)
+all: obj uis_h moc_cpp $(PROGRAM)
 RSC=index.html style.css main.js render.js jquery-3.1.1.min.js \
 		jquery-ui.min.js communication.js console.js img.js keys.js \
 		ui.js
@@ -28,33 +28,33 @@ obj/resource.gen.cpp: resource.qrc $(ORSC)
 
 OBJS=main charselect loginform gamewindow jsbridge \
 		 resource file spriteLoader $(MOCS)
-uis_cpp/%.gen.h :
+uis_h/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
-moc_h/%.gen.cpp :
+moc_cpp/%.gen.cpp :
 	@echo "-Compile by moc" $@
 	@moc $< -o $@
-uis_cpp/charselect.gen.h: uis/charselect.ui
-uis_cpp/loginform.gen.h: uis/loginform.ui
-uis_cpp/gamewindow.gen.h: uis/gamewindow.ui
+uis_h/charselect.gen.h: uis/charselect.ui
+uis_h/loginform.gen.h: uis/loginform.ui
+uis_h/gamewindow.gen.h: uis/gamewindow.ui
 obj/resource.o: obj/resource.gen.cpp
-obj/charselect.o: charselect.cpp loginform.h charselect.h \
-	uis_cpp/charselect.gen.h gamewindow.h
-obj/loginform.o: loginform.cpp loginform.h uis_cpp/loginform.gen.h \
-	charselect.h
-obj/gamewindow.o: gamewindow.cpp uis_cpp/gamewindow.gen.h gamewindow.h
-obj/jsbridge.o: jsbridge.cpp jsbridge.h gamewindow.h
-moc_h/jsbridge.gen.cpp: jsbridge.h
-obj/moc_jsbridge.gen.o: moc_h/jsbridge.gen.cpp
-obj/main.o: main.cpp loginform.h charselect.h gamewindow.h
-obj/file.o: file.cpp file.hpp
-obj/spriteLoader.o: spriteLoader.cpp spriteLoader.hpp file.hpp
+obj/charselect.o: src/charselect.cpp include/loginform.h include/charselect.h \
+	uis_h/charselect.gen.h include/gamewindow.h
+obj/loginform.o: src/loginform.cpp include/loginform.h uis_h/loginform.gen.h \
+	include/charselect.h
+obj/gamewindow.o: src/gamewindow.cpp uis_h/gamewindow.gen.h include/gamewindow.h
+obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
+moc_h/jsbridge.gen.cpp: include/jsbridge.h
+obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
+obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewindow.h
+obj/file.o: src/file.cpp include/file.hpp
+obj/spriteLoader.o: src/spriteLoader.cpp include/spriteLoader.hpp include/file.hpp
 
 #headers
-gamewindow.h: uis_cpp/gamewindow.gen.h
-charselect.h: uis_cpp/charselect.gen.h
-loginform.h: uis_cpp/loginform.gen.h
-moc_h/jsbridge.gen.h: jsbridge.h
+include/gamewindow.h: uis_h/gamewindow.gen.h
+include/charselect.h: uis_h/charselect.gen.h
+include/loginform.h: uis_h/loginform.gen.h
+moc_cpp/jsbridge.gen.cpp: include/jsbridge.h
 
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 

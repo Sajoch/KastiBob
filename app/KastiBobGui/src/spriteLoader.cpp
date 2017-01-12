@@ -61,8 +61,10 @@ std::string SpriteLoader::getError(){
 }
 
 std::string SpriteLoader::getImage(uint32_t id){
+  cout<<"want img"<<id<<endl;
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
+    cout<<"max id = "<<sprites.size()<<endl;
     cout<<error<<endl;
     return "";
   }
@@ -108,5 +110,11 @@ std::string SpriteLoader::getImage(uint32_t id){
     }
   }
   sp.loaded = true;
+  std::string outPath="i";
+  outPath += to_string(id);
+  outPath += ".raw";
+  fstream out(outPath, ios::binary|ios::trunc|ios::out);
+  cout<<"out "<<outPath<<" is "<<(out.good()?"true":"false")<<endl;
+  out.write(sp.image.data(), sp.image.size());
   return sp.getImage();
 }

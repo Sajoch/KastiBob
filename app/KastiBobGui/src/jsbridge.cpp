@@ -1,8 +1,10 @@
 #include "jsbridge.h"
 #include "gamewindow.h"
-#include "src/client.hpp"
+#include "client.hpp"
+#include "spriteLoader.hpp"
 #include <QtCore/QVariant>
 #include <iostream>
+
 
 using namespace std;
 
@@ -12,7 +14,7 @@ JSBridge::JSBridge(QObject *parent) : QObject(parent){
   tclient->afterRecv([&](){
     CrossCallAfterUpdate();
   });
-  sprs = new SpriteLoader("F:\\USER\\Piotr\\github\\KastiBob\\kclient_v1\\Kasti.spr");
+  sprs = new SpriteLoader("..\\..\\kclient_v1\\Kasti.spr");
 }
 
 void JSBridge::setGW(GameWindow* that, QWebView* _webView){
@@ -45,8 +47,9 @@ void JSBridge::charSelect(){
 }
 
 QString JSBridge::getImg(int id){
-  return QString::fromStdString(sprs->getImage(id));
+  std::string buf = sprs->getImage(id);
   cout<<sprs->getError()<<endl;
+  return QString::fromStdString(buf);
 }
 void JSBridge::move(int dir){
   switch(dir){

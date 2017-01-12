@@ -37,6 +37,7 @@ kclient_v2.zip
 *.gen
 *.gen.cpp
 *.gen.h
+*.gen.hpp
 
 # Stackdump
 *.stackdump

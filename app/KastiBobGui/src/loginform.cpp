@@ -2,7 +2,7 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QTimer>
 #include "loginform.h"
-#include "src/client.hpp"
+#include "client.hpp"
 
 extern Client* tclient;
 extern QTimer *logic_loop;

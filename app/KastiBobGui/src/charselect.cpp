@@ -1,6 +1,6 @@
 #include <QtCore/QTimer>
 #include "charselect.h"
-#include "src/client.hpp"
+#include "client.hpp"
 
 extern Client* tclient;
 extern QTimer *logic_loop;

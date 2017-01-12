@@ -1,6 +1,6 @@
 #ifndef _GAMEWINDOW_H
 #define _GAMEWINDOW_H
-#include "uis_cpp/gamewindow.gen.h"
+#include "gamewindow.gen.h"
 #include <QtWidgets/QMainWindow>
 
 

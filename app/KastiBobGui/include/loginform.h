@@ -1,7 +1,7 @@
 #ifndef _LOGINFORM_H
 #define _LOGINFORM_H
 
-#include "uis_cpp/loginform.gen.h"
+#include "loginform.gen.h"
 #include <QtWidgets/QDialog>
 #include <QtGui/QKeyEvent>
 
