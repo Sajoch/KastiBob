@@ -4,7 +4,12 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QLibrary>
 #include <QtCore/QTimer>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
 #include "client.hpp"
+#include <iostream>
+
+using namespace std;
 
 Client* tclient = 0;
 QTimer *logic_loop;
@@ -46,6 +51,13 @@ void GoToGameWindow(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    /* list resources entry
+    QStringList resources = QDir(":").entryList();
+    for(int i =0;i<resources.size();i++){
+      cout<<resources.at(i).toUtf8().constData()<<endl;
+    }
+    */
     lf = new LoginForm();
     cs = new CharSelect();
     gw = new GameWindow();

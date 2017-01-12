@@ -5,6 +5,7 @@ obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
 
+
 PROGRAM=KastiBobGui
 LOGIC=KastiBob_logic.dll
 
@@ -14,20 +15,44 @@ uis_h:
 	mkdir -p uis_h
 moc_cpp:
 	mkdir -p moc_cpp
+resources:
+	mkdir -p resources
+obj_rsc:
+	mkdir -p obj_rsc
+#for a lot of objects
+#ld -r a.o b.o -o ab.o
 
 all: obj uis_h moc_cpp $(PROGRAM)
-RSC=index.html style.css main.js render.js jquery-3.1.1.min.js \
-		jquery-ui.min.js communication.js console.js img.js keys.js \
-		ui.js
-ORSC=$(patsubst %,files/%,$(RSC))
 
+RSC_FILES=$(wildcard files/*)
+RSC_CPP=$(patsubst files/%,resources/%.gen.cpp,$(RSC_FILES))
+RSC_RCCS=$(patsubst files/%,resources/rcc_%.gen.qrc,$(RSC_FILES))
+RSC_OBJS=$(patsubst files/%,obj_rsc/%.o,$(RSC_FILES))
+RSC_COMB=obj/rsc_resources_all.o
+
+#.PRECIOUS: $(RSC_CPP) $(RSC_RCCS)
+
+obj/rsc_resources_all.o: resources obj_rsc $(RSC_RCCS) $(RSC_CPP) $(RSC_OBJS)
+	ld -r $(RSC_OBJS) -o $@
+resources/rcc_%.gen.qrc:
+	@echo "Generating "$@
+	@echo "<RCC>\
+	<qresource>\
+	<file alias=\""$(patsubst resources/rcc_%.gen.qrc,%,$@)"\">\
+	../files/"$(patsubst resources/rcc_%.gen.qrc,%,$@)\
+	"</file>\
+	</qresource>\
+	</RCC>" > $@
+resources/%.gen.cpp: files/%
+	rcc $(patsubst resources/%.cpp,resources/rcc_%.qrc,$@) -o $@ -name $(subst /,_,$@)
+obj_rsc/%.o : resources/%.gen.cpp
+	@echo "-Compile "$@
+	@$(CXX) -c $< -o $@
 MOC=jsbridge
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
-obj/resource.gen.cpp: resource.qrc $(ORSC)
-	rcc resource.qrc -o $@
 
 OBJS=main charselect loginform gamewindow jsbridge \
-		 resource file spriteLoader $(MOCS)
+		 file spriteLoader $(MOCS)
 uis_h/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
@@ -58,7 +83,7 @@ moc_cpp/jsbridge.gen.cpp: include/jsbridge.h
 
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 
-$(PROGRAM): $(OBJECTS) $(LOGIC)
+$(PROGRAM): $(RSC_COMB) $(OBJECTS) $(LOGIC)
 	@echo "============ Compile" $@ "=============="
 	$(CXX) $^ -o $@ $(CPPFLAG)
 
@@ -71,4 +96,6 @@ $(LOGIC): ../logic/$(LOGIC)
 	cp $^ $@
 clean:
 	@(rm obj/* || true)
+	@(rm obj_rsc/* || true)
+	@(rm resources/* || true)
 	@(rm $(PROGRAM) || true)
