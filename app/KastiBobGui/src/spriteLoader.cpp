@@ -61,11 +61,8 @@ std::string SpriteLoader::getError(){
 }
 
 std::string SpriteLoader::getImage(uint32_t id){
-  cout<<"want img"<<id<<endl;
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
-    cout<<"max id = "<<sprites.size()<<endl;
-    cout<<error<<endl;
     return "";
   }
   Sprite& sp = sprites[id];
@@ -78,36 +75,44 @@ std::string SpriteLoader::getImage(uint32_t id){
   size_t offset_read = 0;
   uint32_t pixelOffset = 0;
   sp.image.resize(4*32*32, '\0');
-  while(offset_read < sp.size){
-    if(!spr.possibleRead(4)){
+  size_t data_left = buffer.size();
+  uint32_t blank, datas;
+  while(data_left>0){
+    if(data_left<4){
       error = "cannot read header of sprite ";
       return "";
     }
-    uint32_t pixelscount = spr.getUint16();//blank
-    pixelOffset += pixelscount * 4;
+    blank = (uint8_t)buffer[offset_read + 1];
+    blank <<= 8;
+    blank |= (uint8_t)buffer[offset_read];
+    pixelOffset += blank * 4;
     offset_read += 2;
-    if(pixelscount > 3076){
-      error = "has too big pixel transparent chunk";
+    if(blank > 3076){
+      error = "too much blank pixels";
       return "";
     }
-    pixelscount = spr.getUint16();//colorized
+    datas = (uint8_t)buffer[offset_read + 1];
+    datas <<= 8;
+    datas |= (uint8_t)buffer[offset_read];
     offset_read += 2;
-    if(pixelscount > 3076){
-      error = "has too big pixel chunk";
+    if(datas > 3076){
+      error = "too much data pixels";
       return "";
     }
-    if(!spr.possibleRead(3*pixelscount)){
-      error = "cannot read rgb of sprite";
+    data_left -= 4;
+    if(data_left < (3*datas)){
+      error = "not enough pixel data";
       return "";
     }
-    for(uint16_t ip=0;ip<pixelscount;ip++){
-      sp.image[pixelOffset+0] = spr.getUint8();
-      sp.image[pixelOffset+1] = spr.getUint8();
-      sp.image[pixelOffset+2] = spr.getUint8();
+    for(uint16_t ip=0;ip<datas;ip++){
+      sp.image[pixelOffset+0] = buffer[offset_read];
+      sp.image[pixelOffset+1] = buffer[offset_read + 1];
+      sp.image[pixelOffset+2] = buffer[offset_read + 2];
       sp.image[pixelOffset+3] = 255;
       pixelOffset += 4;
       offset_read += 3;
     }
+    data_left -= datas * 3;
   }
   sp.loaded = true;
   std::string outPath="i";

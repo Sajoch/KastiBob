@@ -9,6 +9,9 @@
 #include "client.hpp"
 #include <iostream>
 
+//TODO del test
+#include "spriteLoader.hpp"
+
 using namespace std;
 
 Client* tclient = 0;
@@ -51,7 +54,6 @@ void GoToGameWindow(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
     /* list resources entry
     QStringList resources = QDir(":").entryList();
     for(int i =0;i<resources.size();i++){
