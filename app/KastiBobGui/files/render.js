@@ -5,12 +5,24 @@ var Render = new (function(){
   var ctx = null;
   var size = {height: 0, width: 0};
   var game = null;
+  var divider = 1;
+  var frame_state = 0;
   function render(){
     for(index = 0;index<list.length;index++){
       list[index](ctx, size);
     }
-    if(running)
-      requestAnimationFrame(render);
+    requestAnimationFrame(render);
+  }
+
+  function renderDiv(){
+    frame_state++;
+    if(frame_state >= divider){
+      frame_state = 0;
+      for(index = 0;index<list.length;index++){
+        list[index](ctx, size);
+      }
+    }
+    requestAnimationFrame(renderDiv);
   }
 
   this.add = function(draw_func){
@@ -25,9 +37,10 @@ var Render = new (function(){
     }
   };
 
-  this.start = function(){
+  this.start = function(div){
     if(running) return;
     running = true;
+    div = div || false;
     game = document.getElementById("game");
     size.height = game.height;
     size.width = game.width;
@@ -35,7 +48,11 @@ var Render = new (function(){
     if(ctx === null){
       running = false;
     }else{
-      render();
+      if(div){
+        renderDiv();
+      }else{
+        render();
+      }
     }
   };
 
@@ -43,7 +60,7 @@ var Render = new (function(){
     if(!running) return;
     running = false;
   };
-  
+
   this.resize = function(w, h){
     if(game === null){
       return;
@@ -53,9 +70,9 @@ var Render = new (function(){
     size.height = game.height;
     size.width = game.width;
   }
-  
-  this.createImage = function(w, h){
-    return ctx.createImageData(w, h);
+
+  this.setDivider = function(a){
+    divider = a;
   }
 
 })();
