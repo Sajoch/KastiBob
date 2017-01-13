@@ -46,10 +46,10 @@ var ui = new(function(){
     return null;
   }
   function addTile(){
-    
+
   }
   function delTile(){
-    
+
   }
   this.setHeroPos = function(pos){
     var con = $("#heroPos");
@@ -87,15 +87,15 @@ var ui = new(function(){
     ctx.fillStyle = "grey";
     ctx.fillRect(0, 0, mapWidth, size.height);
   }
-  
+
   this.panelState = function(show){
     showPanel = show?true:false;
   }
-  
+
   this.start = function(){
-    setInterval(loop, 1);
+    setInterval(loop, 10);
     Render.add(hud);
-    
+
   }
 
 })();

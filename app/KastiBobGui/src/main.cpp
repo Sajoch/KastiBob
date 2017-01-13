@@ -9,9 +9,6 @@
 #include "client.hpp"
 #include <iostream>
 
-//TODO del test
-#include "spriteLoader.hpp"
-
 using namespace std;
 
 Client* tclient = 0;
@@ -62,7 +59,6 @@ int main(int argc, char *argv[])
     */
     lf = new LoginForm();
     cs = new CharSelect();
-    gw = new GameWindow();
     logic_loop = new QTimer();
     QObject::connect(logic_loop, &QTimer::timeout, [&](){
       if(tclient->tick()==0){
@@ -70,5 +66,6 @@ int main(int argc, char *argv[])
       }
     });
     GoToLoginForm();
+    gw = new GameWindow();
     return a.exec();
 }

@@ -1,5 +1,5 @@
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
--lQt5Gui \
+-lQt5Gui  -lpng \
 -L../logic -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h
 obj/%.o :
 	@echo "-Compile" $@

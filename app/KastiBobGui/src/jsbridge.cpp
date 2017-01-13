@@ -48,6 +48,7 @@ void JSBridge::charSelect(){
 
 QString JSBridge::getImg(int id){
   std::string buf = sprs->getImage(id);
+  //cout<<sprs->getError()<<endl;
   return QString::fromStdString(buf);
 }
 void JSBridge::move(int dir){

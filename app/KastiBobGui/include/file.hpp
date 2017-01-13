@@ -11,4 +11,7 @@ public:
   uint8_t getUint8();
   void goToOffset(size_t a);
   bool readBuffer(std::string& buf);
+
+  size_t getOffset();
+  void readRest(std::string& buf);
 };

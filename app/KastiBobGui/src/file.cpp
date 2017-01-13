@@ -58,3 +58,17 @@ bool BinaryFile::readBuffer(std::string& buf){
   file.read((char*)&buf[0], buf.size());
   return true;
 }
+
+size_t BinaryFile::getOffset(){
+  return file.tellg();
+}
+
+void BinaryFile::readRest(std::string& buf){
+  size_t now = file.tellg();
+  size_t bs = length - now;
+  if(length < now){
+    return;
+  }
+  buf.resize(bs);
+  file.read((char*)&buf[0], bs);
+}

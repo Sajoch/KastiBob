@@ -10,7 +10,9 @@ class Sprite{
   size_t offset;
   uint32_t size;
   std::string image;
+  bool RawToPng();
 public:
+  void toBase64();
   Sprite(uint32_t off);
   std::string getImage();
 };
@@ -19,7 +21,8 @@ public:
 class SpriteLoader{
   std::string error;
   std::vector<Sprite> sprites;
-  BinaryFile spr;
+  std::string buffer;
+  size_t offset_to_data;
 public:
   std::string getError();
   SpriteLoader(std::string path);

@@ -3,14 +3,9 @@ var Img = new(function(){
 
   function download(id){
     var binary = Communication.getImg(id);
-    var dimg = Render.createImage(32, 32);
-    var di = 0;
-    var bi = binary.split("");
-    
-    for(var i=0;i<bi.length;i++){
-      dimg.data[i] = bi[i].charCodeAt(0);
-    }
-    list[id] = dimg;
+    var new_img = new Image();
+    new_img.src = "data:image/png;base64,"+binary;
+    list[id] = new_img;
   }
 
   this.get = function(id){
