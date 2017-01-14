@@ -90,8 +90,8 @@ var ui = new(function(){
 
   function drawHp(ctx){
 	ctx.font = "30px Arial";
-	ctx.fillText("Hello World",10,50);
 	ctx.fillStyle = "#ff0000";
+	ctx.fillText("Hello World",10,50);
   }
   
   this.panelState = function(show){
