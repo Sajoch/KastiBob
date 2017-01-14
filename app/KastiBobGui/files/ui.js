@@ -88,6 +88,12 @@ var ui = new(function(){
     ctx.fillRect(0, 0, mapWidth, size.height);
   }
 
+  function drawHp(ctx){
+	ctx.font = "30px Arial";
+	ctx.fillText("Hello World",10,50);
+	ctx.fillStyle = "#ff0000";
+  }
+  
   this.panelState = function(show){
     showPanel = show?true:false;
   }
@@ -95,7 +101,7 @@ var ui = new(function(){
   this.start = function(){
     setInterval(loop, 10);
     Render.add(hud);
-
+	Render.add(drawHp);
   }
 
 })();
