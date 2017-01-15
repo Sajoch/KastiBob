@@ -5,26 +5,8 @@ ExtendClient::ExtendClient(Client* _c): c(_c){
 	
 }
 /*
-void ExtendClient::parseSelfAppear(NetworkPacket& p){
-	if(p.getSize()<7){
-		c->disconnect("selfAppear too short");
-		return;
-	}
-	c->id = p.getUint32();
-	c->drawSpeed = p.getUint16();
-
-	c->canReportBugs = p.getUint8()==1?true:false;
-}
 void ExtendClient::parseGMActions(NetworkPacket& p){
 
-}
-void ExtendClient::parseErrorMessage(NetworkPacket& p){
-	if(p.getSize()<2 && p.getSize()<p.peakTStringSize()){
-		disconnect("error message too short");
-		return;
-	}
-	string error = p.getTString();
-	cout<<"Error: "<<error<<endl;
 }
 void ExtendClient::parseFYIMessage(NetworkPacket& p){
 
@@ -32,137 +14,11 @@ void ExtendClient::parseFYIMessage(NetworkPacket& p){
 void ExtendClient::parseWaitingList(NetworkPacket& p){
 
 }
-void ExtendClient::parsePing(NetworkPacket& p){
-	conn->addPacket(PingPacket(xtea));
-}
-void ExtendClient::parseInit(NetworkPacket& p){
-	if(p.getSize()<5){
-		disconnect("parseInit too short");
-		return;
-	}
-	for(int i=0;i<5;i++){
-		verify_data[i] = p.getUint8();
-	}
-	cout<<"login to game server"<<endl;
-	xtea.generateKeys();
-	xtea_crypted = true;
-	conn->addPacket(
-		LoginPacket(login, password,
-			version, os,
-			dat_signature, spr_signature, pic_signature,
-			verify_data, current_character.getName(),
-			rsa, xtea)
-		);
-}
 void ExtendClient::parseDeath(NetworkPacket& p){
 
 }
 void ExtendClient::parseCanReportBugs(NetworkPacket& p){
 
-}
-void ExtendClient::parseMapDescription(NetworkPacket& p){
-	if(p.getSize() < 5) {
-		disconnect("map description too short");
-		return;
-	}
-	x = p.getUint16();
-	y = p.getUint16();
-	z = p.getUint8();
-	gMap = Ground(mapViewX, mapViewY);
-	cout<<"hero ("<<x<<","<<y<<","<<z<<")"<<endl;
-	incoming_packet.dump();
-	if(!getMap(p, x-8, y-6, z, 18, 14)){
-		disconnect("failed to load map");
-		return;
-	}
-}
-bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
-	int32_t currZ;
-	cout<<"getMap"<<endl;
-	if(bz > 7){
-		int32_t endZ = bz + 2;
-		if(endZ > mapLayers){
-			endZ = mapLayers;
-		}
-		for(currZ = bz - 2; currZ < endZ; currZ++){
-			if(!getFloorMap(p, bx, by, currZ, w, h)){
-				return false;
-			}
-		}
-	}else{
-		for(currZ = 7; currZ > 0; currZ--){
-			if(!getFloorMap(p, bx, by, currZ, w, h)){
-				return false;
-			}
-		}
-	}
-	return true;
-}
-bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h){
-	int32_t cx, cy, skipTiles, vAttr;
-	cout<<"getFloorMap "<<_z<<endl;
-	skipTiles = 0;
-	for(cx = 0; cx < w; cx++)
-		for(cy = 0; cy < h; cy++){
-			if(skipTiles == 0){
-				if(p.getSize() < 2) {
-					return false;
-				}
-				vAttr = p.peekUint16();
-				if(vAttr > 0xEFFF){
-					p.getUint16();
-					skipTiles = vAttr & 0xFF;
-				}else{
-					if(!getSquareMap(p, bx + cx, by + cy, _z)){
-						return false;
-					}
-					if(p.getSize() < 2) {
-						return false;
-					}
-					vAttr = p.getUint16();
-					skipTiles = vAttr & 0xFF;
-				}
-			}else{
-				skipTiles--;
-			}
-		}
-	
-	return true;
-}
-bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
-	cout<<"getSquareMap "<<_x<<","<<_y<<","<<_z<<endl;
-	int32_t vAttr, thingsId;
-	Square& sq = gMap.getSquare(_x, _y, _z);
-	//TODO
-	//sq.clear();
-	for(thingsId = 0; thingsId < 10; thingsId++){
-		if(p.getSize() < 2){
-			return false;
-		}
-		vAttr = p.peekUint16();
-		if(vAttr > 0xEFFF){
-			return true;
-		}
-		Thing t = Thing(p);
-		if(!t.good()){
-			return false;
-		}
-		//TODO
-		//sq.add(t);
-	}
-	return false;
-}
-void ExtendClient::parseMoveNorth(NetworkPacket& p){
-	y--;
-}
-void ExtendClient::parseMoveEast(NetworkPacket& p){
-	x++;
-}
-void ExtendClient::parseMoveSouth(NetworkPacket& p){
-	y++;
-}
-void ExtendClient::parseMoveWest(NetworkPacket& p){
-	x--;
 }
 void ExtendClient::parseUpdateTile(NetworkPacket& p){
 

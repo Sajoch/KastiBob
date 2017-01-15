@@ -2,5 +2,5 @@
 #include "../client.hpp"
 
 void ExtendClient::parseMoveSouth(NetworkPacket& p){
-	
+	c->y++;
 }
