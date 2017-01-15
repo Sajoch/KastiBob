@@ -1,1 +1,3 @@
+set breakpoint pending on
+b client.cpp:508
 run

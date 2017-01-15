@@ -25,6 +25,7 @@ public:
 	bool isValid();
 	std::string getAddress();
 	std::string getName();
+	void show();
 };
 
 class API Client: public Creature{
@@ -61,6 +62,7 @@ class API Client: public Creature{
 	NetworkManager* conn;
 	bool xtea_crypted;
 	void newConnection(std::string ip);
+	void disconnect(std::string reason);
 	void closeConnection();
 	void recv();
 	void idle();
@@ -151,5 +153,6 @@ public:
 	void listChars(std::function<void(std::string, size_t)> cb);
 	void afterRecv(std::function<void(void)> cb);
 	bool setChar(size_t id);
+	void sendLogout();
 };
 #endif

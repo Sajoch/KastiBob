@@ -22,6 +22,7 @@ public:
   bool removeCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t stackId);
   Square& getSquare(int32_t x, int32_t y, int32_t z);
   Creature& getCreatureByID(int32_t id);
+  bool isInitialized();
 };
 
 #endif

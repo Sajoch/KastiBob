@@ -17,6 +17,7 @@ public:
 
   Q_INVOKABLE void logout();
   Q_INVOKABLE void charSelect();
+  Q_INVOKABLE void start();
   Q_INVOKABLE QString getImg(int id);
   Q_INVOKABLE void move(int dir);
   Q_INVOKABLE void look(int id);

@@ -8,7 +8,7 @@ dll: obj $(PROGRAM).dll
 all: obj $(PROGRAM)
 obj:
 	mkdir -p obj
-PACKETS=Login Ping Move
+PACKETS=Login Ping Move OneByte
 OBJS=main cipher packet network client ground square \
 		 utils outfit creature thing
 
@@ -28,6 +28,7 @@ obj/thing.o: src/thing.cpp src/thing.hpp
 obj/LoginPacket.o: src/packets/LoginPacket.cpp src/packets/LoginPacket.hpp
 obj/PingPacket.o: src/packets/PingPacket.cpp src/packets/PingPacket.hpp
 obj/MovePacket.o: src/packets/MovePacket.cpp src/packets/MovePacket.hpp
+obj/OneBytePacket.o: src/packets/OneBytePacket.cpp src/packets/OneBytePacket.hpp
 obj/main.o: src/main.cpp src/client.hpp
 $(PROGRAM): $(OBJECTS)
 	@echo "============ Compile" $@ "=============="

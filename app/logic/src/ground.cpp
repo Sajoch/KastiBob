@@ -18,7 +18,9 @@ Ground::Ground(int32_t rx, int32_t ry){
   rangeX = rx;
   rangeY = ry;
 }
-
+bool Ground::isInitialized(){
+  return initialized;
+}
 
 bool Ground::parseMap(){
   return false;

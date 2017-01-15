@@ -3,6 +3,7 @@
 #include "packets/LoginPacket.hpp"
 #include "packets/PingPacket.hpp"
 #include "packets/MovePacket.hpp"
+#include "packets/OneBytePacket.hpp"
 #include "thing.hpp"
 
 #include <sstream>
@@ -37,6 +38,9 @@ string Character::getAddress(){
 std::string Character::getName(){
 	return nick;
 }
+void Character::show(){
+	cout<<"Nick: "<<nick<<" on "<<getAddress()<<endl;
+}
 
 Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	rsa(rsa_m_n, rsa_e_n),
@@ -54,10 +58,12 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 }
 Client::~Client(){
 	closeConnection();
+	cout<<"destoring client"<<endl;
 }
 void Client::newConnection(std::string ip){
 	if(conn != 0){
 		closeConnection();
+		cout<<"close last connection"<<endl;
 	}
 	conn = new NetworkManager(ip);
 }
@@ -81,6 +87,7 @@ bool Client::setChar(size_t id){
 	if(id == -1){
 		if(state == ClientState::GAME){
 			closeConnection();
+			cout<<"setChar disconnect"<<endl;
 		}
 		current_character = Character();
 		state = ClientState::WAIT_TO_ENTER;
@@ -88,11 +95,12 @@ bool Client::setChar(size_t id){
 		current_character = characters[id];
 		if (current_character.isValid()){
 			newConnection(current_character.getAddress());
+			current_character.show();
 			xtea_crypted = false;
 			state = ClientState::GAME;
 			return true;
 		} else {
-			state = ClientState::NONE;
+			disconnect("No valid character to enter game");
 			return false;
 		}
 	}
@@ -114,10 +122,12 @@ void Client::recv(){
 		switch(state){
 			case ClientState::NONE:{
 				closeConnection();
+				cout<<"none disconnect"<<endl;
 				changeStateFunc(3, "");
 			}break;
 			case ClientState::LOGIN:{
 				state = ClientState::NONE;
+				cout<<"login start disconnect"<<endl;
 				closeConnection();
 				do{
 					packetType = incoming_packet.getUint8();
@@ -125,7 +135,7 @@ void Client::recv(){
 						case 0x0A:{ //Error message
 							std::string errormsg = incoming_packet.getTString();
 							changeStateFunc(2, errormsg);
-							state = ClientState::NONE;
+							disconnect("error in login "+errormsg);
 						}break;
 						case 0x0B:{ //For your information
 							std::string infomsg = incoming_packet.getTString();
@@ -139,11 +149,13 @@ void Client::recv(){
 						case 0x1F:
 						case 0x20:
 							changeStateFunc(2, "need to patch");
-							state = ClientState::NONE;
+							disconnect("need to patch in login");
+							return;
 						break;
 						case 0x28: //Select other login server
 							changeStateFunc(2, "Select other login server");
-							state = ClientState::NONE;
+							disconnect("select other login server in login");
+							return;
 						break;
 						case 0x64:{ //character list
 							uint16_t nchars = incoming_packet.getUint8();
@@ -168,7 +180,7 @@ void Client::recv(){
 				cout<<"wait"<<endl;
 			break;
 			case ClientState::ENTER_GAME:{
-				if (!current_character.isValid() && characters.size()>0){
+				if (current_character.isValid() && characters.size()>0){
 					newConnection(current_character.getAddress());
 					xtea_crypted = false;
 					state = ClientState::GAME;
@@ -176,13 +188,12 @@ void Client::recv(){
 				}
 				else {
 					cout<<"no valid"<<endl;
-					state = ClientState::NONE;
+					disconnect("no valid character in enter game");
 				}
 			}break;
 			case ClientState::GAME:{
 				if(!current_character.isValid()){
-					state = ClientState::NONE;
-					closeConnection();
+					disconnect("no valid character in game");
 				}
 				packetType = incoming_packet.getUint8();
 				cout<<"packet "<<packetType<<endl;
@@ -457,7 +468,7 @@ int Client::tick(){
 
 void Client::parseSelfAppear(NetworkPacket& p){
 	if(p.getSize()<7){
-		state = ClientState::NONE;
+		disconnect("selfAppear too short");
 		return;
 	}
 	id = p.getUint32();
@@ -470,7 +481,7 @@ void Client::parseGMActions(NetworkPacket& p){
 }
 void Client::parseErrorMessage(NetworkPacket& p){
 	if(p.getSize()<2 && p.getSize()<p.peakTStringSize()){
-		state = ClientState::NONE;
+		disconnect("error message too short");
 		return;
 	}
 	string error = p.getTString();
@@ -487,14 +498,13 @@ void Client::parsePing(NetworkPacket& p){
 }
 void Client::parseInit(NetworkPacket& p){
 	if(p.getSize()<5){
-		state = ClientState::NONE;
+		disconnect("parseInit too short");
 		return;
 	}
 	for(int i=0;i<5;i++){
 		verify_data[i] = p.getUint8();
 	}
 	cout<<"login to game server"<<endl;
-	gMap = Ground(mapViewX, mapViewY);
 	xtea.generateKeys();
 	xtea_crypted = true;
 	conn->addPacket(
@@ -513,16 +523,17 @@ void Client::parseCanReportBugs(NetworkPacket& p){
 }
 void Client::parseMapDescription(NetworkPacket& p){
 	if(p.getSize() < 5) {
-		state = ClientState::NONE;
+		disconnect("map description too short");
 		return;
 	}
 	x = p.getUint16();
 	y = p.getUint16();
 	z = p.getUint8();
+	gMap = Ground(mapViewX, mapViewY);
 	cout<<"hero ("<<x<<","<<y<<","<<z<<")"<<endl;
 	incoming_packet.dump();
 	if(!getMap(p, x-8, y-6, z, 18, 14)){
-		state = ClientState::NONE;
+		disconnect("failed to load map");
 		return;
 	}
 }
@@ -619,7 +630,7 @@ void Client::parseUpdateTile(NetworkPacket& p){
 }
 void Client::parseTileAddThing(NetworkPacket& p){
 	if(p.getSize()<9){
-		state = ClientState::NONE;
+		disconnect("tileAddThing too short");
 		return;
 	}
 	uint16_t x = p.getUint16();
@@ -915,4 +926,16 @@ void Client::parseAddMapMarker(NetworkPacket& p){
 
 void Client::move(ClientDirectory dir){
 	conn->addPacket(MovePacket(dir, xtea));
+}
+void Client::sendLogout(){
+	if(conn == 0){
+		disconnect("sendLogout connection is null");
+		return;
+	}
+	conn->addPacket(OneBytePacket(0x14, xtea));
+}
+void Client::disconnect(std::string reason){
+	state = ClientState::NONE;
+	closeConnection();
+	cout<<"disconnect: "<<reason<<endl;
 }

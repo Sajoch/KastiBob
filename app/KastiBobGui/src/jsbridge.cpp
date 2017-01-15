@@ -11,9 +11,6 @@ using namespace std;
 extern Client* tclient;
 
 JSBridge::JSBridge(QObject *parent) : QObject(parent){
-  tclient->afterRecv([&](){
-    CrossCallAfterUpdate();
-  });
   sprs = new SpriteLoader("..\\..\\kclient_v1\\Kasti.spr");
 }
 
@@ -32,7 +29,6 @@ void JSBridge::CrossCallAfterUpdate(){
   QVariantMap obj;
   obj["hero"] = hero;
   callAfterUpdate(obj);
-
 }
 
 void JSBridge::logout(){
@@ -48,8 +44,13 @@ void JSBridge::charSelect(){
 
 QString JSBridge::getImg(int id){
   std::string buf = sprs->getImage(id);
-  //cout<<sprs->getError()<<endl;
   return QString::fromStdString(buf);
+}
+void JSBridge::start(){
+  CrossCallAfterUpdate();
+  tclient->afterRecv([&](){
+    CrossCallAfterUpdate();
+  });
 }
 void JSBridge::move(int dir){
   switch(dir){

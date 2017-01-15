@@ -20,6 +20,7 @@ void NetworkManager::addPacketR(NetworkPacket& p){
 }
 void NetworkManager::addPacket(NetworkPacket p){
 	p.add_header();
+	cout<<"add packet "<<p.getSize()<<endl;
 	send_buffer.append(p.getData());
 }
 bool NetworkManager::getPacket(NetworkPacket& p){
@@ -33,11 +34,13 @@ bool NetworkManager::getPacket(NetworkPacket& p){
 		packet_crc = NetworkPacket::peekUint32(recv_buffer);
 		recv_buffer.erase(recv_buffer.begin(), recv_buffer.begin()+4);
 		recv_offset -= 4;
+		packet_size -= 4;
 		haveCrc = true;
 	}
-	if(haveSize && haveCrc){
-		p.buffer = recv_buffer.substr(0, recv_offset);
-		recv_offset = 0;
+	if(haveSize && haveCrc && recv_offset >= packet_size){
+		p.buffer = recv_buffer.substr(0, packet_size);
+		recv_offset -= packet_size;
+		recv_buffer = recv_buffer.substr(recv_offset);
 		haveSize = false;
 		haveCrc = false;
 		if(p.checksum() == packet_crc){
