@@ -16,6 +16,7 @@ enum class CreatureType{
 
 class API Creature: public Thing{
 friend class Client;
+friend class ExtendClient;
   CreatureType type;
   std::string name;
   uint32_t id;
