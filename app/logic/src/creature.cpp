@@ -1,10 +1,44 @@
 #include "creature.hpp"
+#include <iostream>
 
-Creature::Creature(){
+using namespace std;
+
+Creature::Creature(): Thing(ThingType::CREATURE){
   id = -1;
   x = y = z = 0;
 }
 
+Creature Creature::setNewCreature(NetworkPacket& p){
+  Creature ret;
+  uint32_t unk1 = p.getUint32();
+  ret.id = p.getUint32();
+  ret.name = p.getTString();
+  ret.hpp = p.getUint8();
+  uint32_t unk4 = p.getUint8();
+  //sth
+  ret.apperance.fromMsg(p);
+  
+  ret.lightLevel = p.getUint8();
+  ret.lightColor = p.getUint8();
+  ret.speed = p.getUint16();
+  ret.skull = p.getUint8();
+  ret.blockSpace = p.getUint8();
+  ret.setError(0);
+  return ret;
+}
+
+Creature Creature::setKnownCreature(NetworkPacket& p){
+  Creature ret;
+  uint32_t unk1 = p.getUint32();
+  cout<<"known "<<unk1<<endl;
+  return ret;
+}
+
+Creature Creature::setUnk1Creature(NetworkPacket& p){
+  Creature ret;
+  cout<<"unk1"<<endl;
+  return ret;
+}
 uint32_t Creature::getX(){
   return x;
 }

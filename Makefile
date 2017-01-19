@@ -35,6 +35,8 @@ dgui:
 	make -C app/KastiBobGui debug
 clean_gui:
 	make -C app/KastiBobGui clean
+clean_logic:
+	make -C app/logic clean
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean

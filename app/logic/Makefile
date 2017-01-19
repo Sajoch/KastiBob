@@ -12,7 +12,7 @@ obj_ext_c:
 	mkdir -p obj_ext_c
 PACKETS=Login Ping Move OneByte
 OBJS=main cipher packet network client ground square \
-		 utils outfit creature thing extendClient
+		 utils outfit creature thing extendClient item
 extendClient_CPP=$(wildcard src/extendClient/*.cpp)
 extendClient_OBJ=$(patsubst src/extendClient/%.cpp,obj_ext_c/%.o,$(extendClient_CPP))
 OBJS+=$(patsubst %,%Packet,$(PACKETS))
@@ -32,6 +32,7 @@ obj/extendClient.o: src/extendClient.cpp src/extendClient.hpp
 obj/utils.o: src/utils.cpp src/utils.hpp
 obj/outfit.o: src/outfit.cpp src/outfit.hpp
 obj/thing.o: src/thing.cpp src/thing.hpp
+obj/item.o: src/item.cpp src/item.hpp
 obj/LoginPacket.o: src/packets/LoginPacket.cpp src/packets/LoginPacket.hpp
 obj/PingPacket.o: src/packets/PingPacket.cpp src/packets/PingPacket.hpp
 obj/MovePacket.o: src/packets/MovePacket.cpp src/packets/MovePacket.hpp

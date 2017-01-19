@@ -81,13 +81,14 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 	//sq.clear();
 	for(thingsId = 0; thingsId < 10; thingsId++){
 		if(p.getSize() < 2){
+			cout<<"outOfData"<<endl;
 			return false;
 		}
 		vAttr = p.peekUint16();
 		if(vAttr > 0xEFFF){
 			return true;
 		}
-		Thing t = Thing(p);
+		Thing t = Thing::getThing(p);
 		if(!t.good()){
 			return false;
 		}
