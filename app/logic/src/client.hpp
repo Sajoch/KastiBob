@@ -6,13 +6,14 @@
 #include <chrono>
 #include <functional>
 #include "dll.h"
-#include "cipher.hpp"
-#include "packet.hpp"
-#include "network.hpp"
-#include "utils.hpp"
-#include "ground.hpp"
-#include "outfit.hpp"
-#include "extendClient.hpp"
+//#include "cipher.hpp"
+//#include "packet.hpp"
+//#include "network.hpp"
+//#include "utils.hpp"
+#include "creature.hpp"
+//#include "ground.hpp"
+//#include "outfit.hpp"
+//#include "extendClient.hpp"
 
 class API Character{
 	std::string nick;
@@ -30,9 +31,9 @@ public:
 };
 
 class API Client: public Creature{
-	friend ExtendClient;
-	XTEAcipher xtea;
-	RSAcipher rsa;
+	friend class ExtendClient;
+	class XTEAcipher* xtea;
+	class RSAcipher* rsa;
 	static const char* rsa_e_n;
 	static const char* rsa_m_n;
 	static uint32_t dat_signature;
@@ -42,7 +43,7 @@ class API Client: public Creature{
 	static uint32_t mapViewY;
 	static int32_t mapLayers;
 	ClientState state;
-	ExtendClient ext;
+	class ExtendClient* ext;
 
 	Character current_character;
 	std::vector<Character> characters;
@@ -54,15 +55,15 @@ class API Client: public Creature{
 	std::chrono::system_clock::time_point lastAntyIdle;
 	std::function<void(int, std::string)> changeStateFunc;
 	std::function<void(void)> afterRecvFunc;
-	Ground gMap;
+	class Ground* gMap;
 
 	uint8_t verify_data[5];
-	NetworkPacket incoming_packet;
+	class NetworkPacket* incoming_packet;
 	uint16_t version;
 	uint16_t os;
 	std::string login;
 	std::string password;
-	NetworkManager* conn;
+	class NetworkManager* conn;
 	bool xtea_crypted;
 	void newConnection(std::string ip);
 	void disconnect(std::string reason);

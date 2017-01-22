@@ -1,6 +1,11 @@
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -o $@ $(CPPFLAG) $<
+
+src/%.hpp.gch : 
+	@echo "precompile" $@
+	@$(CXX) -o $@ $<
+
 PROGRAM=KastiBob_logic
 CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL
 
@@ -18,7 +23,7 @@ extendClient_OBJ=$(patsubst src/extendClient/%.cpp,obj_ext_c/%.o,$(extendClient_
 OBJS+=$(patsubst %,%Packet,$(PACKETS))
 OBJECTS=$(extendClient_OBJ) $(patsubst %,obj/%.o,$(OBJS))
 PACKETHEADERS=$(patsubst %,src/packets/%Packet.hpp,$(PACKETS))
-obj_ext_c/%.o: src/extendClient/%.cpp $(PACKETHEADERS) src/client.hpp src/network.hpp
+obj_ext_c/%.o: src/extendClient/%.cpp $(PACKETHEADERS) 
 	@echo "-Compile" $@
 	@$(CXX) -c -o $@ $(CPPFLAG) $<
 obj/client.o: src/client.cpp src/client.hpp $(PACKETHEADERS) src/thing.hpp src/extendClient.hpp

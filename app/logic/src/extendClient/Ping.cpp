@@ -1,7 +1,8 @@
-#include "../network.hpp"
+#include "../extendClient.hpp"
 #include "../client.hpp"
+#include "../network.hpp"
 #include "../packets/PingPacket.hpp"
 
-void ExtendClient::parsePing(NetworkPacket& p){
+void ExtendClient::Ping(NetworkPacket* p){
 	c->conn->addPacket(PingPacket(c->xtea));
 }

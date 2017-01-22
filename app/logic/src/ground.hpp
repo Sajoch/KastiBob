@@ -14,7 +14,7 @@ class Ground{
   std::map<int32_t, Square> squares;
 public:
   Ground();
-  Ground(int32_t rx, int32_t ry);
+  void set(int32_t rx, int32_t ry);
   bool parseMap();
   bool parseLight(uint16_t lvl, uint16_t color);
   int getMap(std::vector<Square> sqs, int32_t x, int32_t y, int32_t z);

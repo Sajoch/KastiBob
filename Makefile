@@ -24,12 +24,13 @@ mdll: minject
 test_dll: mdll
 	make -C KastiDll test
 logic:
-	make -C app/logic test
+	+make -C app/logic test
+logic_dll:
+	+make -C app/logic dll
 sprunpack:
 	make -C app/sprunpack test
-gui:
-	make -C app/logic dll
-	make -C app/KastiBobGui test
+gui: logic_dll
+	+make -C app/KastiBobGui test
 dgui:
 	make -C app/logic dll
 	make -C app/KastiBobGui debug

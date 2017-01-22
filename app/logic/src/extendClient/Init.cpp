@@ -1,17 +1,18 @@
-#include "../network.hpp"
+#include "../extendClient.hpp"
 #include "../client.hpp"
+#include "../network.hpp"
 #include "../packets/LoginPacket.hpp"
 
-void ExtendClient::parseInit(NetworkPacket& p){
-	if(p.getSize()<5){
+void ExtendClient::Init(NetworkPacket* p){
+	if(p->getSize()<5){
 		c->disconnect("parseInit too short");
 		return;
 	}
 	for(int i=0;i<5;i++){
-		c->verify_data[i] = p.getUint8();
+		c->verify_data[i] = p->getUint8();
 	}
 	//cout<<"login to game server"<<endl;
-	c->xtea.generateKeys();
+	c->xtea->generateKeys();
 	c->xtea_crypted = true;
 	c->conn->addPacket(
 		LoginPacket(c->login, c->password,

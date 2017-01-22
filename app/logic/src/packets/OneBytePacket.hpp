@@ -7,6 +7,6 @@
 class OneBytePacket: public NetworkPacket
 {
 public:
-	OneBytePacket(uint8_t val, XTEAcipher& xtea);
+	OneBytePacket(uint8_t val, XTEAcipher* xtea);
 };
 #endif

@@ -121,12 +121,12 @@ size_t NetworkPacket::getSize() {
 void NetworkPacket::resize(size_t len) {
 	return buffer.resize(len);
 }
-void NetworkPacket::xteaDecrypt(XTEAcipher& xtea){
-	xtea.decrypt(buffer);
+void NetworkPacket::xteaDecrypt(XTEAcipher* xtea){
+	xtea->decrypt(buffer);
 }
-void NetworkPacket::xteaEncrypt(XTEAcipher& xtea){
+void NetworkPacket::xteaEncrypt(XTEAcipher* xtea){
 	buffer.append((8-(buffer.size()%8)), 0xAC);
-	xtea.encrypt(buffer);
+	xtea->encrypt(buffer);
 }
 
 void NetworkPacket::dump(){

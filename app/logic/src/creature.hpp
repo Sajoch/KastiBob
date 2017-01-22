@@ -33,9 +33,9 @@ friend class ExtendClient;
   ClientDirectory directory;
 public:
   Creature();
-  static Creature setNewCreature(NetworkPacket& p);
-  static Creature setKnownCreature(NetworkPacket& p);
-  static Creature setUnk1Creature(NetworkPacket& p);
+  static Creature setNewCreature(NetworkPacket* p);
+  static Creature setKnownCreature(NetworkPacket* p);
+  static Creature setUnk1Creature(NetworkPacket* p);
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();

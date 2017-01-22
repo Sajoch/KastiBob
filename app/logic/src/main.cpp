@@ -5,7 +5,6 @@
 #include "client.hpp"
 #include <cstdlib>
 #include <ctime>
-#include <Poco/Thread.h>
 
 using namespace std;
 

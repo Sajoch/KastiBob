@@ -13,10 +13,10 @@ Thing::Thing(ThingType _type){
 }
 
 
-Thing Thing::getThing(NetworkPacket& p){
+Thing Thing::getThing(NetworkPacket* p){
 	Thing ret;
 	cout<<"thing"<<endl;
-	uint32_t type = p.getUint16();
+	uint32_t type = p->getUint16();
 	switch(type){
 		case 0x61:
 			ret = Creature::setNewCreature(p);

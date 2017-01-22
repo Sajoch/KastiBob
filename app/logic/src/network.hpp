@@ -24,7 +24,7 @@ public:
 	~NetworkManager();
 	void addPacket(NetworkPacket p);
 	void addPacketR(NetworkPacket& p);
-	bool getPacket(NetworkPacket& p);
+	bool getPacket(NetworkPacket* p);
 	int tick();
 };
 #endif

@@ -14,8 +14,8 @@ class Outfit{
   uint16_t lookMount;
 public:
   Outfit();
-  bool fromMsg(class NetworkPacket& p);
-  void toMsg(class NetworkPacket& p);
+  bool fromMsg(class NetworkPacket* p);
+  void toMsg(class NetworkPacket* p);
 };
 
 #endif

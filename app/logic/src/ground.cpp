@@ -13,7 +13,7 @@ Ground::Ground(){
   rangeX = 0;
   rangeY = 0;
 }
-Ground::Ground(int32_t rx, int32_t ry){
+void Ground::set(int32_t rx, int32_t ry){
   initialized = true;
   rangeX = rx;
   rangeY = ry;

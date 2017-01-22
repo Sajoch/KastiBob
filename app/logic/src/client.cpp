@@ -3,6 +3,9 @@
 #include "packets/LoginPacket.hpp"
 #include "packets/MovePacket.hpp"
 #include "packets/OneBytePacket.hpp"
+#include "extendClient.hpp"
+#include "ground.hpp"
+#include "network.hpp"
 /*
 #include "packets/PingPacket.hpp"
 */
@@ -45,11 +48,15 @@ void Character::show(){
 }
 
 Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
-	rsa(rsa_m_n, rsa_e_n),
-	ext(this),
 	version(_version), os(_os),
 	login(l), password(p)
 {
+	xtea = new XTEAcipher();
+	rsa = new RSAcipher(rsa_m_n, rsa_e_n);
+	ext = new ExtendClient(this);
+	gMap = new Ground();
+	incoming_packet = new NetworkPacket();
+	
 	lastAntyIdle = chrono::system_clock::now();
 	AntyIdle_duration = chrono::seconds(1);
 	conn = 0;
@@ -111,15 +118,15 @@ bool Client::setChar(size_t id){
 }
 void Client::recv(){
 	if(xtea_crypted){
-		incoming_packet.xteaDecrypt(xtea);
+		incoming_packet->xteaDecrypt(xtea);
 	}
-	uint16_t len = incoming_packet.getUint16();
-	uint16_t real_len = incoming_packet.getSize();
+	uint16_t len = incoming_packet->getUint16();
+	uint16_t real_len = incoming_packet->getSize();
 	if(real_len < len){
 		cout<<"wrong size after XTea decrypt, expected "<<len<<" but has "<<real_len<<endl;
 		return;
 	}
-	incoming_packet.resize(len);
+	incoming_packet->resize(len);
 	uint16_t packetType;
 	while(true){
 		switch(state){
@@ -133,19 +140,19 @@ void Client::recv(){
 				cout<<"login start disconnect"<<endl;
 				closeConnection();
 				do{
-					packetType = incoming_packet.getUint8();
+					packetType = incoming_packet->getUint8();
 					switch(packetType){
 						case 0x0A:{ //Error message
-							std::string errormsg = incoming_packet.getTString();
+							std::string errormsg = incoming_packet->getTString();
 							changeStateFunc(2, errormsg);
 							disconnect("error in login "+errormsg);
 						}break;
 						case 0x0B:{ //For your information
-							std::string infomsg = incoming_packet.getTString();
+							std::string infomsg = incoming_packet->getTString();
 							cout<<"Info: "<<infomsg<<endl;
 						}break;
 						case 0x14:{ //MOTD
-							std::string motd = incoming_packet.getTString();
+							std::string motd = incoming_packet->getTString();
 							cout<<"Motd "<<motd<<endl;
 						}break;
 						case 0x1E: //Patching exe/dat/spr messages
@@ -161,19 +168,19 @@ void Client::recv(){
 							return;
 						break;
 						case 0x64:{ //character list
-							uint16_t nchars = incoming_packet.getUint8();
+							uint16_t nchars = incoming_packet->getUint8();
 							for(uint32_t i = 0; i < nchars; ++i){
-								std::string charName = incoming_packet.getTString();
-								std::string world = incoming_packet.getTString();
-								uint32_t ip = incoming_packet.getUint32();
-								uint16_t port = incoming_packet.getUint16();
+								std::string charName = incoming_packet->getTString();
+								std::string world = incoming_packet->getTString();
+								uint32_t ip = incoming_packet->getUint32();
+								uint16_t port = incoming_packet->getUint16();
 								characters.push_back(Character(charName, world, ip, port));
 							}
-							premiumDays = incoming_packet.getUint16();
+							premiumDays = incoming_packet->getUint16();
 							state = ClientState::WAIT_TO_ENTER;
 						}break;
 					}
-				}while(incoming_packet.getSize()>=1);
+				}while(incoming_packet->getSize()>=1);
 				if(state != ClientState::NONE){
 					continue;
 				}
@@ -198,239 +205,239 @@ void Client::recv(){
 				if(!current_character.isValid()){
 					disconnect("no valid character in game");
 				}
-				packetType = incoming_packet.getUint8();
+				packetType = incoming_packet->getUint8();
 				cout<<"packet "<<packetType<<endl;
 				switch(packetType){
 					case 0x0A:
-						ext.parseSelfAppear(incoming_packet);
+						ext->SelfAppear(incoming_packet);
 					break;
 					/*case 0x0B:
-						ext.parseGMActions(incoming_packet);
+						ext->GMActions(incoming_packet);
 					break;
 					*/
 					case 0x14:
-						ext.parseErrorMessage(incoming_packet);
+						ext->ErrorMessage(incoming_packet);
 					break;
 					/*case 0x15:
-						ext.parseFYIMessage(incoming_packet);
+						ext->FYIMessage(incoming_packet);
 					break;
 					case 0x16:
-						ext.parseWaitingList(incoming_packet);
+						ext->WaitingList(incoming_packet);
 					break;
 					*/
 					case 0x1E:
-						ext.parsePing(incoming_packet);
+						ext->Ping(incoming_packet);
 					break;
 					case 0x1F:
-						ext.parseInit(incoming_packet);
+						ext->Init(incoming_packet);
 					break;
 					/*case 0x28:
-						ext.parseDeath(incoming_packet);
+						ext->Death(incoming_packet);
 					break;
 					case 0x32:
-						ext.parseCanReportBugs(incoming_packet);
+						ext->CanReportBugs(incoming_packet);
 					break;
 					*/
 					case 0x64:
-						ext.parseMapDescription(incoming_packet);
+						ext->MapDescription(incoming_packet);
 					break;
 					case 0x65:
-						ext.parseMoveNorth(incoming_packet);
+						ext->MoveNorth(incoming_packet);
 					break;
 					case 0x66:
-						ext.parseMoveEast(incoming_packet);
+						ext->MoveEast(incoming_packet);
 					break;
 					case 0x67:
-						ext.parseMoveSouth(incoming_packet);
+						ext->MoveSouth(incoming_packet);
 					break;
 					case 0x68:
-						ext.parseMoveWest(incoming_packet);
+						ext->MoveWest(incoming_packet);
 					break;
 					/*case 0x69:
-						ext.parseUpdateTile(incoming_packet);
+						ext->UpdateTile(incoming_packet);
 					break;*/
 					case 0x6A:
-						ext.parseTileAddThing(incoming_packet);
+						ext->TileAddThing(incoming_packet);
 					break;
 					/*case 0x6B:
-						ext.parseTileTransformThing(incoming_packet);
+						ext->TileTransformThing(incoming_packet);
 					break;
 					case 0x6C:
-						ext.parseTileRemoveThing(incoming_packet);
+						ext->TileRemoveThing(incoming_packet);
 					break;*/
 					case 0x6D:
-						ext.parseCreatureMove(incoming_packet);
+						ext->CreatureMove(incoming_packet);
 					break;
 					/*case 0x6E:
-						ext.parseOpenContainer(incoming_packet);
+						ext->OpenContainer(incoming_packet);
 					break;
 					case 0x6F:
-						ext.parseCloseContainer(incoming_packet);
+						ext->CloseContainer(incoming_packet);
 					break;
 					case 0x70:
-						ext.parseContainerAddItem(incoming_packet);
+						ext->ContainerAddItem(incoming_packet);
 					break;
 					case 0x71:
-						ext.parseContainerUpdateItem(incoming_packet);
+						ext->ContainerUpdateItem(incoming_packet);
 					break;
 					case 0x72:
-						ext.parseContainerRemoveItem(incoming_packet);
+						ext->ContainerRemoveItem(incoming_packet);
 					break;
 					*/
 					case 0x78:
-						ext.parseInventorySetSlot(incoming_packet);
+						ext->InventorySetSlot(incoming_packet);
 					break;
 					case 0x79:
-						ext.parseInventoryResetSlot(incoming_packet);
+						ext->InventoryResetSlot(incoming_packet);
 					break;
 					/*case 0x7D:
-						ext.parseSafeTradeRequestAck(incoming_packet);
+						ext->SafeTradeRequestAck(incoming_packet);
 					break;
 					case 0x7E:
-						ext.parseSafeTradeRequestNoAck(incoming_packet);
+						ext->SafeTradeRequestNoAck(incoming_packet);
 					break;
 					case 0x7F:
-						ext.parseSafeTradeClose(incoming_packet);
+						ext->SafeTradeClose(incoming_packet);
 					break;
 					*/
 					case 0x82:
-						ext.parseWorldLight(incoming_packet);
+						ext->WorldLight(incoming_packet);
 					break;
 					case 0x83:
-						ext.parseMagicEffect(incoming_packet);
+						ext->MagicEffect(incoming_packet);
 					break;
 					/*case 0x84:
-						ext.parseAnimatedText(incoming_packet);
+						ext->AnimatedText(incoming_packet);
 					break;
 					case 0x85:
-						ext.parseDistanceShot(incoming_packet);
+						ext->DistanceShot(incoming_packet);
 					break;
 					case 0x86:
-						ext.parseCreatureSquare(incoming_packet);
+						ext->CreatureSquare(incoming_packet);
 					break;
 					*/
 					case 0x8C:
-						ext.parseCreatureHealth(incoming_packet);
+						ext->CreatureHealth(incoming_packet);
 					break;
 					case 0x8D:
-						ext.parseCreatureLight(incoming_packet);
+						ext->CreatureLight(incoming_packet);
 					break;
 					/*case 0x8E:
-						ext.parseCreatureOutfit(incoming_packet);
+						ext->CreatureOutfit(incoming_packet);
 					break;
 					case 0x8F:
-						ext.parseCreatureSpeed(incoming_packet);
+						ext->CreatureSpeed(incoming_packet);
 					break;
 					case 0x90:
-						ext.parseCreatureSkulls(incoming_packet);
+						ext->CreatureSkulls(incoming_packet);
 					break;
 					case 0x91:
-						ext.parseCreatureShields(incoming_packet);
+						ext->CreatureShields(incoming_packet);
 					break;
 					case 0x92:
-						ext.parseCreaturePassable(incoming_packet);
+						ext->CreaturePassable(incoming_packet);
 					break;
 					case 0x96:
-						ext.parseItemTextWindow(incoming_packet);
+						ext->ItemTextWindow(incoming_packet);
 					break;
 					case 0x97:
-						ext.parseHouseTextWindow(incoming_packet);
+						ext->HouseTextWindow(incoming_packet);
 					break;
 					case 0xA0:
-						ext.parsePlayerStats(incoming_packet);
+						ext->PlayerStats(incoming_packet);
 					break;
 					case 0xA1:
-						ext.parsePlayerSkills(incoming_packet);
+						ext->PlayerSkills(incoming_packet);
 					break;
 					case 0xA2:
-						ext.parsePlayerIcons(incoming_packet);
+						ext->PlayerIcons(incoming_packet);
 					break;
 					case 0xA3:
-						ext.parsePlayerCancelAttack(incoming_packet);
+						ext->PlayerCancelAttack(incoming_packet);
 					break;
 					*/
 					case 0xAA:
-						ext.parseCreatureSpeak(incoming_packet);
+						ext->CreatureSpeak(incoming_packet);
 					break;
 					/*case 0xAB:
-						ext.parseChannelList(incoming_packet);
+						ext->ChannelList(incoming_packet);
 					case 0xAC:
-						ext.parseOpenChannel(incoming_packet);
+						ext->OpenChannel(incoming_packet);
 					break;
 					case 0xAD:
-						ext.parseOpenPrivatePlayerChat(incoming_packet);
+						ext->OpenPrivatePlayerChat(incoming_packet);
 					break;
 					case 0xAE:
-						ext.parseOpenRuleViolation(incoming_packet);
+						ext->OpenRuleViolation(incoming_packet);
 					break;
 					case 0xAF:
-						ext.parseRuleViolationAF(incoming_packet);
+						ext->RuleViolationAF(incoming_packet);
 					break;
 					case 0xB0:
-						ext.parseRuleViolationB0(incoming_packet);
+						ext->RuleViolationB0(incoming_packet);
 					break;
 					case 0xB1:
-						ext.parseRuleViolationB1(incoming_packet);
+						ext->RuleViolationB1(incoming_packet);
 					break;
 					case 0xB2:
-						ext.parseCreatePrivateChannel(incoming_packet);
+						ext->CreatePrivateChannel(incoming_packet);
 					break;
 					case 0xB3:
-						ext.parseClosePrivateChannel(incoming_packet);
+						ext->ClosePrivateChannel(incoming_packet);
 					break;
 					*/
 					case 0xB4:
-						ext.parseTextMessage(incoming_packet);
+						ext->TextMessage(incoming_packet);
 					break;
 					/*case 0xB5:
-						ext.parsePlayerCancelWalk(incoming_packet);
+						ext->PlayerCancelWalk(incoming_packet);
 					break;
 					case 0xBE:
-						ext.parseFloorChangeUp(incoming_packet);
+						ext->FloorChangeUp(incoming_packet);
 					break;
 					case 0xBF:
-						ext.parseFloorChangeDown(incoming_packet);
+						ext->FloorChangeDown(incoming_packet);
 					break;
 					case 0xC8:
-						ext.parseOutfitWindow(incoming_packet);
+						ext->OutfitWindow(incoming_packet);
 					break;
 					case 0xD2:
-						ext.parseVipState(incoming_packet);
+						ext->VipState(incoming_packet);
 					break;
 					case 0xD3:
-						ext.parseVipLogin(incoming_packet);
+						ext->VipLogin(incoming_packet);
 					break;
 					case 0xD4:
-						ext.parseVipLogout(incoming_packet);
+						ext->VipLogout(incoming_packet);
 					break;
 					case 0xF0:
-						ext.parseQuestList(incoming_packet);
+						ext->QuestList(incoming_packet);
 					break;
 					case 0xF1:
-						ext.parseQuestPartList(incoming_packet);
+						ext->QuestPartList(incoming_packet);
 					break;
 					case 0x7A:
-						ext.parseOpenShopWindow(incoming_packet);
+						ext->OpenShopWindow(incoming_packet);
 					break;
 					case 0x7B:
-						ext.parsePlayerCash(incoming_packet);
+						ext->PlayerCash(incoming_packet);
 					break;
 					case 0x7C:
-						ext.parseCloseShopWindow(incoming_packet);
+						ext->CloseShopWindow(incoming_packet);
 					break;
 					case 0xDC:
-						ext.parseShowTutorial(incoming_packet);
+						ext->ShowTutorial(incoming_packet);
 					break;
 					case 0xDD:
-						ext.parseAddMapMarker(incoming_packet);
+						ext->AddMapMarker(incoming_packet);
 					break;
 					*/
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
-						incoming_packet.dump();
+						incoming_packet->dump();
 						return;
 				}
-				if(incoming_packet.getSize()>0){
+				if(incoming_packet->getSize()>0){
 					continue;
 				}
 			}break;
