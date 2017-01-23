@@ -5,7 +5,7 @@
 class ExtendClient{
 	class Client* c;
 	bool getMap(class NetworkPacket* p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h);
-	bool getFloorMap(class NetworkPacket* p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h);
+	bool getFloorMap(class NetworkPacket* p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles);
 	bool getSquareMap(class NetworkPacket* p, int32_t _x, int32_t _y, int32_t _z);
 public:
 	ExtendClient(class Client* _c);

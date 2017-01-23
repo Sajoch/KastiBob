@@ -23,7 +23,8 @@ void ExtendClient::MapDescription(NetworkPacket* p){
 }
 
 bool ExtendClient::getMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
-	int32_t currZ;
+	int32_t currZ, skipTiles;
+	skipTiles = 0;
 	cout<<"getMap"<<endl;
 	if(bz > 7){
 		int32_t endZ = bz + 2;
@@ -31,23 +32,25 @@ bool ExtendClient::getMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t bz, 
 			endZ = c->mapLayers;
 		}
 		for(currZ = bz - 2; currZ < endZ; currZ++){
-			if(!getFloorMap(p, bx, by, currZ, w, h)){
+			if(!getFloorMap(p, bx, by, currZ, w, h, skipTiles)){
 				return false;
 			}
 		}
 	}else{
 		for(currZ = 7; currZ > 0; currZ--){
-			if(!getFloorMap(p, bx, by, currZ, w, h)){
+			if(!getFloorMap(p, bx, by, currZ, w, h, skipTiles)){
 				return false;
 			}
 		}
 	}
 	return true;
 }
-bool ExtendClient::getFloorMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h){
-	int32_t cx, cy, skipTiles, vAttr;
+bool ExtendClient::getFloorMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){
+	int32_t cx, cy, vAttr;
 	cout<<"getFloorMap "<<_z<<endl;
-	skipTiles = 0;
+	if(_z==1 || _z==2){
+		p->dump();
+	}
 	for(cx = 0; cx < w; cx++)
 		for(cy = 0; cy < h; cy++){
 			if(skipTiles == 0){
@@ -55,7 +58,7 @@ bool ExtendClient::getFloorMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t
 					return false;
 				}
 				vAttr = p->peekUint16();
-				if(vAttr > 0xEFFF){
+				if(vAttr >= 0xFF00){
 					p->getUint16();
 					skipTiles = vAttr & 0xFF;
 				}else{
