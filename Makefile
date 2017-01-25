@@ -1,8 +1,7 @@
 ifeq ($(OS),LINUX)
 	CROSS_COMPILE=
 	CROSS_COMPILE32=
-endif
-ifeq ($(OS), WIN32)
+else ifeq ($(OS), WIN32)
 	CROSS_COMPILE=i686-w64-mingw32-
 	CROSS_COMPILE32=i686-w64-mingw32-
 else
