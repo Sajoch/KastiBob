@@ -1,8 +1,7 @@
 ifeq ($(OS),LINUX)
 	CROSS_COMPILE=
 	CROSS_COMPILE32=
-endif
-ifeq ($(OS), WIN32)
+else ifeq ($(OS), WIN32)
 	CROSS_COMPILE=i686-w64-mingw32-
 	CROSS_COMPILE32=i686-w64-mingw32-
 else
@@ -27,13 +26,19 @@ logic:
 	+make -C app/logic test
 logic_dll:
 	+make -C app/logic dll
+logic_so:
+	+make -C app/logic so
 sprunpack:
 	make -C app/sprunpack test
 gui: logic_dll
 	+make -C app/KastiBobGui test
+linuxgui: logic_so
+	+make -C app/KastiBobGui test
 dgui:
 	make -C app/logic dll
 	make -C app/KastiBobGui debug
+linuxdgui: logic_so
+	+make -C app/KastiBobGui debug
 clean_gui:
 	make -C app/KastiBobGui clean
 clean_logic:

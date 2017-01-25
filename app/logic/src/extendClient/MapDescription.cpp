@@ -5,24 +5,24 @@
 //TODO del iostream - only tests
 #include <iostream>
 using namespace std;
-void ExtendClient::MapDescription(NetworkPacket* p){
-	if(p->getSize() < 5) {
+void ExtendClient::MapDescription(NetworkPacket& p){
+	if(p.getSize() < 5) {
 		c->disconnect("map description too short");
 		return;
 	}
-	c->x = p->getUint16();
-	c->y = p->getUint16();
-	c->z = p->getUint8();
+	c->x = p.getUint16();
+	c->y = p.getUint16();
+	c->z = p.getUint8();
 	c->gMap->set(c->mapViewX, c->mapViewY);
 	cout<<"hero ("<<c->x<<","<<c->y<<","<<c->z<<")"<<endl;
-	c->incoming_packet->dump();
+	p.dump();
 	if(!getMap(p, c->x-8, c->y-6, c->z, 18, 14)){
 		c->disconnect("failed to load map");
 		return;
 	}
 }
 
-bool ExtendClient::getMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
+bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
 	int32_t currZ, skipTiles;
 	skipTiles = 0;
 	cout<<"getMap"<<endl;
@@ -45,30 +45,30 @@ bool ExtendClient::getMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t bz, 
 	}
 	return true;
 }
-bool ExtendClient::getFloorMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){
+bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){
 	int32_t cx, cy, vAttr;
 	cout<<"getFloorMap "<<_z<<endl;
 	if(_z==1 || _z==2){
-		p->dump();
+		p.dump();
 	}
 	for(cx = 0; cx < w; cx++)
 		for(cy = 0; cy < h; cy++){
 			if(skipTiles == 0){
-				if(p->getSize() < 2) {
+				if(p.getSize() < 2) {
 					return false;
 				}
-				vAttr = p->peekUint16();
+				vAttr = p.peekUint16();
 				if(vAttr >= 0xFF00){
-					p->getUint16();
+					p.getUint16();
 					skipTiles = vAttr & 0xFF;
 				}else{
 					if(!getSquareMap(p, bx + cx, by + cy, _z)){
 						return false;
 					}
-					if(p->getSize() < 2) {
+					if(p.getSize() < 2) {
 						return false;
 					}
-					vAttr = p->getUint16();
+					vAttr = p.getUint16();
 					skipTiles = vAttr & 0xFF;
 				}
 			}else{
@@ -78,18 +78,18 @@ bool ExtendClient::getFloorMap(NetworkPacket* p, int32_t bx, int32_t by, int32_t
 	
 	return true;
 }
-bool ExtendClient::getSquareMap(NetworkPacket* p, int32_t _x, int32_t _y, int32_t _z){
+bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
 	cout<<"getSquareMap "<<_x<<","<<_y<<","<<_z<<endl;
 	int32_t vAttr, thingsId;
 	Square& sq = c->gMap->getSquare(_x, _y, _z);
 	//TODO
 	//sq.clear();
 	for(thingsId = 0; thingsId < 10; thingsId++){
-		if(p->getSize() < 2){
+		if(p.getSize() < 2){
 			cout<<"outOfData"<<endl;
 			return false;
 		}
-		vAttr = p->peekUint16();
+		vAttr = p.peekUint16();
 		if(vAttr > 0xEFFF){
 			return true;
 		}

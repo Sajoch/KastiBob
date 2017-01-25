@@ -3,33 +3,33 @@
 
 using namespace std;
 
-void ExtendClient::TileAddThing(NetworkPacket*){
+void ExtendClient::TileAddThing(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::CreatureMove(NetworkPacket*){
+void ExtendClient::CreatureMove(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::InventorySetSlot(NetworkPacket*){
+void ExtendClient::InventorySetSlot(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::InventoryResetSlot(NetworkPacket*){
+void ExtendClient::InventoryResetSlot(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::WorldLight(NetworkPacket*){
+void ExtendClient::WorldLight(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::MagicEffect(NetworkPacket*){
+void ExtendClient::MagicEffect(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::CreatureHealth(NetworkPacket*){
+void ExtendClient::CreatureHealth(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::CreatureLight(NetworkPacket*){
+void ExtendClient::CreatureLight(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::CreatureSpeak(NetworkPacket*){
+void ExtendClient::CreatureSpeak(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }
-void ExtendClient::TextMessage(NetworkPacket*){
+void ExtendClient::TextMessage(NetworkPacket&){
 	cout<<"notImplemented"<<endl;
 }

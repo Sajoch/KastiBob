@@ -58,7 +58,6 @@ class API Client: public Creature{
 	class Ground* gMap;
 
 	uint8_t verify_data[5];
-	class NetworkPacket* incoming_packet;
 	uint16_t version;
 	uint16_t os;
 	std::string login;
@@ -68,7 +67,7 @@ class API Client: public Creature{
 	void newConnection(std::string ip);
 	void disconnect(std::string reason);
 	void closeConnection();
-	void recv();
+	void recv(NetworkPacket& p);
 	void idle();
 	
 public:

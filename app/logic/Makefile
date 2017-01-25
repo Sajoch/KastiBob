@@ -7,9 +7,10 @@ src/%.hpp.gch :
 	@$(CXX) -o $@ $<
 
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL
+CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL -fPIC
 
 dll: obj obj_ext_c $(PROGRAM).dll
+so: obj obj_ext_c lib$(PROGRAM).so
 all: obj obj_ext_c $(PROGRAM)
 obj:
 	mkdir -p obj
@@ -49,7 +50,7 @@ $(PROGRAM): $(OBJECTS)
 $(PROGRAM).dll: $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
-$(PROGRAM).so: $(OBJECTS)
+lib$(PROGRAM).so: $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
 debug: all

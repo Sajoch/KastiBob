@@ -11,7 +11,7 @@ class Thing{
 public:
 	Thing();
 	Thing(ThingType type);
-	static Thing getThing(NetworkPacket* p);
+	static Thing getThing(NetworkPacket& p);
 	void setError(int e);
 	bool good();
 	bool isItem();

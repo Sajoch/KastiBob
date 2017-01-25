@@ -7,10 +7,14 @@
 
 class LoginForm : public QDialog{
 public:
+  
+  Q_OBJECT
+  
   explicit LoginForm(QWidget *parent = 0);
   ~LoginForm();
   void load();
   void login();
+  void logged();
   void exit();
   void selectServer();
   void keyPressEvent(QKeyEvent *e);

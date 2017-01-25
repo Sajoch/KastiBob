@@ -3,6 +3,6 @@
 #include "../network.hpp"
 #include "../packets/PingPacket.hpp"
 
-void ExtendClient::Ping(NetworkPacket* p){
+void ExtendClient::Ping(NetworkPacket& p){
 	c->conn->addPacket(PingPacket(c->xtea));
 }

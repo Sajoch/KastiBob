@@ -4,9 +4,6 @@
 #include "gamewindow.h"
 #include "jsbridge.h"
 
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -26,11 +23,11 @@ void GameWindow::load(){
 }
 
 void GameWindow::logout(){
-  GoToLoginForm();
+  //GoToLoginForm();
 }
 
 void GameWindow::charSelect(){
-  GoToCharSelect();
+  //GoToCharSelect();
 }
 
 bool GameWindow::close(){

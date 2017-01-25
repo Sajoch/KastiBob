@@ -1,13 +1,18 @@
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
 -lQt5Gui  -lpng \
--L../logic -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h
+-L. -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h  \
+-I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
 
 
 PROGRAM=KastiBobGui
-LOGIC=KastiBob_logic.dll
+ifeq ($(OS),LINUX)
+	LOGIC=libKastiBob_logic.so
+else
+	LOGIC=KastiBob_logic.dll
+endif
 
 obj:
 	mkdir -p obj
@@ -47,7 +52,7 @@ resources/%.gen.cpp: files/%
 	rcc $(patsubst resources/%.cpp,resources/rcc_%.qrc,$@) -o $@ -name $(subst /,_,$@)
 obj_rsc/%.o : resources/%.gen.cpp
 	@echo "-Compile "$@
-	@$(CXX) -c $< -o $@
+	@$(CXX) -c $< -o $@  $(CPPFLAG)
 MOC=jsbridge
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
 
@@ -87,13 +92,14 @@ $(PROGRAM): $(RSC_COMB) $(OBJECTS) $(LOGIC)
 	@echo "============ Compile" $@ "=============="
 	$(CXX) $^ -o $@ $(CPPFLAG)
 
+$(LOGIC): ../logic/$(LOGIC)
+	cp ../logic/$(LOGIC) .
+
 debug: all
 	gdb $(PROGRAM) -q -x gdb_start
 
 test: all
 	./$(PROGRAM)
-$(LOGIC): ../logic/$(LOGIC)
-	cp $^ $@
 clean:
 	@(rm obj/* || true)
 	@(rm obj_rsc/* || true)

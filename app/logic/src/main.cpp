@@ -23,9 +23,9 @@ int main(){
 	//178.32.162.105
 	std::string addr = "91.134.189.246:7171";
 	Client kastiClient(addr, 20007, 2, "dupad2", "dupad2");
-	while(kastiClient.tick()){
+	while(1){
 		//C++11 compability
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
   return 0;
 }

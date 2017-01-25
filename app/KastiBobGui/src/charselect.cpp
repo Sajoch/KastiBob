@@ -3,17 +3,13 @@
 #include "client.hpp"
 
 extern Client* tclient;
-extern QTimer *logic_loop;
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
 
 CharSelect::CharSelect(QWidget *parent) :
     QDialog(parent){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
-  connect(ui->pushButton, &QPushButton::clicked, this, logout);
-  connect(ui->pushButton_2, &QPushButton::clicked, this, enter);
+  connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
+  connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
 }
 
 void CharSelect::load(){
@@ -21,15 +17,14 @@ void CharSelect::load(){
     ui->comboBox->removeItem(0);
   }
   tclient->listChars([&](std::string name, size_t id){
-    ui->comboBox->addItem(name.c_str(), id);
+    ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
 }
 
 void CharSelect::enter(){
-  logic_loop->start(1);
   size_t id = ui->comboBox->currentData().toULongLong();
   if(tclient->setChar(id)){
-    GoToGameWindow();
+    //GoToGameWindow();
   }else{
     logout();
   }
@@ -37,8 +32,7 @@ void CharSelect::enter(){
 
 void CharSelect::logout(){
   delete tclient;
-  logic_loop->stop();
-  GoToLoginForm();
+  //GoToLoginForm();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {
