@@ -57,8 +57,6 @@ class API Client: public Creature{
 
 	uint16_t drawSpeed;
 	bool canReportBugs;
-	std::chrono::seconds AntyIdle_duration;
-	std::chrono::system_clock::time_point lastAntyIdle;
 	std::function<void(int, std::string)> changeStateFunc;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
@@ -75,6 +73,7 @@ class API Client: public Creature{
 	uint16_t magic_level_percent;
 	uint16_t soul;
 	uint16_t stamina;
+	uint16_t icons;
 	
 	Client_Skill skills[7];
 
@@ -89,7 +88,6 @@ class API Client: public Creature{
 	void disconnect(std::string reason);
 	void closeConnection();
 	void recv(NetworkPacket& p);
-	void idle();
 	
 public:
 	void move(ClientDirectory dir);
@@ -97,8 +95,10 @@ public:
 	~Client();
 	int tick();
 	void loginListener(std::function<void(int, std::string)> cb);
+	void loginListener();
 	void listChars(std::function<void(std::string, size_t)> cb);
 	void afterRecv(std::function<void(void)> cb);
+	void afterRecv();
 	bool setChar(size_t id);
 	void sendLogout();
 };

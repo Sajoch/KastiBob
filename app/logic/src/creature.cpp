@@ -1,9 +1,10 @@
 #include "creature.hpp"
+#include "packet.hpp"
 #include <iostream>
 
 using namespace std;
 
-Creature::Creature(): Thing(ThingType::CREATURE){
+Creature::Creature(){
   id = -1;
   x = y = z = 0;
 }
@@ -23,7 +24,6 @@ Creature Creature::setNewCreature(NetworkPacket& p){
   ret.speed = p.getUint16();
   ret.skull = p.getUint8();
   ret.blockSpace = p.getUint8();
-  ret.setError(0);
   return ret;
 }
 

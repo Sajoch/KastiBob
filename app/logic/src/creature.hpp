@@ -4,7 +4,6 @@
 #include <string>
 #include "utils.hpp"
 #include "outfit.hpp"
-#include "thing.hpp"
 #include "dll.h"
 
 enum class CreatureType{
@@ -14,7 +13,7 @@ enum class CreatureType{
   Hero
 };
 
-class API Creature: public Thing{
+class API Creature{
 friend class Client;
 friend class ExtendClient;
   CreatureType type;

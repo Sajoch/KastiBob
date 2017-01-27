@@ -74,5 +74,6 @@ void LoginForm::keyPressEvent(QKeyEvent *e) {
 }
 
 LoginForm::~LoginForm(){
+  tclient->loginListener();
   delete ui;
 }

@@ -1,13 +1,8 @@
 #include "network.hpp"
 #include <Poco/Net/NetException.h>
 #include <Poco/AbstractObserver.h>
-#include <iostream>
-using namespace std;
-using namespace Poco::Net;
 
-class SocketActivator{
-	
-};
+using namespace Poco::Net;
 
 NetworkManager::NetworkManager(std::string ip):
 addr(ip),
@@ -22,14 +17,11 @@ recv_offset(0)
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ShutdownNotification>(*this, &NetworkManager::onShutdonw));
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ErrorNotification>(*this, &NetworkManager::onError));
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, TimeoutNotification>(*this, &NetworkManager::onTimeout));
-	thread.start(reactor);
-	//waitForTerminationRequest();
-	
+	thread.start(reactor);	
 }
 NetworkManager::~NetworkManager(){
 	sock.close();
 	reactor.stop();
-	//thread.join(0);
 }
 void NetworkManager::addPacketR(NetworkPacket& p){
 	p.add_header();
@@ -37,7 +29,6 @@ void NetworkManager::addPacketR(NetworkPacket& p){
 }
 void NetworkManager::addPacket(NetworkPacket p){
 	p.add_header();
-	cout<<"add packet "<<p.getSize()<<endl;
 	send_buffer.append(p.getData());
 }
 
@@ -84,48 +75,17 @@ void NetworkManager::onRead(Poco::Net::ReadableNotification* nof){
 void NetworkManager::onWrite(Poco::Net::WritableNotification* nof){
 	if(send_buffer.size()>0){
 		int sendb = sock.sendBytes(send_buffer.data(), send_buffer.size());
-		cout<<"send"<<sendb<<"/"<<send_buffer.size()<<endl;
 		if(sendb > 0){
 			send_buffer.erase(send_buffer.begin(), send_buffer.begin()+sendb);
 		}
 	}
 }
 void NetworkManager::onShutdonw(Poco::Net::ShutdownNotification* nof){
-	cout<<"shutdown"<<endl;
+	//cout<<"shutdown"<<endl;
 }
 void NetworkManager::onError(Poco::Net::ErrorNotification* nof){
-	cout<<"error"<<endl;
+	//cout<<"error"<<endl;
 }
 void NetworkManager::onTimeout(Poco::Net::TimeoutNotification* nof){
-	cout<<"timeout"<<endl;
+	//cout<<"timeout"<<endl;
 }
-
-
-/*
-bool NetworkManager::getPacket(NetworkPacket* p){
-	
-	return false;
-}
-int NetworkManager::tick() {
-	int rsize;
-	try{
-		if(sock.poll(1, Socket::SELECT_ERROR)==true){
-			return 1;
-		} 
-		else if(sock.poll(1, Socket::SELECT_WRITE)==true && send_buffer.size()>0){
-			int sendb = sock.sendBytes(&send_buffer[0], send_buffer.size());
-			cout<<"send"<<sendb<<endl;
-			if(sendb > 0){
-				send_buffer.erase(send_buffer.begin(), send_buffer.begin()+sendb);
-			}
-			return 0;
-		} 
-		else if(sock.poll(1, Socket::SELECT_READ)==true){
-			
-		}
-	}catch(NetException e){
-		cout<<"NetException"<<endl;
-	}
-	return 4;
-}
-*/

@@ -17,7 +17,13 @@ bool Square::removeCreature(uint32_t stackId){
     return false;
   }
 }
-bool Square::addCreature(Creature& v){
+void Square::addCreature(Creature& v){
   creatures.push_back(v);
-  return true;
+}
+void Square::addItem(Item& v){
+  items.push_back(v);
+}
+void Square::clear(){
+  items.clear();
+  creatures.clear();
 }

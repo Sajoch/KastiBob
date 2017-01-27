@@ -18,6 +18,7 @@ void ExtendClient::MapDescription(NetworkPacket& p){
 		c->disconnect("failed to load map");
 		return;
 	}
+	//cout<<"hero "<<c->x<<","<<c->y<<","<<c->z<<endl;
 }
 
 bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
@@ -30,12 +31,14 @@ bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, 
 		}
 		for(currZ = bz - 2; currZ < endZ; currZ++){
 			if(!getFloorMap(p, bx, by, currZ, w, h, skipTiles)){
+				cout<<"e6"<<endl;
 				return false;
 			}
 		}
 	}else{
 		for(currZ = 7; currZ >= 0; currZ--){
 			if(!getFloorMap(p, bx, by, currZ, w, h, skipTiles)){
+				cout<<"e4"<<endl;
 				return false;
 			}
 		}
@@ -48,6 +51,7 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 		for(cy = 0; cy < h; cy++){
 			if(skipTiles == 0){
 				if(p.getSize() < 2) {
+					cout<<"e2"<<endl;
 					return false;
 				}
 				vAttr = p.peekUint16();
@@ -56,9 +60,11 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 					skipTiles = vAttr & 0xFF;
 				}else{
 					if(!getSquareMap(p, bx + cx, by + cy, _z)){
+						cout<<"e1"<<endl;
 						return false;
 					}
 					if(p.getSize() < 2) {
+						cout<<"e12"<<endl;
 						return false;
 					}
 					vAttr = p.getUint16();
@@ -74,23 +80,35 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
 	int32_t vAttr, thingsId;
 	Square& sq = c->gMap->getSquare(_x, _y, _z);
-	//TODO
-	//sq.clear();
+	sq.clear();
+	Creature cr;
+	Item it;
 	for(thingsId = 0; thingsId < 10; thingsId++){
 		if(p.getSize() < 2){
 			cout<<"outOfData"<<endl;
 			return false;
 		}
-		vAttr = p.peekUint16();
-		if(vAttr > 0xEFFF){
+		vAttr = p.getUint16();
+		if(vAttr == 0xFFFF){
 			return true;
 		}
-		Thing t = Thing::getThing(p);
-		if(!t.good()){
-			return false;
+		cout<<"thing "<<vAttr<<endl;
+		switch(vAttr){
+			case 0x61:
+				cr = Creature::setNewCreature(p);
+				sq.addCreature(cr);
+			break;
+			case 0x62:
+				cr = Creature::setKnownCreature(p);
+			break;
+			case 0x63:
+				cr = Creature::setUnk1Creature(p);
+			break;
+			default:
+				it = Item(vAttr);
+				sq.addItem(it);
+			break;
 		}
-		//TODO
-		//sq.add(t);
 	}
 	return false;
 }

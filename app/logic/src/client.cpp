@@ -6,10 +6,6 @@
 #include "extendClient.hpp"
 #include "ground.hpp"
 #include "network.hpp"
-/*
-#include "packets/PingPacket.hpp"
-*/
-#include "thing.hpp"
 
 #include <sstream>
 
@@ -56,8 +52,6 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	ext = new ExtendClient(this);
 	gMap = new Ground();
 	
-	lastAntyIdle = chrono::system_clock::now();
-	AntyIdle_duration = chrono::seconds(1);
 	conn = 0;
 	afterRecvFunc = [](){};
 	newConnection(ip);
@@ -88,6 +82,12 @@ void Client::loginListener(std::function<void(int, std::string)> cb){
 }
 void Client::afterRecv(std::function<void(void)> cb){
 	afterRecvFunc = cb;
+}
+void Client::loginListener(){
+	changeStateFunc = [](int, std::string){};
+}
+void Client::afterRecv(){
+	afterRecvFunc = [](void){};
 }
 void Client::listChars(std::function<void(std::string, size_t)> cb){
 	size_t s = characters.size();
@@ -393,10 +393,10 @@ void Client::recv(NetworkPacket& p){
 					case 0xB4:
 						ext->TextMessage(p);
 						break;
-					/*case 0xB5:
+					case 0xB5:
 						ext->PlayerCancelWalk(p);
 						break;
-					case 0xBE:
+					/*case 0xBE:
 						ext->FloorChangeUp(p);
 						break;
 					case 0xBF:
@@ -449,24 +449,17 @@ void Client::recv(NetworkPacket& p){
 		}
 		break;
 	}
-}
-
-void Client::idle(){
-	system_clock::time_point now = chrono::system_clock::now();
-	seconds elapsed = chrono::duration_cast<chrono::seconds>(now - lastAntyIdle);
-	//chrono::seconds antyafk_elapse_sec = chrono::duration_cast<chrono::seconds>  = now - lastAntyIdle;
-	if(elapsed > AntyIdle_duration){
-		//move(ClientDirectory::STOP);
-		lastAntyIdle = now;
-	}
+	afterRecvFunc();
 }
 
 void Client::move(ClientDirectory dir){
+	if(conn == 0){
+		return;
+	}
 	conn->addPacket(MovePacket(dir, xtea));
 }
 void Client::sendLogout(){
 	if(conn == 0){
-		disconnect("sendLogout connection is null");
 		return;
 	}
 	conn->addPacket(OneBytePacket(0x14, xtea));

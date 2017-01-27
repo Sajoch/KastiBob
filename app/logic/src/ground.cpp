@@ -55,10 +55,8 @@ bool Ground::moveCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t stac
     DEBUG("move: cannot get creature from old square");
     return false;
   }
-  if(!dstSq.addCreature(obj)){
-    DEBUG("move: cannot add creature to new square");
-    return false;
-  }
+  dstSq.addCreature(obj);
+  
   if(!srcSq.removeCreature(stackId)){
     DEBUG("move: cannot remove creature from old square");
     return false;
