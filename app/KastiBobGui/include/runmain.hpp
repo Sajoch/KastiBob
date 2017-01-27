@@ -1,20 +1,19 @@
 #ifndef __RUNMAIN
 #define __RUNMAIN
 
-class RunMain{
-public:
-	
+#include <QtCore/QObject>
+
+class RunMain: public QObject{
 	Q_OBJECT
 	
-  class QApplication* a;
   class LoginForm* lf;
   class CharSelect* cs;
   class GameWindow* gw;
   
-  RunMain(int argc, char** argv);
+public:
+  RunMain();
+	~RunMain();
   
-  int ret();
-
   void delAllWindows();
 
   void GoToLoginForm();

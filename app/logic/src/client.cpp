@@ -139,10 +139,11 @@ void Client::recv(NetworkPacket& p){
 			}break;
 			case ClientState::LOGIN:{
 				state = ClientState::NONE;
-				cout<<"login start disconnect"<<endl;
+				cout<<"login start disconnect "<<p.getSize()<<endl;
 				closeConnection();
 				do{
 					packetType = p.getUint8();
+					cout<<"recv "<<packetType<<endl;
 					switch(packetType){
 						case 0x0A:{ //Error message
 							std::string errormsg = p.getTString();
@@ -163,12 +164,12 @@ void Client::recv(NetworkPacket& p){
 							changeStateFunc(2, "need to patch");
 							disconnect("need to patch in login");
 							return;
-						break;
+							break;
 						case 0x28: //Select other login server
 							changeStateFunc(2, "Select other login server");
 							disconnect("select other login server in login");
 							return;
-						break;
+							break;
 						case 0x64:{ //character list
 							uint16_t nchars = p.getUint8();
 							for(uint32_t i = 0; i < nchars; ++i){
@@ -212,232 +213,233 @@ void Client::recv(NetworkPacket& p){
 				switch(packetType){
 					case 0x0A:
 						ext->SelfAppear(p);
-					break;
+						break;
 					/*case 0x0B:
 						ext->GMActions(p);
-					break;
+						break;
 					*/
 					case 0x14:
 						ext->ErrorMessage(p);
-					break;
+						break;
 					/*case 0x15:
 						ext->FYIMessage(p);
-					break;
+						break;
 					case 0x16:
 						ext->WaitingList(p);
-					break;
+						break;
 					*/
 					case 0x1E:
 						ext->Ping(p);
-					break;
+						break;
 					case 0x1F:
 						ext->Init(p);
-					break;
+						break;
 					/*case 0x28:
 						ext->Death(p);
-					break;
+						break;
 					case 0x32:
 						ext->CanReportBugs(p);
-					break;
+						break;
 					*/
 					case 0x64:
 						ext->MapDescription(p);
-					break;
+						break;
 					case 0x65:
 						ext->MoveNorth(p);
-					break;
+						break;
 					case 0x66:
 						ext->MoveEast(p);
-					break;
+						break;
 					case 0x67:
 						ext->MoveSouth(p);
-					break;
+						break;
 					case 0x68:
 						ext->MoveWest(p);
-					break;
+						break;
 					/*case 0x69:
 						ext->UpdateTile(p);
-					break;*/
+						break;*/
 					case 0x6A:
 						ext->TileAddThing(p);
-					break;
+						break;
 					/*case 0x6B:
 						ext->TileTransformThing(p);
-					break;
+						break;
 					case 0x6C:
 						ext->TileRemoveThing(p);
-					break;*/
+						break;*/
 					case 0x6D:
 						ext->CreatureMove(p);
-					break;
+						break;
 					/*case 0x6E:
 						ext->OpenContainer(p);
-					break;
+						break;
 					case 0x6F:
 						ext->CloseContainer(p);
-					break;
+						break;
 					case 0x70:
 						ext->ContainerAddItem(p);
-					break;
+						break;
 					case 0x71:
 						ext->ContainerUpdateItem(p);
-					break;
+						break;
 					case 0x72:
 						ext->ContainerRemoveItem(p);
-					break;
+						break;
 					*/
 					case 0x78:
 						ext->InventorySetSlot(p);
-					break;
+						break;
 					case 0x79:
 						ext->InventoryResetSlot(p);
-					break;
+						break;
 					/*case 0x7D:
 						ext->SafeTradeRequestAck(p);
-					break;
+						break;
 					case 0x7E:
 						ext->SafeTradeRequestNoAck(p);
-					break;
+						break;
 					case 0x7F:
 						ext->SafeTradeClose(p);
-					break;
+						break;
 					*/
 					case 0x82:
 						ext->WorldLight(p);
-					break;
+						break;
 					case 0x83:
 						ext->MagicEffect(p);
-					break;
+						break;
 					/*case 0x84:
 						ext->AnimatedText(p);
-					break;
+						break;
 					case 0x85:
 						ext->DistanceShot(p);
-					break;
+						break;
 					case 0x86:
 						ext->CreatureSquare(p);
-					break;
+						break;
 					*/
 					case 0x8C:
 						ext->CreatureHealth(p);
-					break;
+						break;
 					case 0x8D:
 						ext->CreatureLight(p);
-					break;
+						break;
 					/*case 0x8E:
 						ext->CreatureOutfit(p);
-					break;
+						break;
 					case 0x8F:
 						ext->CreatureSpeed(p);
-					break;
+						break;
 					case 0x90:
 						ext->CreatureSkulls(p);
-					break;
+						break;
 					case 0x91:
 						ext->CreatureShields(p);
-					break;
+						break;
 					case 0x92:
 						ext->CreaturePassable(p);
-					break;
+						break;
 					case 0x96:
 						ext->ItemTextWindow(p);
-					break;
+						break;
 					case 0x97:
 						ext->HouseTextWindow(p);
-					break;
+						break;*/
 					case 0xA0:
 						ext->PlayerStats(p);
-					break;
+						break;
 					case 0xA1:
 						ext->PlayerSkills(p);
-					break;
+						break;
 					case 0xA2:
 						ext->PlayerIcons(p);
-					break;
+						break;/*
 					case 0xA3:
 						ext->PlayerCancelAttack(p);
-					break;
+						break;
 					*/
 					case 0xAA:
 						ext->CreatureSpeak(p);
-					break;
+						break;
 					/*case 0xAB:
 						ext->ChannelList(p);
-					break;
+						break;
 					case 0xAC:
 						ext->OpenChannel(p);
-					break;
+						break;
 					case 0xAD:
 						ext->OpenPrivatePlayerChat(p);
-					break;
+						break;
 					case 0xAE:
 						ext->OpenRuleViolation(p);
-					break;
+						break;
 					case 0xAF:
 						ext->RuleViolationAF(p);
-					break;
+						break;
 					case 0xB0:
 						ext->RuleViolationB0(p);
-					break;
+						break;
 					case 0xB1:
 						ext->RuleViolationB1(p);
-					break;
+						break;
 					case 0xB2:
 						ext->CreatePrivateChannel(p);
-					break;
+						break;
 					case 0xB3:
 						ext->ClosePrivateChannel(p);
-					break;
+						break;
 					*/
 					case 0xB4:
 						ext->TextMessage(p);
-					break;
+						break;
 					/*case 0xB5:
 						ext->PlayerCancelWalk(p);
-					break;
+						break;
 					case 0xBE:
 						ext->FloorChangeUp(p);
-					break;
+						break;
 					case 0xBF:
 						ext->FloorChangeDown(p);
-					break;
+						break;
 					case 0xC8:
 						ext->OutfitWindow(p);
-					break;
+						break;
 					case 0xD2:
 						ext->VipState(p);
-					break;
+						break;
 					case 0xD3:
 						ext->VipLogin(p);
-					break;
+						break;
 					case 0xD4:
 						ext->VipLogout(p);
-					break;
+						break;
 					case 0xF0:
 						ext->QuestList(p);
-					break;
+						break;
 					case 0xF1:
 						ext->QuestPartList(p);
-					break;
+						break;
 					case 0x7A:
 						ext->OpenShopWindow(p);
-					break;
+						break;
 					case 0x7B:
 						ext->PlayerCash(p);
-					break;
+						break;
 					case 0x7C:
 						ext->CloseShopWindow(p);
-					break;
+						break;
 					case 0xDC:
 						ext->ShowTutorial(p);
-					break;
+						break;
 					case 0xDD:
 						ext->AddMapMarker(p);
-					break;
+						break;
 					*/
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
 						p.dump();
+						exit(1);
 						return;
 				}
 				if(p.getSize()>0){

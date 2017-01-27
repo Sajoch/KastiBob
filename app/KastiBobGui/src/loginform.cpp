@@ -1,6 +1,5 @@
 #include <functional>
 #include <QtWidgets/QApplication>
-#include <QtCore/QTimer>
 #include "loginform.h"
 #include "runmain.hpp"
 #include "client.hpp"
@@ -41,7 +40,7 @@ void LoginForm::changeLoginState(int a, std::string msg){
     break;
     case 4:
       ui->label->setText(QApplication::translate("LoginForm", "logged", 0));
-      //GoToCharSelect();
+      logged();
     break;
     default:
       ui->label->setText(QApplication::translate("LoginForm", "unexpected error", 0));

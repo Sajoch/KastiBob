@@ -32,6 +32,25 @@ uint32_t NetworkPacket::peekUint32(std::string& b){
 	ret |= (b[0]&0xff);
 	return ret;
 }
+uint64_t NetworkPacket::peekUint64(std::string& b){
+	uint64_t ret;
+	ret =  (b[7]&0xff);
+	ret <<= 8;
+	ret =  (b[6]&0xff);
+	ret <<= 8;
+	ret =  (b[5]&0xff);
+	ret <<= 8;
+	ret =  (b[4]&0xff);
+	ret <<= 8;
+	ret =  (b[3]&0xff);
+	ret <<= 8;
+	ret |= (b[2]&0xff);
+	ret <<= 8;
+	ret |= (b[1]&0xff);
+	ret <<= 8;
+	ret |= (b[0]&0xff);
+	return ret;
+}
 void NetworkPacket::addUint8(uint8_t a){
 	buffer.push_back(a);
 }
@@ -44,6 +63,16 @@ void NetworkPacket::addUint32(uint32_t a){
 	buffer.push_back((a>>8)&0xff);
 	buffer.push_back((a>>16)&0xff);
 	buffer.push_back((a>>24)&0xff);
+}
+void NetworkPacket::addUint64(uint64_t a){
+	buffer.push_back((a)&0xff);
+	buffer.push_back((a>>8)&0xff);
+	buffer.push_back((a>>16)&0xff);
+	buffer.push_back((a>>24)&0xff);
+	buffer.push_back((a>>32)&0xff);
+	buffer.push_back((a>>40)&0xff);
+	buffer.push_back((a>>48)&0xff);
+	buffer.push_back((a>>56)&0xff);
 }
 void NetworkPacket::addString(std::string a){
 	for(size_t i=0;i<a.size();i++)
@@ -91,6 +120,11 @@ uint16_t NetworkPacket::getUint16() {
 uint32_t NetworkPacket::getUint32() {
 	uint32_t a = peekUint32(buffer);
 	buffer.erase(buffer.begin(), buffer.begin()+4);
+	return a;
+}
+uint64_t NetworkPacket::getUint64() {
+	uint64_t a = peekUint64(buffer);
+	buffer.erase(buffer.begin(), buffer.begin()+8);
 	return a;
 }
 

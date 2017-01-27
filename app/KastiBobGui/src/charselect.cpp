@@ -1,7 +1,8 @@
-#include <QtCore/QTimer>
 #include "charselect.h"
 #include "client.hpp"
+#include "runmain.hpp"
 
+extern RunMain* app;
 extern Client* tclient;
 
 CharSelect::CharSelect(QWidget *parent) :
@@ -10,6 +11,9 @@ CharSelect::CharSelect(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
   connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
+  
+  connect(this, &CharSelect::logouted, app, &RunMain::GoToLoginForm);
+  connect(this, &CharSelect::entered, app, &RunMain::GoToGameWindow);
 }
 
 void CharSelect::load(){
@@ -19,12 +23,13 @@ void CharSelect::load(){
   tclient->listChars([&](std::string name, size_t id){
     ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
+  show();
 }
 
 void CharSelect::enter(){
   size_t id = ui->comboBox->currentData().toULongLong();
   if(tclient->setChar(id)){
-    //GoToGameWindow();
+    entered();
   }else{
     logout();
   }
@@ -32,7 +37,7 @@ void CharSelect::enter(){
 
 void CharSelect::logout(){
   delete tclient;
-  //GoToLoginForm();
+  logouted();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {

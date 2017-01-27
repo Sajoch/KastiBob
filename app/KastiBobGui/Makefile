@@ -53,7 +53,7 @@ resources/%.gen.cpp: files/%
 obj_rsc/%.o : resources/%.gen.cpp
 	@echo "-Compile "$@
 	@$(CXX) -c $< -o $@  $(CPPFLAG)
-MOC=jsbridge
+MOC=jsbridge loginform runmain gamewindow charselect
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
 
 OBJS=main charselect loginform gamewindow jsbridge \
@@ -74,17 +74,24 @@ obj/loginform.o: src/loginform.cpp include/loginform.h uis_h/loginform.gen.h \
 	include/charselect.h
 obj/gamewindow.o: src/gamewindow.cpp uis_h/gamewindow.gen.h include/gamewindow.h
 obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
-moc_h/jsbridge.gen.cpp: include/jsbridge.h
-obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
 obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewindow.h
 obj/file.o: src/file.cpp include/file.hpp
 obj/spriteLoader.o: src/spriteLoader.cpp include/spriteLoader.hpp include/file.hpp
 
+obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
+obj/moc_loginform.gen.o: moc_cpp/loginform.gen.cpp
+obj/moc_runmain.gen.o: moc_cpp/runmain.gen.cpp
+obj/moc_gamewindow.gen.o: moc_cpp/gamewindow.gen.cpp
+obj/moc_charselect.gen.o: moc_cpp/charselect.gen.cpp
 #headers
 include/gamewindow.h: uis_h/gamewindow.gen.h
 include/charselect.h: uis_h/charselect.gen.h
 include/loginform.h: uis_h/loginform.gen.h
 moc_cpp/jsbridge.gen.cpp: include/jsbridge.h
+moc_cpp/loginform.gen.cpp: include/loginform.h
+moc_cpp/runmain.gen.cpp: include/runmain.hpp
+moc_cpp/gamewindow.gen.cpp: include/gamewindow.h
+moc_cpp/charselect.gen.cpp: include/charselect.h
 
 OBJECTS=$(patsubst %,obj/%.o,$(OBJS))
 

@@ -30,6 +30,12 @@ public:
 	void show();
 };
 
+class Client_Skill{
+public:
+	uint16_t val;
+	uint16_t percent;
+};
+
 class API Client: public Creature{
 	friend class ExtendClient;
 	class XTEAcipher* xtea;
@@ -56,6 +62,21 @@ class API Client: public Creature{
 	std::function<void(int, std::string)> changeStateFunc;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
+	
+	uint16_t health;
+	uint16_t max_health;
+	uint32_t free_cap;
+	uint64_t experience;
+	uint16_t level;
+	uint16_t percent_level;
+	uint16_t mana;
+	uint16_t max_mana;
+	uint16_t magic_level;
+	uint16_t magic_level_percent;
+	uint16_t soul;
+	uint16_t stamina;
+	
+	Client_Skill skills[7];
 
 	uint8_t verify_data[5];
 	uint16_t version;

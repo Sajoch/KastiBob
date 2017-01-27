@@ -6,20 +6,20 @@
 #include <QtGui/QKeyEvent>
 
 class LoginForm : public QDialog{
-public:
   
   Q_OBJECT
   
+public:
   explicit LoginForm(QWidget *parent = 0);
   ~LoginForm();
   void load();
   void login();
-  void logged();
   void exit();
   void selectServer();
   void keyPressEvent(QKeyEvent *e);
   void changeLoginState(int a, std::string msg);
 signals:
+  void logged();
 private:
   Ui_LoginForm* ui;
 };

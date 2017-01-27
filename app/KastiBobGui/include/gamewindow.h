@@ -5,18 +5,24 @@
 
 
 class GameWindow : public QMainWindow{
+  Q_OBJECT
 public:
-    explicit GameWindow(QWidget *parent = 0);
-    ~GameWindow();
-
-    void logout();
-    void charSelect();
-    void load();
-    bool close();
+  explicit GameWindow(QWidget *parent = 0);
+  ~GameWindow();
+  
+  bool calledExec;
+  bool loaded_page;
+  
+  void load();
+  bool close();
+  void loaded();
+signals:
+  void logout();
+  void charSelect();
 private:
-    Ui_GameWindow* ui;
-    class JSBridge* bridge;
-    void attachObject();
+  Ui_GameWindow* ui;
+  class JSBridge* bridge;
+  void attachObject();
 };
 
 #endif // _GAMEWINDOW_H

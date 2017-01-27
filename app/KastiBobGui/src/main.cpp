@@ -1,30 +1,25 @@
+#include <QtWidgets/QApplication>
+#include <QtCore/QLibrary>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
+#include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
-#include <QtWidgets/QApplication>
-#include <QtCore/QLibrary>
-#include <QtCore/QTimer>
-#include <QtCore/QDir>
-#include <QtCore/QStringList>
-#include "client.hpp"
-#include "runmain.hpp"
 #include <iostream>
 
 using namespace std;
 
-Client* tclient = 0;
+class Client* tclient = 0;
 
-RunMain::RunMain(int argc, char** argv){
-  a = new QApplication(argc, argv);
+RunMain::RunMain(){
   lf = 0;
   cs = 0;
   gw = 0;
 }
 
-int RunMain::ret(){
-  lf = new LoginForm();
-  lf->load();
-  return a->exec();
+RunMain::~RunMain(){
+  delAllWindows();
 }
 
 void RunMain::delAllWindows(){
@@ -62,7 +57,8 @@ RunMain* app;
 
 int main(int argc, char *argv[])
 {
-    app = new RunMain(argc, argv);
+    QApplication Qapp(argc, argv);
+    app = new RunMain();
     app->GoToLoginForm();
-    return app->ret();
+    return Qapp.exec();
 }

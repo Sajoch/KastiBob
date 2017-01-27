@@ -14,6 +14,7 @@ addr(ip),
 recv_offset(0)
 {
 	sock.connect(addr);
+	sock.setBlocking(false);
 	onPacketRecived = [](NetworkPacket&){};
 	haveSize = false;
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ReadableNotification>(*this, &NetworkManager::onRead));
@@ -21,11 +22,14 @@ recv_offset(0)
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ShutdownNotification>(*this, &NetworkManager::onShutdonw));
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ErrorNotification>(*this, &NetworkManager::onError));
 	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, TimeoutNotification>(*this, &NetworkManager::onTimeout));
-	sock.setBlocking(false);
 	thread.start(reactor);
+	//waitForTerminationRequest();
+	
 }
 NetworkManager::~NetworkManager(){
-	sock.shutdown();
+	sock.close();
+	reactor.stop();
+	//thread.join(0);
 }
 void NetworkManager::addPacketR(NetworkPacket& p){
 	p.add_header();

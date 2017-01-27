@@ -14,8 +14,6 @@ void ExtendClient::MapDescription(NetworkPacket& p){
 	c->y = p.getUint16();
 	c->z = p.getUint8();
 	c->gMap->set(c->mapViewX, c->mapViewY);
-	cout<<"hero ("<<c->x<<","<<c->y<<","<<c->z<<")"<<endl;
-	p.dump();
 	if(!getMap(p, c->x-8, c->y-6, c->z, 18, 14)){
 		c->disconnect("failed to load map");
 		return;
@@ -25,7 +23,6 @@ void ExtendClient::MapDescription(NetworkPacket& p){
 bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h){
 	int32_t currZ, skipTiles;
 	skipTiles = 0;
-	cout<<"getMap"<<endl;
 	if(bz > 7){
 		int32_t endZ = bz + 2;
 		if(endZ > c->mapLayers){
@@ -37,7 +34,7 @@ bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, 
 			}
 		}
 	}else{
-		for(currZ = 7; currZ > 0; currZ--){
+		for(currZ = 7; currZ >= 0; currZ--){
 			if(!getFloorMap(p, bx, by, currZ, w, h, skipTiles)){
 				return false;
 			}
@@ -47,10 +44,6 @@ bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, 
 }
 bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){
 	int32_t cx, cy, vAttr;
-	cout<<"getFloorMap "<<_z<<endl;
-	if(_z==1 || _z==2){
-		p.dump();
-	}
 	for(cx = 0; cx < w; cx++)
 		for(cy = 0; cy < h; cy++){
 			if(skipTiles == 0){
@@ -79,7 +72,6 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 	return true;
 }
 bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
-	cout<<"getSquareMap "<<_x<<","<<_y<<","<<_z<<endl;
 	int32_t vAttr, thingsId;
 	Square& sq = c->gMap->getSquare(_x, _y, _z);
 	//TODO

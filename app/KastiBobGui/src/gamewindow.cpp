@@ -3,7 +3,12 @@
 #include <QtCore/QUrl>
 #include "gamewindow.h"
 #include "jsbridge.h"
+#include "runmain.hpp"
+#include <iostream>
 
+using namespace std;
+
+extern RunMain* app;
 
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -12,22 +17,33 @@ GameWindow::GameWindow(QWidget *parent) :
     ui->setupUi(this);
     QWebPage* page = ui->webView->page();
     page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    
+    connect(this, &GameWindow::logout, app, &RunMain::GoToLoginForm);
+    connect(this, &GameWindow::charSelect, app, &RunMain::GoToGameWindow);
+    
+    connect(page, &QWebPage::loadFinished, this, &GameWindow::loaded);
+    calledExec = false;
+    loaded_page = false;
+}
+void GameWindow::loaded(){
+  loaded_page = true;
+  if(calledExec){
+    load();
+    calledExec = false;
+  }
 }
 void GameWindow::load(){
+  if(!loaded_page){
+    calledExec = true;
+    return;
+  }
   bridge = new JSBridge(this);
   bridge->setGW(this, ui->webView);
   QWebPage* page = ui->webView->page();
   QWebFrame* frame = page->mainFrame();
   frame->addToJavaScriptWindowObject("JSBridge", bridge);
   frame->evaluateJavaScript("start();");
-}
-
-void GameWindow::logout(){
-  //GoToLoginForm();
-}
-
-void GameWindow::charSelect(){
-  //GoToCharSelect();
+  show();
 }
 
 bool GameWindow::close(){

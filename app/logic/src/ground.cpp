@@ -73,3 +73,6 @@ bool Ground::removeCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t st
   }
   return true;
 }
+Creature* Ground::getCreatureByID(uint32_t id){
+  return creatures[id];
+}
