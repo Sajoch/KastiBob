@@ -1,19 +1,19 @@
-#include <QtCore/QTimer>
 #include "charselect.h"
 #include "client.hpp"
+#include "runmain.hpp"
 
+extern RunMain* app;
 extern Client* tclient;
-extern QTimer *logic_loop;
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
 
 CharSelect::CharSelect(QWidget *parent) :
     QDialog(parent){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
-  connect(ui->pushButton, &QPushButton::clicked, this, logout);
-  connect(ui->pushButton_2, &QPushButton::clicked, this, enter);
+  connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
+  connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
+  
+  connect(this, &CharSelect::logouted, app, &RunMain::GoToLoginForm);
+  connect(this, &CharSelect::entered, app, &RunMain::GoToGameWindow);
 }
 
 void CharSelect::load(){
@@ -21,15 +21,15 @@ void CharSelect::load(){
     ui->comboBox->removeItem(0);
   }
   tclient->listChars([&](std::string name, size_t id){
-    ui->comboBox->addItem(name.c_str(), id);
+    ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
+  show();
 }
 
 void CharSelect::enter(){
-  logic_loop->start(1);
   size_t id = ui->comboBox->currentData().toULongLong();
   if(tclient->setChar(id)){
-    GoToGameWindow();
+    entered();
   }else{
     logout();
   }
@@ -37,8 +37,7 @@ void CharSelect::enter(){
 
 void CharSelect::logout(){
   delete tclient;
-  logic_loop->stop();
-  GoToLoginForm();
+  logouted();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {

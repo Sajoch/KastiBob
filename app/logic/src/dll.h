@@ -1,5 +1,13 @@
 #ifdef DLL
-  #define API __declspec(dllexport)
+  #ifdef __unix__
+    #define API
+  #else
+    #define API __declspec(dllexport)
+  #endif
 #else
-  #define API __declspec(dllimport)
+  #ifdef __unix__
+    #define API
+  #else
+    #define API __declspec(dllimport)
+  #endif
 #endif

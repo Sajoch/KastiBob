@@ -8,6 +8,6 @@
 class MovePacket: public NetworkPacket
 {
 public:
-	MovePacket(ClientDirectory dir, XTEAcipher& xtea);
+	MovePacket(ClientDirectory dir, XTEAcipher* xtea);
 };
 #endif

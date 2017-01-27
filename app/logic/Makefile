@@ -1,10 +1,16 @@
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -o $@ $(CPPFLAG) $<
+
+src/%.hpp.gch : 
+	@echo "precompile" $@
+	@$(CXX) -o $@ $<
+
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL
+CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL -fPIC
 
 dll: obj obj_ext_c $(PROGRAM).dll
+so: obj obj_ext_c lib$(PROGRAM).so
 all: obj obj_ext_c $(PROGRAM)
 obj:
 	mkdir -p obj
@@ -12,13 +18,13 @@ obj_ext_c:
 	mkdir -p obj_ext_c
 PACKETS=Login Ping Move OneByte
 OBJS=main cipher packet network client ground square \
-		 utils outfit creature thing extendClient
+		 utils outfit creature thing extendClient item
 extendClient_CPP=$(wildcard src/extendClient/*.cpp)
 extendClient_OBJ=$(patsubst src/extendClient/%.cpp,obj_ext_c/%.o,$(extendClient_CPP))
 OBJS+=$(patsubst %,%Packet,$(PACKETS))
 OBJECTS=$(extendClient_OBJ) $(patsubst %,obj/%.o,$(OBJS))
 PACKETHEADERS=$(patsubst %,src/packets/%Packet.hpp,$(PACKETS))
-obj_ext_c/%.o: src/extendClient/%.cpp $(PACKETHEADERS) src/client.hpp src/network.hpp
+obj_ext_c/%.o: src/extendClient/%.cpp $(PACKETHEADERS) 
 	@echo "-Compile" $@
 	@$(CXX) -c -o $@ $(CPPFLAG) $<
 obj/client.o: src/client.cpp src/client.hpp $(PACKETHEADERS) src/thing.hpp src/extendClient.hpp
@@ -32,6 +38,7 @@ obj/extendClient.o: src/extendClient.cpp src/extendClient.hpp
 obj/utils.o: src/utils.cpp src/utils.hpp
 obj/outfit.o: src/outfit.cpp src/outfit.hpp
 obj/thing.o: src/thing.cpp src/thing.hpp
+obj/item.o: src/item.cpp src/item.hpp
 obj/LoginPacket.o: src/packets/LoginPacket.cpp src/packets/LoginPacket.hpp
 obj/PingPacket.o: src/packets/PingPacket.cpp src/packets/PingPacket.hpp
 obj/MovePacket.o: src/packets/MovePacket.cpp src/packets/MovePacket.hpp
@@ -43,7 +50,7 @@ $(PROGRAM): $(OBJECTS)
 $(PROGRAM).dll: $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
-$(PROGRAM).so: $(OBJECTS)
+lib$(PROGRAM).so: $(OBJECTS)
 	@echo "============ Compile" $@ "=============="
 	@$(CXX) $^ -shared -o $@ $(CPPFLAG)
 debug: all

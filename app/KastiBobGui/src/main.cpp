@@ -1,71 +1,64 @@
+#include <QtWidgets/QApplication>
+#include <QtCore/QLibrary>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
+#include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
-#include <QtWidgets/QApplication>
-#include <QtCore/QLibrary>
-#include <QtCore/QTimer>
-#include <QtCore/QDir>
-#include <QtCore/QStringList>
-#include "client.hpp"
 #include <iostream>
 
 using namespace std;
 
-Client* tclient = 0;
-QTimer *logic_loop;
-LoginForm* lf;
-CharSelect* cs;
-GameWindow* gw;
+class Client* tclient = 0;
 
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
+RunMain::RunMain(){
+  lf = 0;
+  cs = 0;
+  gw = 0;
+}
 
-void GoToLoginForm(){
-  QTimer::singleShot(0, [](){
-    lf->show();
-    cs->hide();
-    gw->hide();
-    lf->load();
-    logic_loop->stop();
-  });
+RunMain::~RunMain(){
+  delAllWindows();
 }
-void GoToCharSelect(){
-  QTimer::singleShot(0, [](){
-    cs->show();
-    lf->hide();
-    gw->hide();
-    cs->load();
-    logic_loop->stop();
-  });
+
+void RunMain::delAllWindows(){
+  if(lf != 0){
+    delete lf;
+    lf = 0;
+  }
+  if(cs != 0){
+    delete cs;
+    cs = 0;
+  }
+  if(gw != 0){
+    delete gw;
+    gw = 0;
+  }
 }
-void GoToGameWindow(){
-  QTimer::singleShot(0, [](){
-    gw->show();
-    cs->hide();
-    lf->hide();
-    gw->load();
-  });
+
+void RunMain::GoToLoginForm(){
+  delAllWindows();
+  lf = new LoginForm();
+  lf->load();
 }
+void RunMain::GoToCharSelect(){
+  delAllWindows();
+  cs = new CharSelect();
+  cs->load();
+}
+void RunMain::GoToGameWindow(){
+  delAllWindows();
+  gw = new GameWindow();
+  gw->load();
+}
+
+RunMain* app;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    /* list resources entry
-    QStringList resources = QDir(":").entryList();
-    for(int i =0;i<resources.size();i++){
-      cout<<resources.at(i).toUtf8().constData()<<endl;
-    }
-    */
-    lf = new LoginForm();
-    cs = new CharSelect();
-    logic_loop = new QTimer();
-    QObject::connect(logic_loop, &QTimer::timeout, [&](){
-      if(tclient->tick()==0){
-        logic_loop->stop();
-      }
-    });
-    GoToLoginForm();
-    gw = new GameWindow();
-    return a.exec();
+    QApplication Qapp(argc, argv);
+    app = new RunMain();
+    app->GoToLoginForm();
+    return Qapp.exec();
 }

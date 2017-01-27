@@ -6,6 +6,9 @@
 #include <QtGui/QKeyEvent>
 
 class LoginForm : public QDialog{
+  
+  Q_OBJECT
+  
 public:
   explicit LoginForm(QWidget *parent = 0);
   ~LoginForm();
@@ -16,6 +19,7 @@ public:
   void keyPressEvent(QKeyEvent *e);
   void changeLoginState(int a, std::string msg);
 signals:
+  void logged();
 private:
   Ui_LoginForm* ui;
 };

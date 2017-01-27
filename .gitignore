@@ -52,3 +52,4 @@ node_modules
 
 bin2c/bin2c
 running_inject/KastiBob_run
+app/KastiBobGui/KastiBobGui

@@ -6,6 +6,8 @@
 #include <QtGui/QKeyEvent>
 
 class CharSelect : public QDialog{
+  Q_OBJECT
+  
 public:
     explicit CharSelect(QWidget *parent = 0);
     ~CharSelect();
@@ -13,6 +15,9 @@ public:
     void logout();
     void load();
     void keyPressEvent(QKeyEvent *e);
+signals:
+  void logouted();
+  void entered();
 private:
   Ui_CharSelect* ui;
 };

@@ -7,6 +7,6 @@
 class PingPacket: public NetworkPacket
 {
 public:
-	PingPacket(XTEAcipher& xtea);
+	PingPacket(XTEAcipher* xtea);
 };
 #endif

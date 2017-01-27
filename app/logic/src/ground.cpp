@@ -13,7 +13,7 @@ Ground::Ground(){
   rangeX = 0;
   rangeY = 0;
 }
-Ground::Ground(int32_t rx, int32_t ry){
+void Ground::set(int32_t rx, int32_t ry){
   initialized = true;
   rangeX = rx;
   rangeY = ry;
@@ -72,4 +72,7 @@ bool Ground::removeCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t st
     return false;
   }
   return true;
+}
+Creature* Ground::getCreatureByID(uint32_t id){
+  return creatures[id];
 }

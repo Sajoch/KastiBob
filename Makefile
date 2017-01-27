@@ -23,17 +23,26 @@ mdll: minject
 test_dll: mdll
 	make -C KastiDll test
 logic:
-	make -C app/logic test
+	+make -C app/logic test
+logic_dll:
+	+make -C app/logic dll
+logic_so:
+	+make -C app/logic so
 sprunpack:
 	make -C app/sprunpack test
-gui:
-	make -C app/logic dll
-	make -C app/KastiBobGui test
+gui: logic_dll
+	+make -C app/KastiBobGui test
+linuxgui: logic_so
+	+make -C app/KastiBobGui test
 dgui:
 	make -C app/logic dll
 	make -C app/KastiBobGui debug
+linuxdgui: logic_so
+	+make -C app/KastiBobGui debug
 clean_gui:
 	make -C app/KastiBobGui clean
+clean_logic:
+	make -C app/logic clean
 clean:
 	make -C KastiDll clean
 	make -C running_inject clean

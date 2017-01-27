@@ -1,14 +1,11 @@
 #include <functional>
 #include <QtWidgets/QApplication>
-#include <QtCore/QTimer>
 #include "loginform.h"
+#include "runmain.hpp"
 #include "client.hpp"
 
+extern RunMain* app;
 extern Client* tclient;
-extern QTimer *logic_loop;
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
 
 LoginForm::LoginForm(QWidget *parent) :
     QDialog(parent)
@@ -18,13 +15,16 @@ LoginForm::LoginForm(QWidget *parent) :
   //TODO outside
   ui->comboBox->addItem("Kasteria.net", "91.134.189.246:7171");
   ui->comboBox->addItem("Tibijka.net", "178.32.162.105:7171");
-  connect(ui->pushButton_2, &QPushButton::clicked, this, login);
-  connect(ui->pushButton, &QPushButton::clicked, this, exit);
+  connect(ui->pushButton_2, &QPushButton::clicked, this, &LoginForm::login);
+  connect(ui->pushButton, &QPushButton::clicked, this, &LoginForm::exit);
+  
+  connect(this, &LoginForm::logged, app, &RunMain::GoToCharSelect);
 }
 
 void LoginForm::load(){
   ui->retranslateUi(this);
   ui->lineEdit_2->setFocus();
+  show();
 }
 
 void LoginForm::changeLoginState(int a, std::string msg){
@@ -40,7 +40,7 @@ void LoginForm::changeLoginState(int a, std::string msg){
     break;
     case 4:
       ui->label->setText(QApplication::translate("LoginForm", "logged", 0));
-      GoToCharSelect();
+      logged();
     break;
     default:
       ui->label->setText(QApplication::translate("LoginForm", "unexpected error", 0));
@@ -59,7 +59,6 @@ void LoginForm::login(){
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
   });
-  logic_loop->start(1);
 }
 
 void LoginForm::exit(){
