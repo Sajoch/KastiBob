@@ -139,8 +139,6 @@ void Client::recv(NetworkPacket& p){
 			}break;
 			case ClientState::LOGIN:{
 				state = ClientState::NONE;
-				cout<<"login start disconnect "<<p.getSize()<<endl;
-				closeConnection();
 				do{
 					packetType = p.getUint8();
 					cout<<"recv "<<packetType<<endl;
@@ -187,6 +185,7 @@ void Client::recv(NetworkPacket& p){
 				if(state != ClientState::NONE){
 					continue;
 				}
+				closeConnection();
 			}break;
 			case ClientState::WAIT_TO_ENTER:
 				changeStateFunc(4, "");

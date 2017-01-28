@@ -88,7 +88,7 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 			cout<<"outOfData"<<endl;
 			return false;
 		}
-		vAttr = p.getUint16();
+		vAttr = p.peekUint16();
 		if(vAttr == 0xFFFF){
 			return true;
 		}
@@ -106,6 +106,7 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 			break;
 			default:
 				it = Item(vAttr);
+				//p.getUint16();
 				sq.addItem(it);
 			break;
 		}

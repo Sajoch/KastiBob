@@ -7,7 +7,10 @@ src/%.hpp.gch :
 	@$(CXX) -o $@ $<
 
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL -fPIC
+CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL 
+ifeq ($(OS),LINUX)
+CPPFLAG=$(CPPFLAG) -fPIC
+endif
 
 dll: obj obj_ext_c $(PROGRAM).dll
 so: obj obj_ext_c lib$(PROGRAM).so

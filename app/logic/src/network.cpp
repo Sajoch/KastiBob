@@ -1,6 +1,7 @@
 #include "network.hpp"
 #include <Poco/Net/NetException.h>
 #include <Poco/AbstractObserver.h>
+#include <iostream>
 
 using namespace Poco::Net;
 
@@ -12,16 +13,28 @@ recv_offset(0)
 	sock.setBlocking(false);
 	onPacketRecived = [](NetworkPacket&){};
 	haveSize = false;
-	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ReadableNotification>(*this, &NetworkManager::onRead));
-	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, WritableNotification>(*this, &NetworkManager::onWrite));
-	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ShutdownNotification>(*this, &NetworkManager::onShutdonw));
-	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, ErrorNotification>(*this, &NetworkManager::onError));
-	reactor.addEventHandler(sock, Poco::Observer<NetworkManager, TimeoutNotification>(*this, &NetworkManager::onTimeout));
-	thread.start(reactor);	
+	force_close = false;
+	thread.start(&NetworkManager::mainLoop, this);
 }
 NetworkManager::~NetworkManager(){
-	sock.close();
-	reactor.stop();
+	force_close = true;
+	thread.join();
+}
+
+void NetworkManager::mainLoop(void* data){
+	NetworkManager* nm = (NetworkManager*)data;
+	while(!nm->force_close){
+		try{
+			if(nm->sock.poll(0, Socket::SELECT_READ|Socket::SELECT_ERROR)){
+				nm->onRead();
+			}else if(nm->sock.poll(0, Socket::SELECT_WRITE)){
+				nm->onWrite();
+			}
+		}catch(NetException e){
+			return nm->onError();
+		}
+		Poco::Thread::yield();
+	}
 }
 void NetworkManager::addPacketR(NetworkPacket& p){
 	p.add_header();
@@ -37,7 +50,7 @@ void NetworkManager::SetOnPacketRecived(std::function<void(NetworkPacket&)> cb){
 	onPacketRecived = cb;
 }
 
-void NetworkManager::onRead(Poco::Net::ReadableNotification* nof){
+void NetworkManager::onRead(){
 	int rsize = sock.available();
 	int buffer_size = recv_buffer.size() - recv_offset;
 	if(buffer_size<rsize){
@@ -46,6 +59,9 @@ void NetworkManager::onRead(Poco::Net::ReadableNotification* nof){
 	int recvb = sock.receiveBytes(&recv_buffer[recv_offset], rsize);
 	if(recvb > 0){
 		recv_offset += recvb;
+	}else{
+		onDisconnect();
+		return;
 	}
 	if(!haveSize && recv_offset >= 2){
 		packet_size = NetworkPacket::peekUint16(recv_buffer);
@@ -72,7 +88,7 @@ void NetworkManager::onRead(Poco::Net::ReadableNotification* nof){
 		}
 	}
 }
-void NetworkManager::onWrite(Poco::Net::WritableNotification* nof){
+void NetworkManager::onWrite(){
 	if(send_buffer.size()>0){
 		int sendb = sock.sendBytes(send_buffer.data(), send_buffer.size());
 		if(sendb > 0){
@@ -80,12 +96,11 @@ void NetworkManager::onWrite(Poco::Net::WritableNotification* nof){
 		}
 	}
 }
-void NetworkManager::onShutdonw(Poco::Net::ShutdownNotification* nof){
-	//cout<<"shutdown"<<endl;
+void NetworkManager::onDisconnect(){
+	force_close = true;
+	std::cout<<"shutdown"<<std::endl;
 }
-void NetworkManager::onError(Poco::Net::ErrorNotification* nof){
-	//cout<<"error"<<endl;
-}
-void NetworkManager::onTimeout(Poco::Net::TimeoutNotification* nof){
-	//cout<<"timeout"<<endl;
+void NetworkManager::onError(){
+	force_close = true;
+	std::cout<<"error"<<std::endl;
 }

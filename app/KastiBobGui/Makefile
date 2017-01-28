@@ -1,7 +1,10 @@
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
--lQt5Gui  -lpng \
--L. -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h  \
--I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
+-lQt5Gui  -lpng -lpthread \
+-L. -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h
+
+ifeq ($(OS),LINUX)
+CPPFLAG=$(CPPFLAG) -I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
+endif
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
