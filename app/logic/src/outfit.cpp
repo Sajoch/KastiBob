@@ -1,5 +1,8 @@
 #include "outfit.hpp"
 #include "packet.hpp"
+#include <iostream>
+
+using namespace std;
 
 Outfit::Outfit(){
 
@@ -19,7 +22,8 @@ bool Outfit::fromMsg(NetworkPacket& p){
     if(p.getSize()<2) return false;
     uint16_t itemId = p.getUint16();
     if(itemId != 0){ //TODO looktypeex
-
+      cout<<"looktypeex"<<endl;
+      return false;
     }
   }
   if(p.getSize()<2) return false;

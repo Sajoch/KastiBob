@@ -46,6 +46,7 @@ bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, 
 	return true;
 }
 bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){
+	cout<<"getFloorMap "<<_z<<endl;
 	int32_t cx, cy, vAttr;
 	for(cx = 0; cx < w; cx++)
 		for(cy = 0; cy < h; cy++){
@@ -78,20 +79,22 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 	return true;
 }
 bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
+	cout<<"getSquareMap "<<_x<<","<<_y<<","<<_z<<endl;
 	int32_t vAttr, thingsId;
 	Square& sq = c->gMap->getSquare(_x, _y, _z);
 	sq.clear();
 	Creature cr;
 	Item it;
-	for(thingsId = 0; thingsId < 10; thingsId++){
+	for(thingsId = 0; thingsId < 11; thingsId++){
 		if(p.getSize() < 2){
 			cout<<"outOfData"<<endl;
 			return false;
 		}
 		vAttr = p.peekUint16();
-		if(vAttr == 0xFFFF){
+		if(vAttr >= 0xFF00){
 			return true;
 		}
+		p.getUint16();
 		cout<<"thing "<<vAttr<<endl;
 		switch(vAttr){
 			case 0x61:
@@ -106,7 +109,6 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 			break;
 			default:
 				it = Item(vAttr);
-				//p.getUint16();
 				sq.addItem(it);
 			break;
 		}

@@ -11,11 +11,11 @@ Creature::Creature(){
 
 Creature Creature::setNewCreature(NetworkPacket& p){
   Creature ret;
-  uint32_t unk1 = p.getUint32();
+  uint32_t oldId = p.getUint32();
   ret.id = p.getUint32();
   ret.name = p.getTString();
   ret.hpp = p.getUint8();
-  uint32_t unk4 = p.getUint8();
+  uint32_t dir = p.getUint8();
   //sth
   ret.apperance.fromMsg(p);
   
@@ -31,12 +31,14 @@ Creature Creature::setKnownCreature(NetworkPacket& p){
   Creature ret;
   uint32_t unk1 = p.getUint32();
   cout<<"known "<<unk1<<endl;
+  exit(1);
   return ret;
 }
 
 Creature Creature::setUnk1Creature(NetworkPacket& p){
   Creature ret;
   cout<<"unk1"<<endl;
+  exit(1);
   return ret;
 }
 uint32_t Creature::getX(){
