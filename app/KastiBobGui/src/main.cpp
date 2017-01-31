@@ -15,17 +15,20 @@ using namespace std;
 //TODO no global
 class Client* tclient = 0;
 ConfigFile* paths;
-class DatLoader* datobjs;
 
 
 RunMain::RunMain(){
   lf = 0;
   cs = 0;
   gw = 0;
+  datobjs = 0;
 }
 
 RunMain::~RunMain(){
   delAllWindows();
+  if(datobjs != 0){
+    delete datobjs;
+  }
 }
 
 void RunMain::delAllWindows(){
@@ -44,18 +47,25 @@ void RunMain::delAllWindows(){
 }
 
 void RunMain::GoToLoginForm(){
+  LoginForm* new_lf = new LoginForm();
   delAllWindows();
-  lf = new LoginForm();
+  lf = new_lf;
   lf->load();
 }
 void RunMain::GoToCharSelect(){
+  CharSelect* new_cs = new CharSelect();
+  if(datobjs == 0){
+    std::string dat_path = paths->getVal("DAT_FILE","../../kclient_v1/Kasti.dat");
+    datobjs = new DatLoader(dat_path);
+  }
   delAllWindows();
-  cs = new CharSelect();
+  cs = new_cs;
   cs->load();
 }
 void RunMain::GoToGameWindow(){
+  GameWindow* new_gw = new GameWindow();
   delAllWindows();
-  gw = new GameWindow();
+  gw = new_gw;
   gw->load();
 }
 

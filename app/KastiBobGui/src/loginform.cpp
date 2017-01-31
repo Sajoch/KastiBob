@@ -8,7 +8,6 @@
 
 extern RunMain* app;
 extern Client* tclient;
-extern DatLoader* datobjs;
 
 LoginForm::LoginForm(QWidget *parent) :
     QDialog(parent),

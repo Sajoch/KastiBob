@@ -9,7 +9,8 @@ class RunMain: public QObject{
   class LoginForm* lf;
   class CharSelect* cs;
   class GameWindow* gw;
-  
+  class DatLoader* datobjs;
+	
 public:
   RunMain();
 	~RunMain();
