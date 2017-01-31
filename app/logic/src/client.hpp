@@ -91,7 +91,7 @@ class API Client: public Creature{
 	
 public:
 	void move(ClientDirectory dir);
-	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p);
+	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p, class DatLoader* dat);
 	~Client();
 	int tick();
 	void loginListener(std::function<void(int, std::string)> cb);
@@ -100,6 +100,7 @@ public:
 	void afterRecv(std::function<void(void)> cb);
 	void afterRecv();
 	bool setChar(size_t id);
+	void enter();
 	void sendLogout();
 };
 #endif

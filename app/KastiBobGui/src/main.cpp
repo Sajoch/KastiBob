@@ -6,11 +6,17 @@
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
+#include "config.hpp"
+#include "datLoader.hpp"
 #include <iostream>
 
 using namespace std;
 
+//TODO no global
 class Client* tclient = 0;
+ConfigFile* paths;
+class DatLoader* datobjs;
+
 
 RunMain::RunMain(){
   lf = 0;
@@ -58,6 +64,7 @@ RunMain* app;
 int main(int argc, char *argv[])
 {
     QApplication Qapp(argc, argv);
+    paths = new ConfigFile("path.cfg");
     app = new RunMain();
     app->GoToLoginForm();
     return Qapp.exec();

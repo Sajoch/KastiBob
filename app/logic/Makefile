@@ -9,7 +9,7 @@ src/%.hpp.gch :
 PROGRAM=KastiBob_logic
 CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL 
 ifeq ($(OS),LINUX)
-CPPFLAG=$(CPPFLAG) -fPIC
+CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL -fPIC
 endif
 
 dll: obj obj_ext_c $(PROGRAM).dll

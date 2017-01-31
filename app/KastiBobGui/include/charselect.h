@@ -4,6 +4,7 @@
 #include "charselect.gen.h"
 #include <QtWidgets/QDialog>
 #include <QtGui/QKeyEvent>
+#include "config.hpp"
 
 class CharSelect : public QDialog{
   Q_OBJECT
@@ -19,6 +20,8 @@ signals:
   void logouted();
   void entered();
 private:
+  ConfigFile loginConf;
+  size_t rChar;
   Ui_CharSelect* ui;
 };
 

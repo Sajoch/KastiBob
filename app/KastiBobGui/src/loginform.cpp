@@ -1,20 +1,30 @@
 #include <functional>
+#include <iostream>
 #include <QtWidgets/QApplication>
 #include "loginform.h"
 #include "runmain.hpp"
 #include "client.hpp"
+#include "datLoader.hpp"
 
 extern RunMain* app;
 extern Client* tclient;
+extern DatLoader* datobjs;
 
 LoginForm::LoginForm(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    loginConf("login.cfg")
 {
   ui = new Ui_LoginForm();
   ui->setupUi(this);
-  //TODO outside
-  ui->comboBox->addItem("Kasteria.net", "91.134.189.246:7171");
-  ui->comboBox->addItem("Tibijka.net", "178.32.162.105:7171");
+  changeLoginState(2, "loading resources");
+  ConfigFile listServ("list.cfg");
+  listServ.each([&](std::string name, std::string val){
+    ui->comboBox->addItem(QString::fromStdString(name), QString::fromStdString(val));
+  });
+
+  rServer = loginConf.getVal("SERVER", 0);
+  rLogin = loginConf.getVal("LOGIN", "");
+  
   connect(ui->pushButton_2, &QPushButton::clicked, this, &LoginForm::login);
   connect(ui->pushButton, &QPushButton::clicked, this, &LoginForm::exit);
   
@@ -23,7 +33,13 @@ LoginForm::LoginForm(QWidget *parent) :
 
 void LoginForm::load(){
   ui->retranslateUi(this);
-  ui->lineEdit_2->setFocus();
+  ui->comboBox->setCurrentIndex(rServer);
+  if(!rLogin.empty()){
+    ui->lineEdit_2->setText(QString::fromStdString(rLogin));
+    ui->lineEdit->setFocus();
+  }else{
+    ui->lineEdit_2->setFocus();
+  }
   show();
 }
 
@@ -55,7 +71,9 @@ void LoginForm::login(){
   std::string ps = p.toUtf8().constData();
   changeLoginState(1, "");
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
-  tclient = new Client(sa, 20007, 2, ls, ps);
+  loginConf.setVal("SERVER", ui->comboBox->currentIndex());
+  loginConf.setVal("LOGIN", ls);
+  tclient = new Client(sa, 20007, 2, ls, ps, 0);
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
   });

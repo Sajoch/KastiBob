@@ -18,14 +18,3 @@ uint32_t Client::mapViewX = 8;
 uint32_t Client::mapViewY = 8;
 int32_t Client::mapLayers = 15; //0-15 = 16 layers
 
-int main(){
-	srand(time(0));
-	//178.32.162.105
-	std::string addr = "91.134.189.246:7171";
-	Client kastiClient(addr, 20007, 2, "dupad2", "dupad2");
-	while(1){
-		//C++11 compability
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
-  return 0;
-}

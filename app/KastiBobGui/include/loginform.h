@@ -4,6 +4,7 @@
 #include "loginform.gen.h"
 #include <QtWidgets/QDialog>
 #include <QtGui/QKeyEvent>
+#include "config.hpp"
 
 class LoginForm : public QDialog{
   
@@ -21,6 +22,9 @@ public:
 signals:
   void logged();
 private:
+  ConfigFile loginConf;
+  size_t rServer;
+  std::string rLogin;
   Ui_LoginForm* ui;
 };
 

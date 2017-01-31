@@ -1,8 +1,12 @@
+#ifndef __BINARY_FILE_HPP
+#define __BINARY_FILE_HPP
+
 #include <fstream>
 
 class BinaryFile{
   std::fstream file;
   size_t length;
+  std::string path;
 public:
   BinaryFile(std::string name);
   bool possibleRead(size_t a);
@@ -14,4 +18,10 @@ public:
 
   size_t getOffset();
   void readRest(std::string& buf);
+  
+  void write(std::string val);
+  void clear();
+  void flush();
 };
+
+#endif

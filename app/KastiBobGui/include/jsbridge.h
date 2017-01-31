@@ -24,6 +24,7 @@ public:
   Q_INVOKABLE void callAfterUpdate(QVariant data);
 private:
   class GameWindow* gamewindow;
+  QWebView* webView;
   QWebFrame* mframe;
   class SpriteLoader* sprs;
 };

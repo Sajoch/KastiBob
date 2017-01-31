@@ -13,17 +13,18 @@ extern RunMain* app;
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    ui = new Ui_GameWindow();
-    ui->setupUi(this);
-    QWebPage* page = ui->webView->page();
-    page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    
-    connect(this, &GameWindow::logout, app, &RunMain::GoToLoginForm);
-    connect(this, &GameWindow::charSelect, app, &RunMain::GoToGameWindow);
-    
-    connect(page, &QWebPage::loadFinished, this, &GameWindow::loaded);
-    calledExec = false;
-    loaded_page = false;
+  ui = new Ui_GameWindow();
+  ui->setupUi(this);
+  QWebPage* page = ui->webView->page();
+  //ui->webView->setContextMenuPolicy(Qt::CustomContextMenu);
+  page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  
+  connect(this, &GameWindow::logout, app, &RunMain::GoToLoginForm);
+  connect(this, &GameWindow::charSelect, app, &RunMain::GoToGameWindow);
+  
+  calledExec = false;
+  loaded_page = false;
+  connect(page, &QWebPage::loadFinished, this, &GameWindow::loaded);
 }
 void GameWindow::loaded(){
   loaded_page = true;
@@ -39,10 +40,6 @@ void GameWindow::load(){
   }
   bridge = new JSBridge(this);
   bridge->setGW(this, ui->webView);
-  QWebPage* page = ui->webView->page();
-  QWebFrame* frame = page->mainFrame();
-  frame->addToJavaScriptWindowObject("JSBridge", bridge);
-  frame->evaluateJavaScript("start();");
   show();
 }
 

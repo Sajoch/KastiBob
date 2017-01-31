@@ -3,17 +3,24 @@
 using namespace std;
 
 BinaryFile::BinaryFile(std::string name):
-file(name.c_str(), ios::in|ios::binary)
+file(name.c_str(), ios::in|ios::binary|ios::out),
+path(name)
 {
-  file.seekg (0, file.end);
-  length = file.tellg();
-  file.seekg (0, file.beg);
+  if(file.good()){
+    file.seekg (0, file.end);
+    length = file.tellg();
+    file.seekg (0, file.beg);
+  }else{
+    length = 0;
+  }
 }
 bool BinaryFile::possibleRead(size_t a){
-  size_t offset = file.tellg();
-  offset+=a;
-  if(offset<=length){
-    return true;
+  if(file.good()){
+    size_t offset = file.tellg();
+    offset+=a;
+    if(offset<=length){
+      return true;
+    }
   }
   return false;
 }
@@ -71,4 +78,17 @@ void BinaryFile::readRest(std::string& buf){
   }
   buf.resize(bs);
   file.read((char*)&buf[0], bs);
+}
+
+void BinaryFile::write(std::string val){
+  file.write(val.c_str(), val.length());
+}
+
+void BinaryFile::flush(){
+  file.flush();
+}
+
+void BinaryFile::clear(){
+  file.close();
+  file.open(path.c_str(), ios::in|ios::binary|ios::out|ios::trunc);
 }

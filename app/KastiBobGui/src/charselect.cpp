@@ -5,10 +5,16 @@
 extern RunMain* app;
 extern Client* tclient;
 
+//TODO shared loginConf between loginform and charselect
+
 CharSelect::CharSelect(QWidget *parent) :
-    QDialog(parent){
+    QDialog(parent), 
+    loginConf("login.cfg"){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
+  
+  rChar = loginConf.getVal("CHAR", 0);
+  
   connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
   connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
   
@@ -23,11 +29,13 @@ void CharSelect::load(){
   tclient->listChars([&](std::string name, size_t id){
     ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
+  ui->comboBox->setCurrentIndex(rChar);
   show();
 }
 
 void CharSelect::enter(){
   size_t id = ui->comboBox->currentData().toULongLong();
+  loginConf.setVal("CHAR", ui->comboBox->currentIndex());
   if(tclient->setChar(id)){
     entered();
   }else{

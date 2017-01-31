@@ -6,6 +6,7 @@
 #include "extendClient.hpp"
 #include "ground.hpp"
 #include "network.hpp"
+#include "datLoader.hpp"
 
 #include <sstream>
 
@@ -43,7 +44,7 @@ void Character::show(){
 	cout<<"Nick: "<<nick<<" on "<<getAddress()<<endl;
 }
 
-Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
+Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p, DatLoader* dat):
 	version(_version), os(_os),
 	login(l), password(p)
 {
@@ -106,10 +107,6 @@ bool Client::setChar(size_t id){
 	}else if(id<characters.size()){
 		current_character = characters[id];
 		if (current_character.isValid()){
-			newConnection(current_character.getAddress());
-			current_character.show();
-			xtea_crypted = false;
-			state = ClientState::GAME;
 			return true;
 		} else {
 			disconnect("No valid character to enter game");
@@ -118,6 +115,13 @@ bool Client::setChar(size_t id){
 	}
 	return false;
 }
+void Client::enter(){
+	newConnection(current_character.getAddress());
+	current_character.show();
+	xtea_crypted = false;
+	state = ClientState::GAME;
+}
+
 void Client::recv(NetworkPacket& p){
 	if(xtea_crypted){
 		p.xteaDecrypt(xtea);

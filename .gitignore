@@ -39,6 +39,8 @@ kclient_v2.zip
 *.gen.h
 *.gen.hpp
 *.gen.qrc
+path.cfg
+login.cfg
 
 
 # Stackdump
