@@ -4,6 +4,7 @@
 #include "spriteLoader.hpp"
 #include "config.hpp"
 #include <QtCore/QVariant>
+#include <QtWidgets/QMessageBox>
 #include <iostream>
 #include <QtCore/QTimer>
 
@@ -16,6 +17,15 @@ extern ConfigFile* paths;
 JSBridge::JSBridge(QObject *parent) : QObject(parent){
   std::string spr_path = paths->getVal("SPR_FILE","../../kclient_v1/Kasti.spr");
   sprs = new SpriteLoader(spr_path);
+  connect(this, &JSBridge::sendData, this, &JSBridge::sendDataToJS);
+  
+  connect(this, &JSBridge::errorMsg, this, [&](std::string msg){
+    QMessageBox msgBox;
+    cout<<"error xD "<<msg<<endl;
+    msgBox.setText(QString::fromStdString(msg));
+    msgBox.exec();
+  });
+  
 }
 
 void JSBridge::setGW(GameWindow* that, QWebView* _webView){
@@ -24,6 +34,9 @@ void JSBridge::setGW(GameWindow* that, QWebView* _webView){
   mframe = webView->page()->currentFrame();
   mframe->addToJavaScriptWindowObject("JSBridge", this);
   mframe->evaluateJavaScript("start();");
+  tclient->afterError([&](std::string msg){
+    errorMsg(msg);
+  });
   tclient->enter();
 }
 
@@ -82,9 +95,9 @@ void JSBridge::look(int id){
 void JSBridge::callAfterUpdate(QVariant data){
   QJsonDocument doc = QJsonDocument::fromVariant(data);
   QString json = doc.toJson(QJsonDocument::Compact);
-  QString cmd = QString("Communication.update(%1)").arg(json);
-  mframe = webView->page()->currentFrame();
-  QTimer::singleShot(0, [&](){
-    mframe->evaluateJavaScript(cmd);
-  });
+  json = QString("Communication.update(%1)").arg(json);
+  sendData(json);
+}
+void JSBridge::sendDataToJS(QString json){
+  mframe->evaluateJavaScript(json);
 }

@@ -2,6 +2,7 @@
 #define __DATLOADER_HPP
 
 #include "dll.h"
+#include "file.hpp"
 #include <mutex>
 #include <vector>
 
@@ -13,6 +14,7 @@ class API DatLoader{
 	std::mutex load_state;
 	bool loaded;
 	std::vector<DatObject> objects;
+	BinaryFile file;
 public:
 	bool isLoaded();
 	DatLoader(std::string path);

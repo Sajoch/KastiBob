@@ -3,9 +3,12 @@
 
 using namespace std;
 
-DatLoader::DatLoader(std::string path){
+DatLoader::DatLoader(std::string path):
+	file(path)
+{
 	loaded = false;
 	cout<<"dat "<<path<<endl;
+	exit(1);
 }
 
 bool DatLoader::isLoaded(){

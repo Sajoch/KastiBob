@@ -14,6 +14,7 @@ public:
   explicit JSBridge(QObject *parent = 0);
   void setGW(class GameWindow* that, QWebView* _webview);
   void CrossCallAfterUpdate();
+  void sendDataToJS(QString json);
 
   Q_INVOKABLE void logout();
   Q_INVOKABLE void charSelect();
@@ -27,6 +28,9 @@ private:
   QWebView* webView;
   QWebFrame* mframe;
   class SpriteLoader* sprs;
+signals:
+  void sendData(QString json);
+  void errorMsg(std::string msg);
 };
 
 #endif // JSBRIDGE_H

@@ -55,6 +55,9 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p, D
 	
 	conn = 0;
 	afterRecvFunc = [](){};
+	errorHandler = [](std::string msg){
+		cout<<"Error: "<<msg<<endl;
+	};
 	newConnection(ip);
 	state = ClientState::LOGIN;
 	xtea_crypted = true;
@@ -83,6 +86,10 @@ void Client::loginListener(std::function<void(int, std::string)> cb){
 }
 void Client::afterRecv(std::function<void(void)> cb){
 	afterRecvFunc = cb;
+}
+
+void Client::afterError(std::function<void(std::string)> cb){
+	errorHandler = cb;
 }
 void Client::loginListener(){
 	changeStateFunc = [](int, std::string){};
@@ -442,6 +449,7 @@ void Client::recv(NetworkPacket& p){
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
 						p.dump();
+						errorHandler("Network parser error");
 						exit(1);
 						return;
 				}
@@ -470,5 +478,5 @@ void Client::sendLogout(){
 void Client::disconnect(std::string reason){
 	state = ClientState::NONE;
 	closeConnection();
-	cout<<"disconnect: "<<reason<<endl;
+	errorHandler("Disconnect: "+reason);
 }

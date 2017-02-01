@@ -58,6 +58,7 @@ class API Client: public Creature{
 	uint16_t drawSpeed;
 	bool canReportBugs;
 	std::function<void(int, std::string)> changeStateFunc;
+	std::function<void(std::string)> errorHandler;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
 	
@@ -97,6 +98,7 @@ public:
 	void loginListener(std::function<void(int, std::string)> cb);
 	void loginListener();
 	void listChars(std::function<void(std::string, size_t)> cb);
+	void afterError(std::function<void(std::string)> cb);
 	void afterRecv(std::function<void(void)> cb);
 	void afterRecv();
 	bool setChar(size_t id);
