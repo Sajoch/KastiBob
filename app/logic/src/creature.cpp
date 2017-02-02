@@ -29,9 +29,18 @@ Creature Creature::setNewCreature(NetworkPacket& p){
 
 Creature Creature::setKnownCreature(NetworkPacket& p){
   Creature ret;
-  uint32_t unk1 = p.getUint32();
-  cout<<"known "<<unk1<<endl;
-  exit(1);
+  ret.id = p.getUint32();
+  ret.hpp = p.getUint8();
+  uint32_t dir = p.getUint8();
+  //sth
+  ret.apperance.fromMsg(p);
+  
+  ret.lightLevel = p.getUint8();
+  ret.lightColor = p.getUint8();
+  ret.speed = p.getUint16();
+  ret.skull = p.getUint8();
+  ret.blockSpace = p.getUint8();
+  cout<<"known"<<endl;
   return ret;
 }
 

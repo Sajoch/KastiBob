@@ -22,6 +22,7 @@ void ExtendClient::CreatureHealth(NetworkPacket& p){
 		c->disconnect("CreatureHealth too short");
 		return;
 	}
+	p.dump();
 }
 void ExtendClient::CreatureLight(NetworkPacket& p){
 	if(p.getSize()<6){
@@ -43,4 +44,5 @@ void ExtendClient::CreatureSpeak(NetworkPacket& p){
 		c->disconnect("CreatureSpeak too short");
 		return;
 	}
+	p.dump();
 }

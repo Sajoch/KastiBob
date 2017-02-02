@@ -1,10 +1,11 @@
 #include <vector>
 #include <string>
+#include "dll.h"
 #include "file.hpp"
 
 using namespace std;
 
-class Sprite{
+class API Sprite{
   friend class SpriteLoader;
   bool loaded;
   size_t offset;
@@ -18,7 +19,7 @@ public:
 };
 
 
-class SpriteLoader{
+class API SpriteLoader{
   std::string error;
   std::vector<Sprite> sprites;
   std::string buffer;
