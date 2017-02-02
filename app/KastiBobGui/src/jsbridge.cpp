@@ -1,7 +1,7 @@
 #include "jsbridge.h"
 #include "gamewindow.h"
 #include "client.hpp"
-#include "spriteLoader.hpp"
+#include "sprLoader.hpp"
 #include "config.hpp"
 #include <QtCore/QVariant>
 #include <QtWidgets/QMessageBox>

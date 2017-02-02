@@ -13,5 +13,5 @@ void ExtendClient::MagicEffect(NetworkPacket& p){
 	y = p.getUint16();
 	z = p.getUint8();
 	type = p.getUint8();
-	std::cout<<type<<std::endl;
+	std::cout<<"magic effect "<<type<<std::endl;
 }

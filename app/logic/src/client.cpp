@@ -52,6 +52,7 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p, D
 	rsa = new RSAcipher(rsa_m_n, rsa_e_n);
 	ext = new ExtendClient(this);
 	gMap = new Ground();
+	datobjs = dat;
 	
 	conn = 0;
 	afterRecvFunc = [](){};
@@ -274,10 +275,10 @@ void Client::recv(NetworkPacket& p){
 						break;
 					/*case 0x6B:
 						ext->TileTransformThing(p);
-						break;
+						break;*/
 					case 0x6C:
 						ext->TileRemoveThing(p);
-						break;*/
+						break;
 					case 0x6D:
 						ext->CreatureMove(p);
 						break;

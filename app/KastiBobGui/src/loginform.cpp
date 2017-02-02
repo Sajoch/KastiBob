@@ -15,7 +15,6 @@ LoginForm::LoginForm(QWidget *parent) :
 {
   ui = new Ui_LoginForm();
   ui->setupUi(this);
-  changeLoginState(2, "loading resources");
   ConfigFile listServ("list.cfg");
   listServ.each([&](std::string name, std::string val){
     ui->comboBox->addItem(QString::fromStdString(name), QString::fromStdString(val));
@@ -32,6 +31,7 @@ LoginForm::LoginForm(QWidget *parent) :
 
 void LoginForm::load(){
   ui->retranslateUi(this);
+  changeLoginState(2, "loading resources");
   ui->comboBox->setCurrentIndex(rServer);
   if(!rLogin.empty()){
     ui->lineEdit_2->setText(QString::fromStdString(rLogin));
@@ -72,7 +72,7 @@ void LoginForm::login(){
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
   loginConf.setVal("SERVER", ui->comboBox->currentIndex());
   loginConf.setVal("LOGIN", ls);
-  tclient = new Client(sa, 20007, 2, ls, ps, 0);
+  tclient = new Client(sa, 20007, 2, ls, ps, app->getDatobjs());
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
   });
@@ -80,6 +80,10 @@ void LoginForm::login(){
 
 void LoginForm::exit(){
   reject();
+}
+
+void LoginForm::resourcesLoaded(){
+  changeLoginState(2, "Resources loaded");
 }
 
 void LoginForm::keyPressEvent(QKeyEvent *e) {

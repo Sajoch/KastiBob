@@ -16,6 +16,7 @@ public:
   void load();
   void login();
   void exit();
+  void resourcesLoaded();
   void selectServer();
   void keyPressEvent(QKeyEvent *e);
   void changeLoginState(int a, std::string msg);

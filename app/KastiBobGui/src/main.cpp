@@ -2,6 +2,7 @@
 #include <QtCore/QLibrary>
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
+#include <QtCore/QThread>
 #include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
@@ -16,12 +17,30 @@ using namespace std;
 class Client* tclient = 0;
 ConfigFile* paths;
 
+class LoaderThread: public QThread{
+public:
+  LoaderThread(DatLoader* _dat, std::string _path){
+    dat = _dat;
+    path = _path;
+  }
+private:
+  DatLoader* dat;
+  std::string path;
+  void run(){
+    dat->load(path);
+  }
+};
 
 RunMain::RunMain(){
   lf = 0;
   cs = 0;
   gw = 0;
-  datobjs = 0;
+  datobjs = new DatLoader();
+  stateLoadedResources = false;
+  std::string dat_path = paths->getVal("DAT_FILE","../../kclient_v1/Kasti.dat");
+  lt = new LoaderThread(datobjs, dat_path);
+  connect(lt, &LoaderThread::finished, this, &RunMain::loadedResources);
+  lt->start();
 }
 
 RunMain::~RunMain(){
@@ -29,6 +48,14 @@ RunMain::~RunMain(){
   if(datobjs != 0){
     delete datobjs;
   }
+  delete lt;
+}
+
+void RunMain::loadedResources(){
+  if(lf != 0){
+    lf->resourcesLoaded();
+  }
+  stateLoadedResources = true;
 }
 
 void RunMain::delAllWindows(){
@@ -51,13 +78,12 @@ void RunMain::GoToLoginForm(){
   delAllWindows();
   lf = new_lf;
   lf->load();
+  if(stateLoadedResources){
+    lf->resourcesLoaded();
+  }
 }
 void RunMain::GoToCharSelect(){
   CharSelect* new_cs = new CharSelect();
-  if(datobjs == 0){
-    std::string dat_path = paths->getVal("DAT_FILE","../../kclient_v1/Kasti.dat");
-    datobjs = new DatLoader(dat_path);
-  }
   delAllWindows();
   cs = new_cs;
   cs->load();
@@ -67,6 +93,9 @@ void RunMain::GoToGameWindow(){
   delAllWindows();
   gw = new_gw;
   gw->load();
+}
+DatLoader* RunMain::getDatobjs(){
+  return datobjs;
 }
 
 RunMain* app;

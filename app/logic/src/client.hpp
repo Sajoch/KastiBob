@@ -38,6 +38,7 @@ public:
 
 class API Client: public Creature{
 	friend class ExtendClient;
+	friend class Item;
 	class XTEAcipher* xtea;
 	class RSAcipher* rsa;
 	static const char* rsa_e_n;
@@ -61,6 +62,7 @@ class API Client: public Creature{
 	std::function<void(std::string)> errorHandler;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
+	class DatLoader* datobjs;
 	
 	uint16_t health;
 	uint16_t max_health;

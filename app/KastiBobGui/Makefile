@@ -1,6 +1,7 @@
+LOGIC_SRC=../logic/src
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
--lQt5Gui  -lpng -lpthread \
--L. -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h
+-lQt5Gui -lpthread \
+-L. -lKastiBob_logic -I$(LOGIC_SRC) -Iinclude -Iuis_h
 
 ifeq ($(OS),LINUX)
 CPPFLAG+= -I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
@@ -60,7 +61,7 @@ MOC=jsbridge loginform runmain gamewindow charselect
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
 
 OBJS=main charselect loginform gamewindow jsbridge \
-		 file spriteLoader config $(MOCS)
+		 config $(MOCS)
 uis_h/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
@@ -78,10 +79,7 @@ obj/loginform.o: src/loginform.cpp include/loginform.h uis_h/loginform.gen.h \
 obj/gamewindow.o: src/gamewindow.cpp uis_h/gamewindow.gen.h include/gamewindow.h
 obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
 obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewindow.h
-obj/file.o: src/file.cpp include/file.hpp
-obj/config.o: src/config.cpp include/config.hpp include/file.hpp
-obj/spriteLoader.o: src/spriteLoader.cpp include/spriteLoader.hpp include/file.hpp
-
+obj/config.o: src/config.cpp include/config.hpp $(LOGIC_SRC)/file.hpp
 obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
 obj/moc_loginform.gen.o: moc_cpp/loginform.gen.cpp
 obj/moc_runmain.gen.o: moc_cpp/runmain.gen.cpp

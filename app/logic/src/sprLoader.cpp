@@ -1,5 +1,5 @@
 //read sprites and convert to base64 png
-#include "spriteLoader.hpp"
+#include "sprLoader.hpp"
 #include <png.h>
 
 using namespace std;

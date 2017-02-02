@@ -7,7 +7,7 @@ src/%.hpp.gch :
 	@$(CXX) -o $@ $<
 
 PROGRAM=KastiBob_logic
-CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -DDLL 
+CPPFLAG= --std=c++11 -Wall -ggdb -lgmp -lPocoNet -lPocoFoundation -lpng -DDLL 
 ifeq ($(OS),LINUX)
 CPPFLAG+= -fPIC
 endif
@@ -21,7 +21,7 @@ obj_ext_c:
 	mkdir -p obj_ext_c
 PACKETS=Login Ping Move OneByte
 OBJS=main cipher packet network client ground square \
-		 utils outfit creature extendClient item datLoader
+		 utils outfit creature extendClient item datLoader sprLoader file
 extendClient_CPP=$(wildcard src/extendClient/*.cpp)
 extendClient_OBJ=$(patsubst src/extendClient/%.cpp,obj_ext_c/%.o,$(extendClient_CPP))
 OBJS+=$(patsubst %,%Packet,$(PACKETS))
@@ -42,6 +42,9 @@ obj/datLoader.o: src/datLoader.cpp src/datLoader.hpp
 obj/utils.o: src/utils.cpp src/utils.hpp
 obj/outfit.o: src/outfit.cpp src/outfit.hpp
 obj/item.o: src/item.cpp src/item.hpp
+obj/file.o: src/file.cpp src/file.hpp
+obj/datLoader.o: src/datLoader.cpp src/datLoader.hpp
+obj/sprLoader.o: src/sprLoader.cpp src/sprLoader.hpp
 obj/LoginPacket.o: src/packets/LoginPacket.cpp src/packets/LoginPacket.hpp
 obj/PingPacket.o: src/packets/PingPacket.cpp src/packets/PingPacket.hpp
 obj/MovePacket.o: src/packets/MovePacket.cpp src/packets/MovePacket.hpp

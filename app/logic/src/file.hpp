@@ -2,8 +2,9 @@
 #define __BINARY_FILE_HPP
 
 #include <fstream>
+#include "dll.h"
 
-class BinaryFile{
+class API BinaryFile{
   std::fstream file;
   size_t length;
   std::string path;

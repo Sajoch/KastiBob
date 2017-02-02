@@ -3,6 +3,3 @@
 
 using namespace std;
 
-void ExtendClient::TileAddThing(NetworkPacket&){
-	cout<<"notImplemented"<<endl;
-}
