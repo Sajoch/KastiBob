@@ -32,9 +32,9 @@ friend class ExtendClient;
   ClientDirectory directory;
 public:
   Creature();
-  static Creature setNewCreature(NetworkPacket& p);
-  static Creature setKnownCreature(NetworkPacket& p);
-  static Creature setUnk1Creature(NetworkPacket& p);
+  static int setNewCreature(Creature & ret, NetworkPacket& p);
+  static int setKnownCreature(Creature & ret, NetworkPacket& p);
+  static int setUnk1Creature(Creature & ret, NetworkPacket& p);
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();

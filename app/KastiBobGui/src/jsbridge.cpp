@@ -1,10 +1,10 @@
 #include "jsbridge.h"
 #include "gamewindow.h"
+#include "runmain.hpp"
 #include "client.hpp"
 #include "sprLoader.hpp"
 #include "config.hpp"
 #include <QtCore/QVariant>
-#include <QtWidgets/QMessageBox>
 #include <iostream>
 #include <QtCore/QTimer>
 
@@ -14,18 +14,13 @@ using namespace std;
 extern Client* tclient;
 extern ConfigFile* paths;
 
-JSBridge::JSBridge(QObject *parent) : QObject(parent){
-  std::string spr_path = paths->getVal("SPR_FILE","../../kclient_v1/Kasti.spr");
-  sprs = new SpriteLoader(spr_path);
+JSBridge::JSBridge(RunMain* app) : QObject(0){
   connect(this, &JSBridge::sendData, this, &JSBridge::sendDataToJS);
+  connect(this, &JSBridge::errorMsg, app, &RunMain::errorMsg);
   
-  connect(this, &JSBridge::errorMsg, this, [&](std::string msg){
-    QMessageBox msgBox;
-    cout<<"error xD "<<msg<<endl;
-    msgBox.setText(QString::fromStdString(msg));
-    msgBox.exec();
-  });
-  
+}
+JSBridge::~JSBridge(){
+  tclient->clearCallbacks();
 }
 
 void JSBridge::setGW(GameWindow* that, QWebView* _webView){
@@ -34,8 +29,13 @@ void JSBridge::setGW(GameWindow* that, QWebView* _webView){
   mframe = webView->page()->currentFrame();
   mframe->addToJavaScriptWindowObject("JSBridge", this);
   mframe->evaluateJavaScript("start();");
-  tclient->afterError([&](std::string msg){
-    errorMsg(msg);
+  tclient->afterError([&](std::string msg, std::string type){
+    cout<<type<<": "<<msg<<endl;
+    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+  });
+  tclient->afterDisconnect([&](){
+    cout<<"reconnecting"<<endl;
+    tclient->enter();
   });
   tclient->enter();
 }
@@ -54,7 +54,6 @@ void JSBridge::CrossCallAfterUpdate(){
 
 void JSBridge::logout(){
   delete tclient;
-  delete sprs;
   gamewindow->logout();
 }
 
@@ -64,7 +63,7 @@ void JSBridge::charSelect(){
 }
 
 QString JSBridge::getImg(int id){
-  std::string buf = sprs->getImage(id);
+  std::string buf = "";//sprs->getImage(id);
   return QString::fromStdString(buf);
 }
 void JSBridge::start(){

@@ -94,23 +94,10 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 		if(vAttr >= 0xFF00){
 			return true;
 		}
-		p.getUint16();
-		//cout<<"thing "<<vAttr<<endl;
-		switch(vAttr){
-			case 0x61:
-				cr = Creature::setNewCreature(p);
-				sq.addCreature(cr);
-			break;
-			case 0x62:
-				cr = Creature::setKnownCreature(p);
-			break;
-			case 0x63:
-				cr = Creature::setUnk1Creature(p);
-			break;
-			default:
-				it = Item(vAttr, c->datobjs, p, c);
-				sq.addItem(it);
-			break;
+		int getThing_ret = getThing(sq, p);
+		if(getThing_ret != 0){
+			c->disconnect("getThing from getSquareMap");
+			return false;
 		}
 	}
 	return false;

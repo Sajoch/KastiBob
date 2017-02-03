@@ -1,5 +1,6 @@
 #include "network.hpp"
 #include <Poco/Net/NetException.h>
+#include <Poco/Net/SocketImpl.h>
 #include <Poco/AbstractObserver.h>
 #include <iostream>
 
@@ -9,32 +10,76 @@ NetworkManager::NetworkManager(std::string ip):
 addr(ip),
 recv_offset(0)
 {
-	sock.connect(addr);
-	sock.setBlocking(false);
-	onPacketRecived = [](NetworkPacket&){};
+	sock.connectNB(addr);
+	//sock.setBlocking(false);
+	clearCallbacks();
 	haveSize = false;
 	force_close = false;
 	thread.start(&NetworkManager::mainLoop, this);
 }
 NetworkManager::~NetworkManager(){
+	runningState.lock();
+	bool r = running;
+	runningState.unlock();
+	sock.close();
 	force_close = true;
-	thread.join();
+	if(r){
+		thread.join();
+	}
 }
 
 void NetworkManager::mainLoop(void* data){
+	NetException error_store;
+	int connectState;
 	NetworkManager* nm = (NetworkManager*)data;
+	nm->runningState.lock();
+	nm->running = true;
+	nm->runningState.unlock();
+	connectState = 0;
 	while(!nm->force_close){
+		//std::cout<<"still in connection "<<nm->sock.impl()->socketError()<<std::endl;
 		try{
-			if(nm->sock.poll(0, Socket::SELECT_READ|Socket::SELECT_ERROR)){
-				nm->onRead();
+			if(nm->sock.poll(0, Socket::SELECT_READ)){
+				if(nm->onRead() != 0){
+					std::cout<<"close thread after read"<<std::endl;
+					connectState = 1;//nm->onDisconnect();
+					break;
+				}else{
+					nm->last = std::chrono::system_clock::now();
+				}
 			}else if(nm->sock.poll(0, Socket::SELECT_WRITE)){
-				nm->onWrite();
+				if(nm->onWrite() != 0){
+					std::cout<<"close thread after write"<<std::endl;
+					connectState = 1;//nm->onDisconnect();
+					break;
+				}
+			}else{
+				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+				int64_t diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - nm->last).count();
+				nm->last = now;
+				if(diff > 15000){
+					std::cout<<"close thread after timeout"<<std::endl;
+					connectState = 1;//nm->onDisconnect();
+					break;
+				}
 			}
 		}catch(NetException e){
-			return nm->onError();
+			error_store = e;
+			connectState = 2;//nm->onSocketError(e);
+			break;
 		}
 		Poco::Thread::yield();
 	}
+	nm->runningState.lock();
+	nm->running = false;
+	nm->runningState.unlock();
+	std::cout<<"endThread of connection"<<std::endl;
+	if(connectState == 1){
+		nm->onDisconnect();
+	}else if(connectState == 2){
+		nm->onSocketError(error_store);
+	}
+	//std::cout<<"endThread of connection - called cbs"<<std::endl;
 }
 void NetworkManager::addPacketR(NetworkPacket& p){
 	p.add_header();
@@ -49,8 +94,15 @@ void NetworkManager::addPacket(NetworkPacket p){
 void NetworkManager::SetOnPacketRecived(std::function<void(NetworkPacket&)> cb){
 	onPacketRecived = cb;
 }
+void NetworkManager::SetOnError(std::function<void(std::string)> cb){
+	onError = cb;
+}
+void NetworkManager::clearCallbacks(){
+	onPacketRecived = [](NetworkPacket&){};
+	onError = [](std::string){};
+}
 
-void NetworkManager::onRead(){
+int NetworkManager::onRead(){
 	int rsize = sock.available();
 	int buffer_size = recv_buffer.size() - recv_offset;
 	if(buffer_size<rsize){
@@ -60,8 +112,8 @@ void NetworkManager::onRead(){
 	if(recvb > 0){
 		recv_offset += recvb;
 	}else{
-		onDisconnect();
-		return;
+		//onDisconnect();
+		return 1;
 	}
 	if(!haveSize && recv_offset >= 2){
 		packet_size = NetworkPacket::peekUint16(recv_buffer);
@@ -87,20 +139,24 @@ void NetworkManager::onRead(){
 			onPacketRecived(p);
 		}
 	}
+	return 0;
 }
-void NetworkManager::onWrite(){
+int NetworkManager::onWrite(){
 	if(send_buffer.size()>0){
 		int sendb = sock.sendBytes(send_buffer.data(), send_buffer.size());
 		if(sendb > 0){
 			send_buffer.erase(send_buffer.begin(), send_buffer.begin()+sendb);
+		}else{
+			return 1;
 		}
 	}
+	return 0;
 }
 void NetworkManager::onDisconnect(){
 	force_close = true;
-	std::cout<<"shutdown"<<std::endl;
+	onError("disconnected");
 }
-void NetworkManager::onError(){
+void NetworkManager::onSocketError(NetException e){
 	force_close = true;
-	std::cout<<"error"<<std::endl;
+	onError(e.name());
 }

@@ -11,7 +11,7 @@ class LoginForm : public QDialog{
   Q_OBJECT
   
 public:
-  explicit LoginForm(QWidget *parent = 0);
+  explicit LoginForm(class RunMain* app);
   ~LoginForm();
   void load();
   void login();
@@ -22,7 +22,9 @@ public:
   void changeLoginState(int a, std::string msg);
 signals:
   void logged();
+  void errorMsg(QString msg, QString type);
 private:
+  class RunMain* runapp;
   ConfigFile loginConf;
   size_t rServer;
   std::string rLogin;

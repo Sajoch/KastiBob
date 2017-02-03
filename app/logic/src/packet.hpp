@@ -26,6 +26,7 @@ public:
 	uint64_t getUint64();
 	std::string getTString(); //TODO split to peak size
 	size_t peakTStringSize();
+	bool peakStringLength();
 	std::string& getData();
 	size_t getSize();
 	void resize(size_t len);

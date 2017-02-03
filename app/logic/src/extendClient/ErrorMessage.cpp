@@ -11,5 +11,5 @@ void ExtendClient::ErrorMessage(NetworkPacket& p){
 		return;
 	}
 	string error = p.getTString();
-	c->errorHandler(error);
+	c->errorHandler(error, "ErrorMessage");
 }

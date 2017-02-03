@@ -2,13 +2,12 @@
 #include "client.hpp"
 #include "runmain.hpp"
 
-extern RunMain* app;
 extern Client* tclient;
 
 //TODO shared loginConf between loginform and charselect
 
-CharSelect::CharSelect(QWidget *parent) :
-    QDialog(parent), 
+CharSelect::CharSelect(RunMain* app) :
+    QDialog(0), 
     loginConf("login.cfg"){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
@@ -20,6 +19,7 @@ CharSelect::CharSelect(QWidget *parent) :
   
   connect(this, &CharSelect::logouted, app, &RunMain::GoToLoginForm);
   connect(this, &CharSelect::entered, app, &RunMain::GoToGameWindow);
+  connect(this, &CharSelect::errorMsg, app, &RunMain::errorMsg);
 }
 
 void CharSelect::load(){
@@ -30,6 +30,9 @@ void CharSelect::load(){
     ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
   ui->comboBox->setCurrentIndex(rChar);
+  tclient->afterError([&](std::string msg, std::string type){
+    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+  });
   show();
 }
 
@@ -58,5 +61,5 @@ void CharSelect::keyPressEvent(QKeyEvent *e) {
 
 CharSelect::~CharSelect()
 {
-
+  tclient->clearCallbacks();
 }

@@ -51,6 +51,9 @@ class API Client: public Creature{
 	static int32_t mapLayers;
 	ClientState state;
 	class ExtendClient* ext;
+	
+	std::chrono::system_clock::time_point last_ping;
+	int64_t duration_between_pings;
 
 	Character current_character;
 	std::vector<Character> characters;
@@ -59,7 +62,8 @@ class API Client: public Creature{
 	uint16_t drawSpeed;
 	bool canReportBugs;
 	std::function<void(int, std::string)> changeStateFunc;
-	std::function<void(std::string)> errorHandler;
+	std::function<void(std::string, std::string)> errorHandler;
+	std::function<void(void)> disconnectHandler;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
 	class DatLoader* datobjs;
@@ -93,16 +97,17 @@ class API Client: public Creature{
 	void recv(NetworkPacket& p);
 	
 public:
+	void reconnect();
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p, class DatLoader* dat);
 	~Client();
 	int tick();
 	void loginListener(std::function<void(int, std::string)> cb);
-	void loginListener();
 	void listChars(std::function<void(std::string, size_t)> cb);
-	void afterError(std::function<void(std::string)> cb);
+	void afterError(std::function<void(std::string, std::string)> cb);
 	void afterRecv(std::function<void(void)> cb);
-	void afterRecv();
+	void afterDisconnect(std::function<void(void)> cb);
+	void clearCallbacks();
 	bool setChar(size_t id);
 	void enter();
 	void sendLogout();

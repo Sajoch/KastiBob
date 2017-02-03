@@ -7,7 +7,7 @@
 class GameWindow : public QMainWindow{
   Q_OBJECT
 public:
-  explicit GameWindow(QWidget *parent = 0);
+  explicit GameWindow(class RunMain* app);
   ~GameWindow();
   
   bool calledExec;
@@ -19,7 +19,9 @@ public:
 signals:
   void logout();
   void charSelect();
+  void errorMsg(QString msg);
 private:
+  class RunMain* runapp;
   Ui_GameWindow* ui;
   class JSBridge* bridge;
   void attachObject();

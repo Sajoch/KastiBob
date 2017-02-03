@@ -11,7 +11,8 @@ class JSBridge : public QObject
 {
   Q_OBJECT
 public:
-  explicit JSBridge(QObject *parent = 0);
+  explicit JSBridge(class RunMain* app);
+  ~JSBridge();
   void setGW(class GameWindow* that, QWebView* _webview);
   void CrossCallAfterUpdate();
   void sendDataToJS(QString json);
@@ -27,10 +28,9 @@ private:
   class GameWindow* gamewindow;
   QWebView* webView;
   QWebFrame* mframe;
-  class SpriteLoader* sprs;
 signals:
   void sendData(QString json);
-  void errorMsg(std::string msg);
+  void errorMsg(QString msg, QString type);
 };
 
 #endif // JSBRIDGE_H

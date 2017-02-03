@@ -55,10 +55,7 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p, D
 	datobjs = dat;
 	
 	conn = 0;
-	afterRecvFunc = [](){};
-	errorHandler = [](std::string msg){
-		cout<<"Error: "<<msg<<endl;
-	};
+	clearCallbacks();	
 	newConnection(ip);
 	state = ClientState::LOGIN;
 	xtea_crypted = true;
@@ -73,7 +70,12 @@ void Client::newConnection(std::string ip){
 		closeConnection();
 		cout<<"close last connection"<<endl;
 	}
+	cout<<"new connection to "<<ip<<endl;
 	conn = new NetworkManager(ip);
+	conn->SetOnError([&](std::string msg){
+		errorHandler(msg, "NetworkError");
+		disconnectHandler();
+	});
 	conn->SetOnPacketRecived([&](NetworkPacket& p){
 		recv(p);
 	});
@@ -88,15 +90,19 @@ void Client::loginListener(std::function<void(int, std::string)> cb){
 void Client::afterRecv(std::function<void(void)> cb){
 	afterRecvFunc = cb;
 }
-
-void Client::afterError(std::function<void(std::string)> cb){
+void Client::afterError(std::function<void(std::string, std::string)> cb){
 	errorHandler = cb;
 }
-void Client::loginListener(){
-	changeStateFunc = [](int, std::string){};
+void Client::afterDisconnect(std::function<void(void)> cb){
+	disconnectHandler = cb;
 }
-void Client::afterRecv(){
-	afterRecvFunc = [](void){};
+void Client::clearCallbacks(){
+	afterRecvFunc = [](){};
+	changeStateFunc = [](int, std::string){};
+	errorHandler = [](std::string msg, std::string){
+		cout<<"Error: "<<msg<<endl;
+	};
+	disconnectHandler = [](){};
 }
 void Client::listChars(std::function<void(std::string, size_t)> cb){
 	size_t s = characters.size();
@@ -128,6 +134,7 @@ void Client::enter(){
 	current_character.show();
 	xtea_crypted = false;
 	state = ClientState::GAME;
+	last_ping = std::chrono::system_clock::now();
 }
 
 void Client::recv(NetworkPacket& p){
@@ -153,7 +160,7 @@ void Client::recv(NetworkPacket& p){
 				state = ClientState::NONE;
 				do{
 					packetType = p.getUint8();
-					cout<<"recv "<<packetType<<endl;
+					//cout<<"recv "<<packetType<<endl;
 					switch(packetType){
 						case 0x0A:{ //Error message
 							std::string errormsg = p.getTString();
@@ -450,7 +457,7 @@ void Client::recv(NetworkPacket& p){
 					default:
 						cout<<"unknown packet type "<<packetType<<endl;
 						p.dump();
-						errorHandler("Network parser error");
+						errorHandler(to_string(packetType), "NetworkParser");
 						exit(1);
 						return;
 				}
@@ -479,5 +486,5 @@ void Client::sendLogout(){
 void Client::disconnect(std::string reason){
 	state = ClientState::NONE;
 	closeConnection();
-	errorHandler("Disconnect: "+reason);
+	errorHandler(reason, "Disconnect");
 }

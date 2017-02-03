@@ -96,13 +96,18 @@ void DatObject::dump(){
 	
 }
 
-DatLoader::DatLoader(){
+DatLoader::DatLoader(std::string path){
+	file = new BinaryFile(path);
 	loaded = false;
 }
 
-bool DatLoader::load(std::string path){
-	file = new BinaryFile(path);
+bool DatLoader::load(){
+	if(file == 0){
+		return false;
+	}
 	if(!file->possibleRead(12)){
+		delete file;
+		file = 0;
 		return false;
 	}
 	signature = file->getUint32();
@@ -144,6 +149,8 @@ bool DatLoader::load(std::string path){
 			if(getObject(*obj, id)){
 				array->push_back(obj);
 			}else{
+				delete file;
+				file = 0;
 				return false;
 			}
 		}
@@ -154,6 +161,7 @@ bool DatLoader::load(std::string path){
 	loaded = true;
 	load_state.unlock();
 	delete file;
+	file = 0;
 	return true;
 }
 

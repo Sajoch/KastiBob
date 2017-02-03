@@ -8,10 +8,9 @@
 
 using namespace std;
 
-extern RunMain* app;
-
-GameWindow::GameWindow(QWidget *parent) :
-    QMainWindow(parent)
+GameWindow::GameWindow(RunMain* app) :
+    QMainWindow(0),
+    runapp(app)
 {
   ui = new Ui_GameWindow();
   ui->setupUi(this);
@@ -19,8 +18,8 @@ GameWindow::GameWindow(QWidget *parent) :
   //ui->webView->setContextMenuPolicy(Qt::CustomContextMenu);
   page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
   
-  connect(this, &GameWindow::logout, app, &RunMain::GoToLoginForm);
-  connect(this, &GameWindow::charSelect, app, &RunMain::GoToGameWindow);
+  connect(this, &GameWindow::logout, runapp, &RunMain::GoToLoginForm);
+  connect(this, &GameWindow::charSelect, runapp, &RunMain::GoToGameWindow);
   
   calledExec = false;
   loaded_page = false;
@@ -38,7 +37,7 @@ void GameWindow::load(){
     calledExec = true;
     return;
   }
-  bridge = new JSBridge(this);
+  bridge = new JSBridge(runapp);
   bridge->setGW(this, ui->webView);
   show();
 }

@@ -3,31 +3,33 @@
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
+#include <QtWidgets/QMessageBox>
 #include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
 #include "config.hpp"
 #include "datLoader.hpp"
+#include "sprLoader.hpp"
 #include <iostream>
 
 using namespace std;
 
 //TODO no global
 class Client* tclient = 0;
-ConfigFile* paths;
 
 class LoaderThread: public QThread{
 public:
-  LoaderThread(DatLoader* _dat, std::string _path){
+  LoaderThread(DatLoader* _dat, SpriteLoader* _spr){
     dat = _dat;
-    path = _path;
+    spr = _spr;
   }
 private:
   DatLoader* dat;
-  std::string path;
+  SpriteLoader* spr;
   void run(){
-    dat->load(path);
+    dat->load();
+    spr->load();
   }
 };
 
@@ -35,10 +37,13 @@ RunMain::RunMain(){
   lf = 0;
   cs = 0;
   gw = 0;
-  datobjs = new DatLoader();
-  stateLoadedResources = false;
+  paths = new ConfigFile("path.cfg");
   std::string dat_path = paths->getVal("DAT_FILE","../../kclient_v1/Kasti.dat");
-  lt = new LoaderThread(datobjs, dat_path);
+  std::string spr_path = paths->getVal("SPR_FILE","../../kclient_v1/Kasti.spr");
+  datobjs = new DatLoader(dat_path);
+  sprobjs = new SpriteLoader(spr_path);
+  stateLoadedResources = false;
+  lt = new LoaderThread(datobjs, sprobjs);
   connect(lt, &LoaderThread::finished, this, &RunMain::loadedResources);
   lt->start();
 }
@@ -74,28 +79,32 @@ void RunMain::delAllWindows(){
 }
 
 void RunMain::GoToLoginForm(){
-  LoginForm* new_lf = new LoginForm();
   delAllWindows();
-  lf = new_lf;
+  lf = new LoginForm(this);
   lf->load();
   if(stateLoadedResources){
     lf->resourcesLoaded();
   }
 }
 void RunMain::GoToCharSelect(){
-  CharSelect* new_cs = new CharSelect();
   delAllWindows();
-  cs = new_cs;
+  cs = new CharSelect(this);
   cs->load();
 }
 void RunMain::GoToGameWindow(){
-  GameWindow* new_gw = new GameWindow();
   delAllWindows();
-  gw = new_gw;
+  gw = new GameWindow(this);
   gw->load();
 }
 DatLoader* RunMain::getDatobjs(){
   return datobjs;
+}
+
+void RunMain::errorMsg(QString msg){
+  QMessageBox msgBox;
+  msg = QApplication::translate("ErrorMsg", msg.toUtf8().data(), 0);
+  msgBox.setText(msg);
+  msgBox.exec();
 }
 
 RunMain* app;
@@ -103,8 +112,7 @@ RunMain* app;
 int main(int argc, char *argv[])
 {
     QApplication Qapp(argc, argv);
-    paths = new ConfigFile("path.cfg");
-    app = new RunMain();
+    RunMain* app = new RunMain();
     app->GoToLoginForm();
     return Qapp.exec();
 }

@@ -6,11 +6,11 @@
 #include "client.hpp"
 #include "datLoader.hpp"
 
-extern RunMain* app;
 extern Client* tclient;
 
-LoginForm::LoginForm(QWidget *parent) :
-    QDialog(parent),
+LoginForm::LoginForm(RunMain* app) :
+    QDialog(0), 
+    runapp(app),
     loginConf("login.cfg")
 {
   ui = new Ui_LoginForm();
@@ -27,6 +27,7 @@ LoginForm::LoginForm(QWidget *parent) :
   connect(ui->pushButton, &QPushButton::clicked, this, &LoginForm::exit);
   
   connect(this, &LoginForm::logged, app, &RunMain::GoToCharSelect);
+  connect(this, &LoginForm::errorMsg, app, &RunMain::errorMsg);
 }
 
 void LoginForm::load(){
@@ -72,7 +73,10 @@ void LoginForm::login(){
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
   loginConf.setVal("SERVER", ui->comboBox->currentIndex());
   loginConf.setVal("LOGIN", ls);
-  tclient = new Client(sa, 20007, 2, ls, ps, app->getDatobjs());
+  tclient = new Client(sa, 20007, 2, ls, ps, runapp->getDatobjs());
+  tclient->afterError([&](std::string msg, std::string type){
+    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+  });
   tclient->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
   });
@@ -95,6 +99,6 @@ void LoginForm::keyPressEvent(QKeyEvent *e) {
 }
 
 LoginForm::~LoginForm(){
-  tclient->loginListener();
+  tclient->clearCallbacks();
   delete ui;
 }

@@ -24,8 +24,11 @@ class API SpriteLoader{
   std::vector<Sprite> sprites;
   std::string buffer;
   size_t offset_to_data;
+  class BinaryFile* spr;
 public:
   std::string getError();
   SpriteLoader(std::string path);
+  ~SpriteLoader();
+  bool load();
   std::string getImage(uint32_t id);
 };

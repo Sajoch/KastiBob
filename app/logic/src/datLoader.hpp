@@ -75,8 +75,8 @@ public:
 	DatObject* getEffect(uint32_t id);
 	DatObject* getDistance(uint32_t id);
 	bool isLoaded();
-	DatLoader();
-	bool load(std::string path);
+	DatLoader(std::string path);
+	bool load();
 	DatObject get(size_t id);
 };
 

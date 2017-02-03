@@ -85,47 +85,69 @@ void Sprite::toBase64(){
 }
 
 SpriteLoader::SpriteLoader(std::string path){
-  BinaryFile spr(path);
-  if(!spr.possibleRead(4)){
+  spr = new BinaryFile(path);
+}
+
+SpriteLoader::~SpriteLoader(){
+  
+}
+
+bool SpriteLoader::load(){
+  if(spr == 0){
+    return false;
+  }
+  if(!spr->possibleRead(4)){
     error = "cannot read signature";
-    return;
+    delete spr;
+    spr = 0;
+    return false;
   }
-  spr.getUint32();
-  if(!spr.possibleRead(2)){
+  spr->getUint32();
+  if(!spr->possibleRead(2)){
     error = "cannot read spriteCount";
-    return;
+    delete spr;
+    spr = 0;
+    return false;
   }
-  uint32_t spriteCount = spr.getUint16();
+  uint32_t spriteCount = spr->getUint16();
   for(uint32_t id=0;id<spriteCount;id++){
-    if(!spr.possibleRead(4)){
+    if(!spr->possibleRead(4)){
       error = "cannot read offset of header of sprite";
-      return;
+      delete spr;
+      spr = 0;
+      return false;
     }
-    Sprite sp(spr.getUint32());
+    Sprite sp(spr->getUint32());
     sprites.push_back(sp);
   }
-  offset_to_data = spr.getOffset();
+  offset_to_data = spr->getOffset();
   for(vector<Sprite>::iterator it=sprites.begin();it!=sprites.end();++it){
     if((*it).offset == 0)
       continue;
     (*it).loaded = false;
-    spr.goToOffset((*it).offset);
-    if(!spr.possibleRead(5)){
+    spr->goToOffset((*it).offset);
+    if(!spr->possibleRead(5)){
       error = "cannot read header of sprite";
-      return;
+      delete spr;
+      spr = 0;
+      return false;
     }
-    spr.getUint8();
-    spr.getUint8();
-    spr.getUint8();
-    (*it).size = spr.getUint16();
+    spr->getUint8();
+    spr->getUint8();
+    spr->getUint8();
+    (*it).size = spr->getUint16();
     if((*it).size > 3444){
       error = "has too big size";
-      return;
+      delete spr;
+      spr = 0;
+      return false;
     }
   }
   //cache rest of file
-  spr.goToOffset(offset_to_data);
-  spr.readRest(buffer);
+  spr->goToOffset(offset_to_data);
+  spr->readRest(buffer);
+  delete spr;
+  return true;
 }
 
 std::string SpriteLoader::getError(){

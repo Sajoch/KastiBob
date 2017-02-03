@@ -146,6 +146,14 @@ size_t NetworkPacket::peakTStringSize(){
 	return a;
 }
 
+bool NetworkPacket::peakStringLength(){
+	size_t s = getSize();
+	if(s<2){
+		return false;
+	}
+	return peakTStringSize()<=s;
+}
+
 std::string& NetworkPacket::getData(){
 	return buffer;
 }

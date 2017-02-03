@@ -4,11 +4,14 @@
 #include <string>
 #include "packet.hpp"
 #include <functional>
+#include <chrono>
+#include <mutex>
 #define POCO_WIN32_UTF8
-#include "Poco/Thread.h"
-#include "Poco/Net/SocketAddress.h"
-#include "Poco/Net/Socket.h"
-#include "Poco/Net/StreamSocket.h"
+#include <Poco/Net/NetException.h>
+#include <Poco/Thread.h>
+#include <Poco/Net/SocketAddress.h>
+#include <Poco/Net/Socket.h>
+#include <Poco/Net/StreamSocket.h>
 
 class NetworkManager{
 	Poco::Net::SocketAddress addr;
@@ -23,17 +26,23 @@ class NetworkManager{
 	bool haveSize;
 	bool haveCrc;
 	bool force_close;
+	bool running;
+	std::mutex runningState;
+	std::chrono::system_clock::time_point last;
 	std::function<void(NetworkPacket&)> onPacketRecived;
+	std::function<void(std::string)> onError;
 	static void mainLoop(void* data);
-	void onRead();
-	void onWrite();
+	int onRead();
+	int onWrite();
 	void onDisconnect();
-	void onError();
+	void onSocketError(Poco::Net::NetException e);
 public:
 	NetworkManager(std::string ip);
 	~NetworkManager();
 	void addPacket(NetworkPacket p);
 	void addPacketR(NetworkPacket& p);
 	void SetOnPacketRecived(std::function<void(NetworkPacket&)> cb);
+	void SetOnError(std::function<void(std::string)> cb);
+	void clearCallbacks();
 };
 #endif

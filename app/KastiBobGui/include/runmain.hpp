@@ -10,7 +10,9 @@ class RunMain: public QObject{
   class CharSelect* cs;
   class GameWindow* gw;
   class DatLoader* datobjs;
+	class SpriteLoader* sprobjs;
 	class LoaderThread* lt;
+	class ConfigFile* paths;
 	bool stateLoadedResources;
 	
 public:
@@ -23,6 +25,7 @@ public:
   void GoToCharSelect();
   void GoToGameWindow();
 	class DatLoader* getDatobjs();
+	void errorMsg(QString msg);
 };
 
 #endif

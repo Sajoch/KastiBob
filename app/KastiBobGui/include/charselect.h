@@ -10,7 +10,7 @@ class CharSelect : public QDialog{
   Q_OBJECT
   
 public:
-    explicit CharSelect(QWidget *parent = 0);
+    explicit CharSelect(class RunMain* app);
     ~CharSelect();
     void enter();
     void logout();
@@ -19,6 +19,7 @@ public:
 signals:
   void logouted();
   void entered();
+  void errorMsg(QString msg, QString type);
 private:
   ConfigFile loginConf;
   size_t rChar;
