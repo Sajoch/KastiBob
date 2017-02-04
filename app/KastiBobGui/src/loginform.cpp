@@ -6,8 +6,6 @@
 #include "client.hpp"
 #include "datLoader.hpp"
 
-extern Client* tclient;
-
 LoginForm::LoginForm(RunMain* app) :
     QDialog(0), 
     runapp(app),
@@ -73,11 +71,11 @@ void LoginForm::login(){
   std::string sa = ui->comboBox->currentData().toString().toUtf8().constData();
   loginConf.setVal("SERVER", ui->comboBox->currentIndex());
   loginConf.setVal("LOGIN", ls);
-  tclient = new Client(sa, 20007, 2, ls, ps, runapp->getDatobjs());
-  tclient->afterError([&](std::string msg, std::string type){
+  runapp->getClient(new Client(sa, 20007, 2, ls, ps, runapp->getDatobjs()));
+  runapp->getClient()->afterError([&](std::string msg, std::string type){
     //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
   });
-  tclient->loginListener([&](int a, std::string msg){
+  runapp->getClient()->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);
   });
 }
@@ -99,6 +97,6 @@ void LoginForm::keyPressEvent(QKeyEvent *e) {
 }
 
 LoginForm::~LoginForm(){
-  tclient->clearCallbacks();
+  runapp->getClient()->clearCallbacks();
   delete ui;
 }

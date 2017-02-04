@@ -13,6 +13,7 @@ class RunMain: public QObject{
 	class SpriteLoader* sprobjs;
 	class LoaderThread* lt;
 	class ConfigFile* paths;
+	class Client* tclient;
 	bool stateLoadedResources;
 	
 public:
@@ -25,6 +26,9 @@ public:
   void GoToCharSelect();
   void GoToGameWindow();
 	class DatLoader* getDatobjs();
+	class SpriteLoader* getSpr();
+	class Client* getClient();
+	class Client* getClient(class Client* v);
 	void errorMsg(QString msg);
 };
 

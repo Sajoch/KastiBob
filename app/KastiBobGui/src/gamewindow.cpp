@@ -2,7 +2,8 @@
 #include <QtWebKitWidgets/QWebPage>
 #include <QtCore/QUrl>
 #include "gamewindow.h"
-#include "jsbridge.h"
+#include "renderarea.hpp"
+#include "sprLoader.hpp"
 #include "runmain.hpp"
 #include <iostream>
 
@@ -14,31 +15,12 @@ GameWindow::GameWindow(RunMain* app) :
 {
   ui = new Ui_GameWindow();
   ui->setupUi(this);
-  QWebPage* page = ui->webView->page();
-  //ui->webView->setContextMenuPolicy(Qt::CustomContextMenu);
-  page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-  
+  render = new RenderArea(runapp);
+  ui->horizontalLayout->addWidget(render);
   connect(this, &GameWindow::logout, runapp, &RunMain::GoToLoginForm);
   connect(this, &GameWindow::charSelect, runapp, &RunMain::GoToGameWindow);
-  
-  calledExec = false;
-  loaded_page = false;
-  connect(page, &QWebPage::loadFinished, this, &GameWindow::loaded);
-}
-void GameWindow::loaded(){
-  loaded_page = true;
-  if(calledExec){
-    load();
-    calledExec = false;
-  }
 }
 void GameWindow::load(){
-  if(!loaded_page){
-    calledExec = true;
-    return;
-  }
-  bridge = new JSBridge(runapp);
-  bridge->setGW(this, ui->webView);
   show();
 }
 
@@ -47,6 +29,5 @@ bool GameWindow::close(){
 }
 
 GameWindow::~GameWindow(){
-  delete bridge;
   delete ui;
 }

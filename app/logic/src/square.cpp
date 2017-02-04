@@ -27,3 +27,6 @@ void Square::clear(){
   items.clear();
   creatures.clear();
 }
+Item Square::getGround(){
+  return items[0];
+}

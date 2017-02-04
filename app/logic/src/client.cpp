@@ -471,6 +471,23 @@ void Client::recv(NetworkPacket& p){
 	afterRecvFunc();
 }
 
+uint32_t Client::getMapViewX(){
+	return mapViewX;
+}
+uint32_t Client::getMapViewY(){
+	return mapViewY;
+}
+bool Client::getDrawMap(std::vector<DatObject*>& objs){
+	std::vector<Square> sqs;
+	gMap->getMap(sqs, x, y, z);
+	uint32_t itemId;
+	for(size_t i=0;i<sqs.size();i++){
+		itemId = sqs[i].getGround().getId();
+		cout<<"ground "<<itemId<<endl;
+		objs[i] = datobjs->getItem(itemId);
+	}
+	return false;
+}
 void Client::move(ClientDirectory dir){
 	if(conn == 0){
 		return;

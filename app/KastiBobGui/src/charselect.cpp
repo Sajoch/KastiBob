@@ -2,12 +2,9 @@
 #include "client.hpp"
 #include "runmain.hpp"
 
-extern Client* tclient;
-
-//TODO shared loginConf between loginform and charselect
-
 CharSelect::CharSelect(RunMain* app) :
     QDialog(0), 
+    runapp(app),
     loginConf("login.cfg"){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
@@ -26,11 +23,11 @@ void CharSelect::load(){
   while(ui->comboBox->count()>0){
     ui->comboBox->removeItem(0);
   }
-  tclient->listChars([&](std::string name, size_t id){
+  runapp->getClient()->listChars([&](std::string name, size_t id){
     ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
   ui->comboBox->setCurrentIndex(rChar);
-  tclient->afterError([&](std::string msg, std::string type){
+  runapp->getClient()->afterError([&](std::string msg, std::string type){
     //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
   });
   show();
@@ -39,7 +36,7 @@ void CharSelect::load(){
 void CharSelect::enter(){
   size_t id = ui->comboBox->currentData().toULongLong();
   loginConf.setVal("CHAR", ui->comboBox->currentIndex());
-  if(tclient->setChar(id)){
+  if(runapp->getClient()->setChar(id)){
     entered();
   }else{
     logout();
@@ -47,13 +44,13 @@ void CharSelect::enter(){
 }
 
 void CharSelect::logout(){
-  delete tclient;
+  delete runapp->getClient();
   logouted();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {
   if(e->key() != Qt::Key_Escape){
-      QDialog::keyPressEvent(e);
+    QDialog::keyPressEvent(e);
   } else {
 
   }
@@ -61,5 +58,5 @@ void CharSelect::keyPressEvent(QKeyEvent *e) {
 
 CharSelect::~CharSelect()
 {
-  tclient->clearCallbacks();
+  runapp->getClient()->clearCallbacks();
 }

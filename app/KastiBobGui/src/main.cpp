@@ -100,6 +100,17 @@ DatLoader* RunMain::getDatobjs(){
   return datobjs;
 }
 
+SpriteLoader* RunMain::getSpr(){
+  return sprobjs;
+}
+Client* RunMain::getClient(){
+  return tclient;
+}
+Client* RunMain::getClient(Client* v){
+  tclient = v;
+  return tclient;
+}
+
 void RunMain::errorMsg(QString msg){
   QMessageBox msgBox;
   msg = QApplication::translate("ErrorMsg", msg.toUtf8().data(), 0);

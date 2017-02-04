@@ -15,6 +15,7 @@ recv_offset(0)
 	clearCallbacks();
 	haveSize = false;
 	force_close = false;
+	last = std::chrono::system_clock::now();
 	thread.start(&NetworkManager::mainLoop, this);
 }
 NetworkManager::~NetworkManager(){

@@ -9,6 +9,7 @@ class Square{
   std::vector<Item> items;
   std::vector<Creature> creatures;
 public:
+  Item getGround();
   bool getCreature(uint32_t stackId, Creature& cr);
   bool removeCreature(uint32_t stackId);
   void addCreature(Creature& v);

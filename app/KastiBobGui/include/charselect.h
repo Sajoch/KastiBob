@@ -21,6 +21,7 @@ signals:
   void entered();
   void errorMsg(QString msg, QString type);
 private:
+  class RunMain* runapp;
   ConfigFile loginConf;
   size_t rChar;
   Ui_CharSelect* ui;

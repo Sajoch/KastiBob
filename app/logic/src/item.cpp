@@ -23,3 +23,7 @@ Item::Item(uint32_t _id, DatLoader* dat, NetworkPacket& p, Client* c):
 		stack = p.getUint8();
 	}
 }
+
+uint32_t Item::getId(){
+	return id;
+}

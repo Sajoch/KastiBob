@@ -34,6 +34,13 @@
   <property name="windowTitle">
    <string>KastiBob</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/icon.svg</normaloff>:/icon.svg</iconset>
+  </property>
+  <property name="toolTipDuration">
+   <number>-1</number>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -61,31 +68,15 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="">
       <property name="spacing">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QWebView" name="webView">
-        <property name="url">
-         <url>
-          <string>qrc:/index.html</string>
-         </url>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
    </layout>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -206,11 +206,12 @@ std::string SpriteLoader::getImage(uint32_t id){
     }
     data_left -= datas * 3;
   }
+  ///*
   if(!sp.RawToPng()){
     error="cannot convert raw to png";
     return "";
   }
-
+  //*/
   /*
   std::string out_path="i";
   out_path += to_string(id);
@@ -219,7 +220,7 @@ std::string SpriteLoader::getImage(uint32_t id){
   cout<<"out "<<out_path<<" is "<<(out.good()?"true":"false")<<endl;
   out.write(sp.image.data(), sp.image.size());
   //*/
-  sp.toBase64();
+  //sp.toBase64();
   sp.loaded = true;
   return sp.getImage();
 }

@@ -3,9 +3,11 @@
 
 Square& Ground::getSquare(int32_t x, int32_t y, int32_t z){
   // 2 + 2 + 1
-  int32_t idx = (x&0xffff);
+  int64_t idx = (x&0xffff);
   idx <<= 8;
   idx |= (y&0xffff);
+  idx <<= 8;
+  idx |= (z&0xffff);
   return squares[idx];
 }
 Ground::Ground(){
