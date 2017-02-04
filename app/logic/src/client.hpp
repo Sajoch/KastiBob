@@ -99,7 +99,7 @@ class API Client: public Creature{
 public:
 	uint32_t getMapViewX();
 	uint32_t getMapViewY();
-	bool getDrawMap(std::vector<class DatObject*>& objs);
+	bool getGroundSquare(class Item& it, uint32_t cx, uint32_t cy);
 	void reconnect();
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p, class DatLoader* dat);

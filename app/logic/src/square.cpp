@@ -1,5 +1,12 @@
 #include "square.hpp"
+#include "datLoader.hpp"
 
+
+Square::Square(int32_t _x, int32_t _y, int32_t _z):
+x(_x), y(_y), z(_z)
+{
+  
+}
 
 bool Square::getCreature(uint32_t stackId, Creature& cr){
   if(stackId < creatures.size()){
@@ -27,6 +34,15 @@ void Square::clear(){
   items.clear();
   creatures.clear();
 }
-Item Square::getGround(){
-  return items[0];
+bool Square::getGround(Item& it){
+  for(size_t i=0;i<items.size();i++){
+    DatObject* o = items[i].itemTemplate;
+    if(o != 0){
+      if(o->ground){
+        it = items[i];
+        return true;
+      }
+    }
+  }
+  return false;
 }

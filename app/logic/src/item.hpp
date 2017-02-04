@@ -2,8 +2,10 @@
 #define __ITEM_HPP
 
 #include <cinttypes>
+#include "dll.h"
 
-class Item{
+class API Item{
+	friend class Square;
 	uint32_t id;
 	class DatObject* itemTemplate;
 	uint16_t stack;

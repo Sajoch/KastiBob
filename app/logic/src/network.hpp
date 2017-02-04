@@ -13,7 +13,7 @@
 #include <Poco/Net/Socket.h>
 #include <Poco/Net/StreamSocket.h>
 
-class NetworkManager{
+class NetworkManager: public Poco::Net::SocketImpl{
 	Poco::Net::SocketAddress addr;
 	Poco::Net::StreamSocket sock;
 	Poco::Thread thread;
@@ -35,7 +35,7 @@ class NetworkManager{
 	int onRead();
 	int onWrite();
 	void onDisconnect();
-	void onSocketError(Poco::Net::NetException e);
+	void onSocketError(std::string e);
 public:
 	NetworkManager(std::string ip);
 	~NetworkManager();

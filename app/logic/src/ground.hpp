@@ -11,7 +11,7 @@ class Ground{
   int32_t rangeY;
   uint16_t lightLevel;
   uint16_t lightColor;
-  std::map<int64_t, Square> squares;
+  std::vector<Square> squares;
   std::map<uint32_t, Creature*> creatures; 
 public:
   Ground();

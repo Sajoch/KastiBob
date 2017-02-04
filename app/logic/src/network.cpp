@@ -10,12 +10,10 @@ NetworkManager::NetworkManager(std::string ip):
 addr(ip),
 recv_offset(0)
 {
-	sock.connectNB(addr);
-	//sock.setBlocking(false);
 	clearCallbacks();
 	haveSize = false;
 	force_close = false;
-	last = std::chrono::system_clock::now();
+	running = true;
 	thread.start(&NetworkManager::mainLoop, this);
 }
 NetworkManager::~NetworkManager(){
@@ -30,23 +28,26 @@ NetworkManager::~NetworkManager(){
 }
 
 void NetworkManager::mainLoop(void* data){
-	NetException error_store;
+	std::string error_store;
 	int connectState;
+	int error = 0;
 	NetworkManager* nm = (NetworkManager*)data;
-	nm->runningState.lock();
-	nm->running = true;
-	nm->runningState.unlock();
 	connectState = 0;
+	std::cout<<"new connect"<<std::endl;
+	nm->sock.connectNB(nm->addr);//, Poco::Timespan(1,0));
+	nm->sock.setBlocking(false);
+	std::cout<<"new connected"<<std::endl;
 	while(!nm->force_close){
-		//std::cout<<"still in connection "<<nm->sock.impl()->socketError()<<std::endl;
 		try{
+			error = nm->sock.impl()->socketError();
+			if(error != 0){
+				SocketImpl::error(error);
+			}
 			if(nm->sock.poll(0, Socket::SELECT_READ)){
 				if(nm->onRead() != 0){
 					std::cout<<"close thread after read"<<std::endl;
 					connectState = 1;//nm->onDisconnect();
 					break;
-				}else{
-					nm->last = std::chrono::system_clock::now();
 				}
 			}else if(nm->sock.poll(0, Socket::SELECT_WRITE)){
 				if(nm->onWrite() != 0){
@@ -54,22 +55,57 @@ void NetworkManager::mainLoop(void* data){
 					connectState = 1;//nm->onDisconnect();
 					break;
 				}
-			}else{
-				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-				int64_t diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - nm->last).count();
-				nm->last = now;
-				if(diff > 15000){
-					std::cout<<"close thread after timeout"<<std::endl;
-					connectState = 1;//nm->onDisconnect();
-					break;
-				}
 			}
-		}catch(NetException e){
-			error_store = e;
+			Poco::Thread::yield();
+		}catch(InvalidAddressException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(InvalidSocketException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(ServiceNotFoundException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(ConnectionAbortedException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(ConnectionResetException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(ConnectionRefusedException e){
+			error_store = e.what();
+			connectState = 2;
+			break;
+		}catch(HostNotFoundException e){
+			error_store = e.what();
+			connectState = 2;
+			break;
+		}catch(NoAddressFoundException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(InterfaceNotFoundException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(NoMessageException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(MessageException e){
+			error_store = e.what();
+			connectState = 2;//nm->onSocketError(e);
+			break;
+		}catch(...){
+			error_store = "unknown error";
 			connectState = 2;//nm->onSocketError(e);
 			break;
 		}
-		Poco::Thread::yield();
 	}
 	nm->runningState.lock();
 	nm->running = false;
@@ -157,7 +193,7 @@ void NetworkManager::onDisconnect(){
 	force_close = true;
 	onError("disconnected");
 }
-void NetworkManager::onSocketError(NetException e){
+void NetworkManager::onSocketError(std::string e){
 	force_close = true;
-	onError(e.name());
+	onError(e);
 }

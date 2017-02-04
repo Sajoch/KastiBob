@@ -5,23 +5,27 @@
 #include <QtGui/QPen>
 #include <QtGui/QPixmap>
 #include <QtWidgets/QWidget>
+#include <mutex>
 
 class RenderArea: public QWidget{
 	Q_OBJECT
 	
 public:
-	RenderArea(class RunMain* parent);
+	RenderArea(class GameWindow *parent, class RunMain* app);
 	~RenderArea();
 	bool setImageOn(int x, int y, std::string buf);
 	
 protected:
 	void paintEvent(QPaintEvent *event) override;
+signals:
+	void THupdate();
 private:
 	bool setImageOn(size_t id, std::string buf);
-	void onChangeClient();
+	void onChangeClient(class GameWindow *parent);
+	std::mutex mapStateChange;
+	size_t allNode;
 	class Client* c;
-	std::vector<class DatObject*> map_objs;
-	std::vector<QImage> maps;
+	std::map<uint32_t, QImage> maps;
 	bool showPanel;
 	class RunMain* runapp;
 	class QPainter* painter;

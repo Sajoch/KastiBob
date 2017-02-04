@@ -9,6 +9,7 @@ class API DatObject{
 	friend class DatLoader;
 	friend class Item;
 	friend class RenderArea;
+	friend class Square;
 	uint32_t id;
 	uint16_t speed;
 	uint8_t layer;

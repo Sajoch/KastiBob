@@ -1,14 +1,18 @@
 #include "utils.hpp"
 #include "ground.hpp"
 
+
 Square& Ground::getSquare(int32_t x, int32_t y, int32_t z){
-  // 2 + 2 + 1
-  int64_t idx = (x&0xffff);
-  idx <<= 8;
-  idx |= (y&0xffff);
-  idx <<= 8;
-  idx |= (z&0xffff);
-  return squares[idx];
+  size_t s = squares.size();
+  for(size_t i=0;i<s;i++){
+    Square& sq = squares[i];
+    if(sq.x == x && sq.y == y && sq.z == z){
+      return sq;
+    }
+  }
+  Square sq(x, y, z);
+  squares.push_back(sq);
+  return squares.back();
 }
 Ground::Ground(){
   initialized = false;

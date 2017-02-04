@@ -5,41 +5,66 @@
 #include "runmain.hpp"
 #include "datLoader.hpp"
 #include "sprLoader.hpp"
+#include "gamewindow.h"
 #include "client.hpp"
+#include "item.hpp"
 #include <iostream>
 
 using namespace std;
 
-RenderArea::RenderArea(RunMain* parent):
-	QWidget(0),
-	runapp(parent)
+RenderArea::RenderArea(GameWindow *parent, RunMain* app):
+	QWidget(parent),
+	runapp(app)
 {
 	setBackgroundRole(QPalette::Base);
   setAutoFillBackground(true);
 	showPanel = true;
 	c = runapp->getClient();
-	maps.resize(c->getMapViewX()*c->getMapViewY());
-	map_objs.resize(c->getMapViewX()*c->getMapViewY());
+	allNode = c->getMapViewX()*c->getMapViewY();
 	c->afterRecv([&](){
-		onChangeClient();
+		onChangeClient(parent);
 	});
+	//connect(this, &RenderArea::update, this, [&](){
+		//cout<<"rysuj"<<endl;
+    //parent->update();
+  //});
 }
 RenderArea::~RenderArea(){
 	c->clearCallbacks();
 }
 
-void RenderArea::onChangeClient(){
-	c->getDrawMap(map_objs);
-	size_t m = map_objs.size(); //TODO always same
+void RenderArea::onChangeClient(GameWindow *parent){
+	Item ground;
+	uint32_t sx, sy, id, mx, my;
 	DatObject* td;
-	for(size_t i=0;i<m;i++){
-		td = map_objs[i];
-		if(td->images.size() == 1){
-			setImageOn(i, runapp->getSpr()->getImage(td->images[0]));
-		}else{
-			cout<<"error ground to much sprites"<<endl;
+	mx = c->getMapViewX();
+	my = c->getMapViewY();
+	sx = c->getX() - mx;
+	sy = c->getY() - my;
+	mx *= 2;
+	my *= 2;
+	for(uint32_t x=0;x<mx;x++){
+		for(uint32_t y=0;y<my;y++){
+			c->getGroundSquare(ground, sx+x, sy+y);
+			id = ground.getId();
+			td = runapp->getDatobjs()->getItem(id);
+			if(td == 0){
+				continue;
+			}
+			if(td->images.size() >= 1){
+				cout<<"draw id "<<id<<" "<<x<<","<<y<<endl;
+				std::string img = runapp->getSpr()->getImage(td->images[0]);
+				mapStateChange.lock();
+				setImageOn(x, y, img);
+				mapStateChange.unlock();
+			}else{
+				cout<<"ground id "<<id<<endl;
+				cout<<"error ground to much sprites "<<td->images.size()<<endl;
+				return;
+			}
 		}
 	}
+	update();
 }
 
 bool RenderArea::setImageOn(size_t id, std::string buf){
@@ -73,13 +98,16 @@ void RenderArea::paintEvent(QPaintEvent *event){
 		painter->drawText(12, 21, 80, 60, Qt::AlignLeft|Qt::AlignTop, text);
 	}
 	int id = 0;
-	int mx = c->getMapViewX();
-	int my = c->getMapViewY();
+	int mx = 2 * c->getMapViewX();
+	int my = 2 * c->getMapViewY();
+	mapStateChange.lock();
 	for(int x=0;x<mx;x++){
 		for(int y=0;y<my;y++){
+			//cout<<"width "<<maps[id].width()<<endl;
 			painter->drawImage(x*32, y*32, maps[id]);
 			id++;
 		}
 	}
+	mapStateChange.unlock();
 	delete painter;
 }

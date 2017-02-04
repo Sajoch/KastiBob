@@ -73,7 +73,7 @@ void LoginForm::login(){
   loginConf.setVal("LOGIN", ls);
   runapp->getClient(new Client(sa, 20007, 2, ls, ps, runapp->getDatobjs()));
   runapp->getClient()->afterError([&](std::string msg, std::string type){
-    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+    errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
   });
   runapp->getClient()->loginListener([&](int a, std::string msg){
     changeLoginState(a, msg);

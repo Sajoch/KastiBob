@@ -73,6 +73,7 @@ void Client::newConnection(std::string ip){
 	cout<<"new connection to "<<ip<<endl;
 	conn = new NetworkManager(ip);
 	conn->SetOnError([&](std::string msg){
+		cout<<msg<<endl;
 		errorHandler(msg, "NetworkError");
 		disconnectHandler();
 	});
@@ -477,16 +478,9 @@ uint32_t Client::getMapViewX(){
 uint32_t Client::getMapViewY(){
 	return mapViewY;
 }
-bool Client::getDrawMap(std::vector<DatObject*>& objs){
-	std::vector<Square> sqs;
-	gMap->getMap(sqs, x, y, z);
-	uint32_t itemId;
-	for(size_t i=0;i<sqs.size();i++){
-		itemId = sqs[i].getGround().getId();
-		cout<<"ground "<<itemId<<endl;
-		objs[i] = datobjs->getItem(itemId);
-	}
-	return false;
+bool Client::getGroundSquare(Item& it, uint32_t cx, uint32_t cy){
+	Square& sq = gMap->getSquare(cx, cy, z);
+	return sq.getGround(it);
 }
 void Client::move(ClientDirectory dir){
 	if(conn == 0){
