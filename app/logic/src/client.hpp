@@ -46,8 +46,8 @@ class API Client: public Creature{
 	static uint32_t dat_signature;
 	static uint32_t spr_signature;
 	static uint32_t pic_signature;
-	static uint32_t mapViewX;
-	static uint32_t mapViewY;
+	static int32_t mapViewX;
+	static int32_t mapViewY;
 	static int32_t mapLayers;
 	ClientState state;
 	class ExtendClient* ext;
@@ -97,9 +97,9 @@ class API Client: public Creature{
 	void recv(NetworkPacket& p);
 	
 public:
-	uint32_t getMapViewX();
-	uint32_t getMapViewY();
-	bool getGroundSquare(class Item& it, uint32_t cx, uint32_t cy);
+	int32_t getMapViewX();
+	int32_t getMapViewY();
+	class Square& getSquare(int32_t cx, int32_t cy);
 	void reconnect();
 	void move(ClientDirectory dir);
 	Client(std::string ip, uint16_t _version, uint16_t _os, std::string l, std::string p, class DatLoader* dat);

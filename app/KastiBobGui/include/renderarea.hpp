@@ -13,14 +13,16 @@ class RenderArea: public QWidget{
 public:
 	RenderArea(class GameWindow *parent, class RunMain* app);
 	~RenderArea();
-	bool setImageOn(int x, int y, std::string buf);
 	
 protected:
 	void paintEvent(QPaintEvent *event) override;
 signals:
 	void THupdate();
 private:
-	bool setImageOn(size_t id, std::string buf);
+	//std::vector<> sprites;
+	void oneSquare(QPainter* p, class Square& sq, int x, int y);
+	bool clearImage(int x, int y);
+	bool addImageOn(int x, int y, class QImage& n);
 	void onChangeClient(class GameWindow *parent);
 	std::mutex mapStateChange;
 	size_t allNode;

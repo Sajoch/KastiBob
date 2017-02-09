@@ -1,6 +1,7 @@
 //read sprites and convert to base64 png
 #include "sprLoader.hpp"
 #include <png.h>
+#include <iostream>
 
 using namespace std;
 
@@ -12,6 +13,18 @@ Sprite::Sprite(uint32_t off){
 
 std::string Sprite::getImage(){
   return image;
+}
+std::string Sprite::getRaw(){
+  return raw;
+}
+
+void Sprite::clearPng(){
+  loaded = false;
+  image.clear();
+}
+void Sprite::clearRaw(){
+  loaded = false;
+  raw.clear();
 }
 
 bool Sprite::RawToPng(){
@@ -154,15 +167,7 @@ std::string SpriteLoader::getError(){
   return error;
 }
 
-std::string SpriteLoader::getImage(uint32_t id){
-  if(id>=sprites.size()){
-    error = "id too grater than sprites size";
-    return "";
-  }
-  Sprite& sp = sprites[id];
-  if(sp.loaded){
-    return sp.getImage();
-  }
+bool SpriteLoader::loadRaw(Sprite& sp){
   size_t offset_read = sp.offset + 5 - offset_to_data;
   //cout<<"offset "<<sp.offset<<" buffer offset "<<offset_read<<endl;
   uint32_t pixel_offset = 0;
@@ -172,7 +177,7 @@ std::string SpriteLoader::getImage(uint32_t id){
   while(data_left>0){
     if(data_left<4){
       error = "cannot read header of sprite ";
-      return "";
+      return false;
     }
     blank = (uint8_t)buffer[offset_read + 1];
     blank <<= 8;
@@ -181,7 +186,7 @@ std::string SpriteLoader::getImage(uint32_t id){
     offset_read += 2;
     if(blank > 3076){
       error = "too much blank pixels";
-      return "";
+      return false;
     }
     datas = (uint8_t)buffer[offset_read + 1];
     datas <<= 8;
@@ -189,38 +194,61 @@ std::string SpriteLoader::getImage(uint32_t id){
     offset_read += 2;
     if(datas > 3076){
       error = "too much data pixels";
-      return "";
+      return false;
     }
     data_left -= 4;
     if(data_left < (3*datas)){
       error = "not enough pixel data";
-      return "";
+      return false;
     }
     for(uint16_t ip=0;ip<datas;ip++){
-      sp.image[pixel_offset+0] = buffer[offset_read];
-      sp.image[pixel_offset+1] = buffer[offset_read + 1];
-      sp.image[pixel_offset+2] = buffer[offset_read + 2];
-      sp.image[pixel_offset+3] = 255;
+      uint32_t x = (pixel_offset%128)/4;
+      uint32_t y = pixel_offset/128;
+      uint32_t pos = x*128+y*4;
+      sp.image[pos+0] = buffer[offset_read];
+      sp.image[pos+1] = buffer[offset_read + 1];
+      sp.image[pos+2] = buffer[offset_read + 2];
+      sp.image[pos+3] = 255;
       pixel_offset += 4;
       offset_read += 3;
     }
     data_left -= datas * 3;
   }
-  ///*
+  sp.raw = sp.image;
+  return true;
+}
+
+std::string SpriteLoader::getImage(uint32_t id){
+  if(id>=sprites.size()){
+    error = "id too grater than sprites size";
+    return "";
+  }
+  Sprite& sp = sprites[id];
+  if(sp.loaded){
+    return sp.getImage();
+  }
+  if(!loadRaw(sp)){
+    return "";
+  }
   if(!sp.RawToPng()){
     error="cannot convert raw to png";
     return "";
   }
-  //*/
-  /*
-  std::string out_path="i";
-  out_path += to_string(id);
-  out_path += ".png";
-  fstream out(out_path, ios::binary|ios::trunc|ios::out);
-  cout<<"out "<<out_path<<" is "<<(out.good()?"true":"false")<<endl;
-  out.write(sp.image.data(), sp.image.size());
-  //*/
-  //sp.toBase64();
   sp.loaded = true;
   return sp.getImage();
+}
+std::string SpriteLoader::getRaw(uint32_t id){
+  if(id>=sprites.size()){
+    error = "id too grater than sprites size";
+    return "";
+  }
+  Sprite& sp = sprites[id];
+  if(sp.loaded){
+    return sp.getRaw();
+  }
+  if(!loadRaw(sp)){
+    return "";
+  }
+  sp.loaded = true;
+  return sp.getRaw();
 }

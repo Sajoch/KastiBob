@@ -10,9 +10,9 @@ void ExtendClient::MapDescription(NetworkPacket& p){
 		c->disconnect("map description too short");
 		return;
 	}
-	c->x = p.getUint16();
-	c->y = p.getUint16();
-	c->z = p.getUint8();
+	c->x = (int16_t)p.getUint16();
+	c->y = (int16_t)p.getUint16();
+	c->z = (int8_t)p.getUint8();
 	c->gMap->set(c->mapViewX, c->mapViewY);
 	if(!getMap(p, c->x-8, c->y-6, c->z, 18, 14)){
 		c->disconnect("failed to load map");
@@ -81,8 +81,8 @@ bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t
 bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z){
 	//cout<<"getSquareMap "<<_x<<","<<_y<<","<<_z<<endl;
 	int32_t vAttr, thingsId;
-	Square& sq = c->gMap->getSquare(_x, _y, _z);
-	sq.clear();
+	Square& sq = c->gMap->getSquare(_x, _y);
+	sq.clear(_z);
 	Creature cr;
 	Item it;
 	for(thingsId = 0; thingsId < 11; thingsId++){
@@ -94,7 +94,7 @@ bool ExtendClient::getSquareMap(NetworkPacket& p, int32_t _x, int32_t _y, int32_
 		if(vAttr >= 0xFF00){
 			return true;
 		}
-		int getThing_ret = getThing(sq, p);
+		int getThing_ret = getThing(sq, _z, p);
 		if(getThing_ret != 0){
 			c->disconnect("getThing from getSquareMap");
 			return false;

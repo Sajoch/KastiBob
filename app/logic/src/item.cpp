@@ -8,7 +8,7 @@ Item::Item(){
 	itemTemplate = 0;
 }
 
-Item::Item(uint32_t _id, DatLoader* dat, NetworkPacket& p, Client* c):
+Item::Item(int32_t _id, DatLoader* dat, NetworkPacket& p, Client* c):
 	id(_id)
 {
 	itemTemplate = dat->getItem(_id);
@@ -24,6 +24,9 @@ Item::Item(uint32_t _id, DatLoader* dat, NetworkPacket& p, Client* c):
 	}
 }
 
-uint32_t Item::getId(){
+int32_t Item::getId(){
 	return id;
+}
+DatObject* Item::getTemplate(){
+	return itemTemplate;
 }

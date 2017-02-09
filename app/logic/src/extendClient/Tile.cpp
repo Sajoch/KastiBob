@@ -19,8 +19,8 @@ void ExtendClient::TileAddThing(NetworkPacket& p){
 	y = p.getUint16();
 	z = p.getUint8();
 	stack = p.getUint8();
-	Square& sq = c->gMap->getSquare(x, y, z);
-	int getThing_ret = getThing(sq, p);
+	Square& sq = c->gMap->getSquare(x, y);
+	int getThing_ret = getThing(sq, z, p);
 	if(getThing_ret != 0){
 		c->disconnect("getThing from TileAddThing");
 	}
@@ -39,12 +39,12 @@ void ExtendClient::TileRemoveThing(NetworkPacket& p){
 	stack = p.getUint8();
 }
 
-int ExtendClient::getThing(Square& sq, NetworkPacket& p){
+int ExtendClient::getThing(Square& sq, int32_t _z, NetworkPacket& p){
 	if(p.getSize()<2){
 		c->disconnect("getThing too short");
 		return 127;
 	}
-	int32_t vAttr = p.getUint16();
+	int32_t vAttr = (int16_t)p.getUint16();
 	//cout<<"thing "<<vAttr<<endl;
 	Creature cr;
 	Item it;
@@ -55,25 +55,25 @@ int ExtendClient::getThing(Square& sq, NetworkPacket& p){
 			if(ret != 0){
 				return ret;
 			}
-			sq.addCreature(cr);
+			sq.addCreature(_z, cr);
 		break;
 		case 0x62:
 			ret = Creature::setKnownCreature(cr, p);
 			if(ret != 0){
 				return ret;
 			}
-			sq.addCreature(cr);
+			sq.addCreature(_z, cr);
 		break;
 		case 0x63:
 			ret = Creature::setUnk1Creature(cr, p);
 			if(ret != 0){
 				return ret;
 			}
-			sq.addCreature(cr);
+			sq.addCreature(_z, cr);
 		break;
 		default:
 			it = Item(vAttr, c->datobjs, p, c);
-			sq.addItem(it);
+			sq.addItem(_z, it);
 		break;
 	}
 	return 0;

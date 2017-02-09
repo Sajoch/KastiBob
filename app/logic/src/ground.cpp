@@ -2,15 +2,15 @@
 #include "ground.hpp"
 
 
-Square& Ground::getSquare(int32_t x, int32_t y, int32_t z){
+Square& Ground::getSquare(int32_t x, int32_t y){
   size_t s = squares.size();
   for(size_t i=0;i<s;i++){
     Square& sq = squares[i];
-    if(sq.x == x && sq.y == y && sq.z == z){
+    if(sq.x == x && sq.y == y){
       return sq;
     }
   }
-  Square sq(x, y, z);
+  Square sq(x, y);
   squares.push_back(sq);
   return squares.back();
 }
@@ -38,40 +38,25 @@ bool Ground::parseLight(uint16_t lvl, uint16_t color){
   return true;
 }
 
-int Ground::getMap(std::vector<Square> sqs, int32_t x, int32_t y, int32_t z){
-  int32_t px, py, mx, my;
-  px = x - rangeX;
-  py = y - rangeY;
-  mx = x + rangeX;
-  my = y + rangeY;
-  for(;px<mx;px++){
-    for(;py<my;py++){
-      Square& singleSq = getSquare(px, py, z);
-      sqs.push_back(singleSq);
-    }
-  }
-  return 0;
-}
-
 bool Ground::moveCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t stackId, int32_t dstX, int32_t dstY, int32_t dstZ){
   Creature obj;
-  Square& srcSq = getSquare(srcX, srcY, srcZ);
-  Square& dstSq = getSquare(dstX, dstY, dstZ);
-  if(!srcSq.getCreature(stackId, obj)){
+  Square& srcSq = getSquare(srcX, srcY);
+  Square& dstSq = getSquare(dstX, dstY);
+  if(!srcSq.getCreature(srcZ, stackId, obj)){
     DEBUG("move: cannot get creature from old square");
     return false;
   }
-  dstSq.addCreature(obj);
+  dstSq.addCreature(dstZ, obj);
   
-  if(!srcSq.removeCreature(stackId)){
+  if(!srcSq.removeCreature(srcZ, stackId)){
     DEBUG("move: cannot remove creature from old square");
     return false;
   }
   return true;
 }
 bool Ground::removeCreature(int32_t srcX, int32_t srcY, int32_t srcZ, int32_t stackId){
-  Square& sq = getSquare(srcX, srcY, srcZ);
-  if(!sq.removeCreature(stackId)){
+  Square& sq = getSquare(srcX, srcY);
+  if(!sq.removeCreature(srcZ, stackId)){
     DEBUG("remove: cannot remove creature from square");
     return false;
   }

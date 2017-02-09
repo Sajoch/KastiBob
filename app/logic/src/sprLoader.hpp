@@ -11,11 +11,15 @@ class API Sprite{
   size_t offset;
   uint32_t size;
   std::string image;
+  std::string raw;
   bool RawToPng();
 public:
   void toBase64();
   Sprite(uint32_t off);
+  void clearPng();
+  void clearRaw();
   std::string getImage();
+  std::string getRaw();
 };
 
 
@@ -30,5 +34,9 @@ public:
   SpriteLoader(std::string path);
   ~SpriteLoader();
   bool load();
+  bool loadRaw(Sprite& sp);
+  void clearPng(uint32_t id);
+  void clearRaw(uint32_t id);
   std::string getImage(uint32_t id);
+  std::string getRaw(uint32_t id);
 };

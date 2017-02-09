@@ -472,15 +472,14 @@ void Client::recv(NetworkPacket& p){
 	afterRecvFunc();
 }
 
-uint32_t Client::getMapViewX(){
+int32_t Client::getMapViewX(){
 	return mapViewX;
 }
-uint32_t Client::getMapViewY(){
+int32_t Client::getMapViewY(){
 	return mapViewY;
 }
-bool Client::getGroundSquare(Item& it, uint32_t cx, uint32_t cy){
-	Square& sq = gMap->getSquare(cx, cy, z);
-	return sq.getGround(it);
+Square& Client::getSquare(int32_t cx, int32_t cy){
+	return gMap->getSquare(cx, cy);
 }
 void Client::move(ClientDirectory dir){
 	if(conn == 0){
