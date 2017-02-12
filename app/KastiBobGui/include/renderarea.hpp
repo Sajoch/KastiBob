@@ -20,7 +20,7 @@ signals:
 	void THupdate();
 private:
 	//std::vector<> sprites;
-	void oneSquare(QPainter* p, class Square& sq, int x, int y);
+	void oneSquare(QPainter* p, class Square& sq, int x, int y, int oz);
 	bool clearImage(int x, int y);
 	bool addImageOn(int x, int y, class QImage& n);
 	void onChangeClient(class GameWindow *parent);

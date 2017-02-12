@@ -1,6 +1,12 @@
 #ifndef __EXTENDCLIENT_HPP
 #define __EXTENDCLIENT_HPP
 #include <cinttypes>
+#include <map>
+#include <functional>
+#include <string>
+#include <tuple>
+
+#define DEBUG_CB
 
 class ExtendClient{
 	class Client* c;
@@ -8,7 +14,14 @@ class ExtendClient{
 	bool getFloorMap(class NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles);
 	bool getSquareMap(class NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z);
 	int getThing(class Square& sq, int32_t _z, class NetworkPacket& p);
+	std::map<uint16_t, std::string> cbs_names;
+	std::map<uint16_t, void(ExtendClient::*)(class NetworkPacket& p)> cbs_funcs;
 public:
+	#ifdef DEBUG_CB
+		bool getCallback(void(ExtendClient::*&func_addr)(NetworkPacket& p), std::string& func_name, uint16_t type);
+	#else
+		bool getCallback(void(ExtendClient::*&func_addr)(NetworkPacket& p), uint16_t type);
+	#endif
 	ExtendClient(class Client* _c);
 	void SelfAppear(class NetworkPacket& p);
 	void GMActions(class NetworkPacket& p);

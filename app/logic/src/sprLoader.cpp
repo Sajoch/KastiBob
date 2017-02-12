@@ -202,13 +202,13 @@ bool SpriteLoader::loadRaw(Sprite& sp){
       return false;
     }
     for(uint16_t ip=0;ip<datas;ip++){
-      uint32_t x = (pixel_offset%128)/4;
-      uint32_t y = pixel_offset/128;
-      uint32_t pos = x*128+y*4;
-      sp.image[pos+0] = buffer[offset_read];
-      sp.image[pos+1] = buffer[offset_read + 1];
-      sp.image[pos+2] = buffer[offset_read + 2];
-      sp.image[pos+3] = 255;
+      //uint32_t x = (pixel_offset%128)/4;
+      //uint32_t y = pixel_offset/128;
+      //uint32_t pos = x*128+y*4;
+      sp.image[pixel_offset+0] = buffer[offset_read];
+      sp.image[pixel_offset+1] = buffer[offset_read + 1];
+      sp.image[pixel_offset+2] = buffer[offset_read + 2];
+      sp.image[pixel_offset+3] = 255;
       pixel_offset += 4;
       offset_read += 3;
     }
@@ -219,6 +219,7 @@ bool SpriteLoader::loadRaw(Sprite& sp){
 }
 
 std::string SpriteLoader::getImage(uint32_t id){
+  id-=1;
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
     return "";
@@ -238,6 +239,7 @@ std::string SpriteLoader::getImage(uint32_t id){
   return sp.getImage();
 }
 std::string SpriteLoader::getRaw(uint32_t id){
+  id-=1;
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
     return "";
