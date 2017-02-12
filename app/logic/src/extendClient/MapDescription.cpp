@@ -43,6 +43,8 @@ bool ExtendClient::getMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, 
 			}
 		}
 	}
+	cout<<"now edited"<<endl;
+	c->editedMap = true;
 	return true;
 }
 bool ExtendClient::getFloorMap(NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles){

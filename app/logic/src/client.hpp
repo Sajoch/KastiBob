@@ -68,6 +68,7 @@ class API Client: public Creature{
 	class Ground* gMap;
 	class DatLoader* datobjs;
 	
+	
 	uint16_t health;
 	uint16_t max_health;
 	uint32_t free_cap;
@@ -97,6 +98,7 @@ class API Client: public Creature{
 	void recv(NetworkPacket& p);
 	
 public:
+	bool editedMap;
 	int32_t getMapViewX();
 	int32_t getMapViewY();
 	class Square& getSquare(int32_t cx, int32_t cy);

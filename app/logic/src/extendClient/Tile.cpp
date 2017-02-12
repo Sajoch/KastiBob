@@ -26,6 +26,24 @@ void ExtendClient::TileAddThing(NetworkPacket& p){
 	}
 }
 
+void ExtendClient::TileUpdateItem(NetworkPacket& p){
+	if(p.getSize()<6){
+		c->disconnect("TileUpdateItem too short");
+		return;
+	}
+	uint16_t x, y;
+	uint8_t z, stack;
+	x = p.getUint16();
+	y = p.getUint16();
+	z = p.getUint8();
+	stack = p.getUint8();
+	Square& sq = c->gMap->getSquare(x, y);
+	int getThing_ret = getThing(sq, z, p);
+	if(getThing_ret != 0){
+		c->disconnect("getThing from TileUpdateItem");
+	}
+}
+
 void ExtendClient::TileRemoveThing(NetworkPacket& p){
 	if(p.getSize()<6){
 		c->disconnect("TileRemoveThing too short");

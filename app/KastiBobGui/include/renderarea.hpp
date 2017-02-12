@@ -5,6 +5,7 @@
 #include <QtGui/QPen>
 #include <QtGui/QPixmap>
 #include <QtWidgets/QWidget>
+#include <QtCore/QTimer>
 #include <mutex>
 
 class RenderArea: public QWidget{
@@ -19,18 +20,15 @@ protected:
 signals:
 	void THupdate();
 private:
-	//std::vector<> sprites;
-	void oneSquare(QPainter* p, class Square& sq, int x, int y, int oz);
-	bool clearImage(int x, int y);
-	bool addImageOn(int x, int y, class QImage& n);
+	QTimer animationChanger;
+	std::vector<class ImageDraw> map_draws;
+	void oneSquare(class Square& sq, int x, int y, int z);
 	void onChangeClient(class GameWindow *parent);
 	std::mutex mapStateChange;
-	size_t allNode;
+	bool currenctFloor;
 	class Client* c;
-	std::map<uint32_t, QImage> maps;
 	bool showPanel;
 	class RunMain* runapp;
-	class QPainter* painter;
 };
 
 #endif

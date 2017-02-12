@@ -43,13 +43,14 @@ void NetworkManager::mainLoop(void* data){
 			if(error != 0){
 				SocketImpl::error(error);
 			}
-			if(nm->sock.poll(0, Socket::SELECT_READ)){
+			if(nm->sock.poll(1, Socket::SELECT_READ)){
 				if(nm->onRead() != 0){
 					std::cout<<"close thread after read"<<std::endl;
 					connectState = 1;//nm->onDisconnect();
 					break;
 				}
-			}else if(nm->sock.poll(0, Socket::SELECT_WRITE)){
+			}
+			if(nm->sock.poll(0, Socket::SELECT_WRITE)){
 				if(nm->onWrite() != 0){
 					std::cout<<"close thread after write"<<std::endl;
 					connectState = 1;//nm->onDisconnect();

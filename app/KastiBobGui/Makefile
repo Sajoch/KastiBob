@@ -1,7 +1,7 @@
 LOGIC_SRC=../logic/src
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
 -lQt5Gui -lpthread \
--L. -lKastiBob_logic -I$(LOGIC_SRC) -Iinclude -Iuis_h
+-L. -lKastiBob_logic -I$(LOGIC_SRC) -Iinclude -Iuis_h -ggdb
 
 ifeq ($(OS),LINUX)
 CPPFLAG+= -I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
@@ -61,7 +61,7 @@ MOC=loginform runmain gamewindow charselect renderarea
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
 
 OBJS=main charselect loginform gamewindow renderarea\
-		 config $(MOCS)
+		 config render_image $(MOCS)
 uis_h/%.gen.h :
 	@echo "-Compile from ui" $@
 	@uic $< -o $@
@@ -78,7 +78,8 @@ obj/loginform.o: src/loginform.cpp include/loginform.h uis_h/loginform.gen.h \
 	include/charselect.h
 obj/gamewindow.o: src/gamewindow.cpp uis_h/gamewindow.gen.h include/gamewindow.h
 #obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
-obj/renderarea.o: src/renderarea.cpp include/renderarea.hpp include/gamewindow.h
+obj/renderarea.o: src/renderarea.cpp include/renderarea.hpp include/gamewindow.h include/render_image.hpp
+obj/render_image.o: src/render_image.cpp include/render_image.hpp
 obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewindow.h
 obj/config.o: src/config.cpp include/config.hpp $(LOGIC_SRC)/file.hpp
 #obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp

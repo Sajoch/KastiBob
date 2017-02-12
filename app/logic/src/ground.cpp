@@ -10,8 +10,7 @@ Square& Ground::getSquare(int32_t x, int32_t y){
       return sq;
     }
   }
-  Square sq(x, y);
-  squares.push_back(sq);
+  squares.push_back(Square(x, y));
   return squares.back();
 }
 Ground::Ground(){

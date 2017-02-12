@@ -30,7 +30,6 @@ void Square::addCreature(int32_t _z, Creature& v){
   creatures[_z].push_back(v);
 }
 void Square::addItem(int32_t _z, Item& v){
-  cout<<"add to "<<_z<<endl;
   items[_z].push_back(v);
 }
 void Square::clear(int32_t _z){
@@ -49,4 +48,10 @@ Item& Square::getItem(int32_t _z, uint32_t i){
 }
 void Square::dump(){
   cout<<"sq "<<x<<","<<y<<endl;
+}
+int32_t Square::getX(){
+  return x;
+}
+int32_t Square::getY(){
+  return y;
 }

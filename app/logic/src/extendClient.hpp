@@ -39,7 +39,7 @@ public:
 	void MoveWest(class NetworkPacket& p);
 	void UpdateTile(class NetworkPacket& p);
 	void TileAddThing(class NetworkPacket& p);
-	void TileTransformThing(class NetworkPacket& p);
+	void TileUpdateItem(class NetworkPacket& p);
 	void TileRemoveThing(class NetworkPacket& p);
 	void CreatureMove(class NetworkPacket& p);
 	void OpenContainer(class NetworkPacket& p);

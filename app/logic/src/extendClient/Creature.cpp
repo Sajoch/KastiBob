@@ -18,11 +18,20 @@ void ExtendClient::CreatureMove(NetworkPacket& p){
 	c->gMap->moveCreature(old_x, old_y, old_z, old_stackPos, new_x, new_y, new_z);
 }
 void ExtendClient::CreatureHealth(NetworkPacket& p){
-	if(p.getSize()<1){
+	if(p.getSize()<5){
 		c->disconnect("CreatureHealth too short");
 		return;
 	}
-	p.dump();
+	uint32_t id = p.getUint32();
+	uint8_t hpp = p.getUint8();
+}
+void ExtendClient::CreaturePassable(NetworkPacket& p){
+	if(p.getSize()<5){
+		c->disconnect("CreaturePassable too short");
+		return;
+	}
+	uint32_t id = p.getUint32();
+	uint8_t impassable = p.getUint8();
 }
 void ExtendClient::CreatureLight(NetworkPacket& p){
 	if(p.getSize()<6){

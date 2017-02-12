@@ -24,6 +24,8 @@ public:
   uint32_t getItemsAmount(int32_t _z);
   Item& getItem(int32_t _z, uint32_t i);
   void clear(int32_t _z);
+  int32_t getX();
+  int32_t getY();
   void dump();
 };
 
