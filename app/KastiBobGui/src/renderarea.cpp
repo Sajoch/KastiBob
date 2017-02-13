@@ -46,14 +46,34 @@ RenderArea::~RenderArea(){
 }
 
 void RenderArea::oneSquare(Square& sq, int x, int y, int z){
-	uint32_t items = sq.getItemsAmount(z);
-	for(uint32_t i=0;i<items;i++){
-		Item& it = sq.getItem(z, i);
-		DatObject* td = it.getTemplate();
-		if(td != 0){
-			mapStateChange.lock();
-			map_draws.push_back(ImageDraw(runapp->getSpr(), td, x, y));
-			mapStateChange.unlock();
+	uint32_t len;
+	len = sq.getItemsAmount(z);
+	Item it;
+	Creature cr;
+	for(uint32_t i=0;i<len;i++){
+		if(sq.getItem(z, i, it)){
+			DatObject* td = it.getTemplate();
+			if(td != 0){
+				mapStateChange.lock();
+				map_draws.push_back(ImageDraw(runapp->getSpr(), td, x, y));
+				mapStateChange.unlock();
+			}
+		}
+	}
+	len = sq.getCreatureAmount(z);
+	for(uint32_t i=0;i<len;i++){
+		if(sq.getCreature(z, i, cr)){
+			DatObject* td = cr.getTemplate();
+			if(td != 0){
+				ImageDraw idraw(runapp->getSpr(), td, x, y);
+				if(td->getId() == 136){
+					idraw.colorize(QColor(0,0,0), QColor(0,0,0), QColor(0,0,0), QColor(0,0,0));
+				}
+				mapStateChange.lock();
+				//idraw.dumpImages("tmp/iod"+std::to_string(td->getId())+"x");
+				map_draws.push_back(idraw);
+				mapStateChange.unlock();
+			}
 		}
 	}
 }
@@ -115,7 +135,7 @@ void RenderArea::paintEvent(QPaintEvent *event){
 	mapStateChange.lock();
 	for(it=map_draws.begin();it!=map_draws.end();++it){
 		ImageDraw& r = *it;
-		r.draw(painter, mapArea);
+		r.draw(painter, mapArea, 1.5);
 	}
 	mapStateChange.unlock();
 	painter.end();

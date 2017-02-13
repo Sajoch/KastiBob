@@ -16,6 +16,7 @@ public:
   Outfit();
   bool fromMsg(class NetworkPacket& p);
   void toMsg(class NetworkPacket& p);
+  uint16_t getType();
 };
 
 #endif

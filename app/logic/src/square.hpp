@@ -22,7 +22,8 @@ public:
   void addCreature(int32_t _z, Creature& v);
   void addItem(int32_t _z, Item& v);
   uint32_t getItemsAmount(int32_t _z);
-  Item& getItem(int32_t _z, uint32_t i);
+  uint32_t getCreatureAmount(int32_t _z);
+  bool getItem(int32_t _z, uint32_t stackId, Item& cr);
   void clear(int32_t _z);
   int32_t getX();
   int32_t getY();

@@ -20,6 +20,10 @@ LoginForm::LoginForm(RunMain* app) :
 
   rServer = loginConf.getVal("SERVER", 0);
   rLogin = loginConf.getVal("LOGIN", "");
+  rAutoLogin = loginConf.getVal("AUTOLOGIN", 0);
+  if(rAutoLogin){
+    rPassword = loginConf.getVal("PASSWORD", "");
+  }
   
   connect(ui->pushButton_2, &QPushButton::clicked, this, &LoginForm::login);
   connect(ui->pushButton, &QPushButton::clicked, this, &LoginForm::exit);
@@ -37,6 +41,10 @@ void LoginForm::load(){
     ui->lineEdit->setFocus();
   }else{
     ui->lineEdit_2->setFocus();
+  }
+  if(rAutoLogin && !rPassword.empty()){
+    ui->lineEdit->setText(QString::fromStdString(rPassword));
+    login();
   }
   show();
 }

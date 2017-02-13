@@ -26,6 +26,9 @@ bool Square::removeCreature(int32_t _z, uint32_t stackId){
     return false;
   }
 }
+uint32_t Square::getCreatureAmount(int32_t _z){
+  return creatures[_z].size();
+}
 void Square::addCreature(int32_t _z, Creature& v){
   creatures[_z].push_back(v);
 }
@@ -39,12 +42,14 @@ void Square::clear(int32_t _z){
 uint32_t Square::getItemsAmount(int32_t _z){
   return items[_z].size();
 }
-Item& Square::getItem(int32_t _z, uint32_t i){
-  uint32_t mi = getItemsAmount(_z);
-  if(mi > i){
-    return items[_z][i];
+
+bool Square::getItem(int32_t _z, uint32_t stackId, Item& cr){
+  if(stackId < items[_z].size()){
+    cr = items[_z][stackId];
+    return true;
+  }else{
+    return false;
   }
-  return empty_item;
 }
 void Square::dump(){
   cout<<"sq "<<x<<","<<y<<endl;

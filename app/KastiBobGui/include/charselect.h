@@ -24,6 +24,7 @@ private:
   class RunMain* runapp;
   ConfigFile loginConf;
   size_t rChar;
+  int rAutoChar;
   Ui_CharSelect* ui;
 };
 

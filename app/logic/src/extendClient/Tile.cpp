@@ -69,21 +69,21 @@ int ExtendClient::getThing(Square& sq, int32_t _z, NetworkPacket& p){
 	int ret;
 	switch(vAttr){
 		case 0x61:
-			ret = Creature::setNewCreature(cr, p);
+			ret = Creature::setNewCreature(c->datobjs, cr, p);
 			if(ret != 0){
 				return ret;
 			}
 			sq.addCreature(_z, cr);
 		break;
 		case 0x62:
-			ret = Creature::setKnownCreature(cr, p);
+			ret = Creature::setKnownCreature(c->datobjs, cr, p);
 			if(ret != 0){
 				return ret;
 			}
 			sq.addCreature(_z, cr);
 		break;
 		case 0x63:
-			ret = Creature::setUnk1Creature(cr, p);
+			ret = Creature::setUnk1Creature(c->datobjs, cr, p);
 			if(ret != 0){
 				return ret;
 			}

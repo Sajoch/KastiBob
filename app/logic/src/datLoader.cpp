@@ -96,6 +96,10 @@ void DatObject::dump(){
 	
 }
 
+uint32_t DatObject::getId(){
+	return id;
+}
+
 DatLoader::DatLoader(std::string path){
 	file = new BinaryFile(path);
 	loaded = false;
@@ -357,11 +361,32 @@ bool DatLoader::isLoaded(){
 }
 
 DatObject* DatLoader::getItem(uint32_t id){
+	if(id < 100){
+		return 0;
+	}
 	id -= 100;
 	if(id>items.size()){
 		return 0;
 	}
 	return items[id];
+}
+DatObject* DatLoader::getOutfit(uint32_t id){
+	if(id>outfits.size()){
+		return 0;
+	}
+	return outfits[id];
+}
+DatObject* DatLoader::getEffect(uint32_t id){
+	if(id>effects.size()){
+		return 0;
+	}
+	return effects[id];
+}
+DatObject* DatLoader::getDistance(uint32_t id){
+	if(id>distances.size()){
+		return 0;
+	}
+	return distances[id];
 }
 DatObject DatLoader::get(size_t id){
 	

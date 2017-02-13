@@ -28,6 +28,8 @@ private:
   ConfigFile loginConf;
   size_t rServer;
   std::string rLogin;
+  int rAutoLogin;
+  std::string rPassword;
   Ui_LoginForm* ui;
 };
 

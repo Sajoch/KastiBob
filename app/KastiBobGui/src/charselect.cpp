@@ -10,6 +10,7 @@ CharSelect::CharSelect(RunMain* app) :
   ui->setupUi(this);
   
   rChar = loginConf.getVal("CHAR", 0);
+  rAutoChar = loginConf.getVal("AUTOCHAR", 0);
   
   connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
   connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
@@ -30,6 +31,9 @@ void CharSelect::load(){
   runapp->getClient()->afterError([&](std::string msg, std::string type){
     //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
   });
+  if(rAutoChar){
+    //enter();
+  }
   show();
 }
 

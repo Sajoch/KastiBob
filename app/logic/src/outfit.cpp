@@ -34,3 +34,7 @@ bool Outfit::fromMsg(NetworkPacket& p){
 void Outfit::toMsg(NetworkPacket& p){
   //TODO finish
 }
+
+uint16_t Outfit::getType(){
+  return lookType;
+}

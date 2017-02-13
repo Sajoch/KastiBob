@@ -30,14 +30,16 @@ friend class ExtendClient;
   bool blockSpace;
   Outfit apperance;
   ClientDirectory directory;
+  class DatObject* creatureTemplate;
 public:
   Creature();
-  static int setNewCreature(Creature & ret, NetworkPacket& p);
-  static int setKnownCreature(Creature & ret, NetworkPacket& p);
-  static int setUnk1Creature(Creature & ret, NetworkPacket& p);
+  static int setNewCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
+  static int setKnownCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
+  static int setUnk1Creature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();
+  class DatObject* getTemplate();
 };
 
 #endif

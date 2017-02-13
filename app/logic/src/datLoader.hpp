@@ -53,6 +53,8 @@ class API DatObject{
 	std::vector<uint16_t> images;
 public:
 	DatObject();
+	uint32_t getId();
+	bool hadBlend();
 	void dump();
 	
 };
