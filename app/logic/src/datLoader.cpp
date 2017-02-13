@@ -326,6 +326,10 @@ bool DatLoader::getObject(DatObject& obj, uint32_t id){
 	}
 	obj.width = file->getUint8();
 	obj.height = file->getUint8();
+	if(obj.width == 0 || obj.height == 0){
+		cout<<"dat object has 0 area"<<endl;
+		return false;
+	}
 	if(obj.width > 1 || obj.height > 1){
 		obj.renderSize = file->getUint8();
 	}

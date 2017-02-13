@@ -115,9 +115,7 @@ void RenderArea::paintEvent(QPaintEvent *event){
 	mapStateChange.lock();
 	for(it=map_draws.begin();it!=map_draws.end();++it){
 		ImageDraw& r = *it;
-		if(r.needDraw()){
-			r.draw(painter, mapArea);
-		}
+		r.draw(painter, mapArea);
 	}
 	mapStateChange.unlock();
 	painter.end();

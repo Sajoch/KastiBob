@@ -5,6 +5,12 @@
 
 using namespace std;
 
+Sprite::Sprite(){
+  offset = 0;
+  loaded = false;
+  size = 0;
+}
+
 Sprite::Sprite(uint32_t off){
   offset = off;
   loaded = false;
@@ -17,7 +23,9 @@ std::string Sprite::getImage(){
 std::string Sprite::getRaw(){
   return raw;
 }
-
+std::string* Sprite::getRawPointer(){
+  return &raw;
+}
 void Sprite::clearPng(){
   loaded = false;
   image.clear();
@@ -238,19 +246,19 @@ std::string SpriteLoader::getImage(uint32_t id){
   sp.loaded = true;
   return sp.getImage();
 }
-std::string SpriteLoader::getRaw(uint32_t id){
+Sprite& SpriteLoader::get(uint32_t id){
   id-=1;
   if(id>=sprites.size()){
     error = "id too grater than sprites size";
-    return "";
+    return empty;
   }
   Sprite& sp = sprites[id];
   if(sp.loaded){
-    return sp.getRaw();
+    return sp;
   }
   if(!loadRaw(sp)){
-    return "";
+    return empty;
   }
   sp.loaded = true;
-  return sp.getRaw();
+  return sp;
 }

@@ -9,6 +9,9 @@ class ImageDraw{
 	bool changed;
 	int pixelsX;
 	int pixelsY;
+	int blockWidth;
+	int blockHeight;
+	int blockSize;
 	QRect imageArea;
 	std::vector<QImage> imgs;
 public:

@@ -13,29 +13,24 @@ ImageDraw::ImageDraw(SpriteLoader* sprs, DatObject* itemTemplate, int x, int y){
 	changed = true;
 	imageArea = QRect(x-width, y-height, width, height);
 	animatedFrames = itemTemplate->animatedFrames;
-	//TODO if width = 0 or height = 0
 	int frameBlockSize = blockWidth * blockHeight;
 	int frameAmount = itemTemplate->images.size() / frameBlockSize;
-	//cout<<"item "<<itemTemplate->id<<endl;
 	for(int frame_id=0;frame_id<frameAmount;frame_id++){
 		QImage frame(width, height, QImage::Format_RGBA8888_Premultiplied);
+		frame.fill(QColor(0,0,0,0));
 		QPainter p_frame(&frame);
 		for(int fx=0;fx<blockWidth;fx++){
 			for(int fy=0;fy<blockHeight;fy++){
 				int idx = (frame_id * frameBlockSize) + frameBlockSize - 1 - (fy*blockWidth+fx);
-				//cout<<"idx "<<idx<<" = "<<itemTemplate->images.size()<<endl;
-				size_t sprId = itemTemplate->images[idx];
-				//cout<<"sprId "<<sprId<<" ("<<idx<<")"<<" on "<<fx<<","<<fy<<endl;
+				size_t sprId = itemTemplate->images[idx];;
 				if(sprId != 0){
-					std::string img = sprs->getRaw(sprId);
-					QImage n((uchar*)img.c_str(), 32, 32, 4*32, QImage::Format_RGBA8888);
+					std::string* img = sprs->get(sprId).getRawPointer();
+					QImage n((uchar*)img->c_str(), 32, 32, 4*32, QImage::Format_RGBA8888);
 					p_frame.drawImage(fx*32, fy*32, n);
 				}
 			}
 		}
 		p_frame.end();
-		//std::string path = "tmp/b"+std::to_string(x)+"x"+std::to_string(y)+"id"+std::to_string(itemTemplate->id)+"fr"+std::to_string(frame_id)+".png";
-		//frame.save(path.c_str(),"PNG");
 		imgs.push_back(frame);
 	}
 }

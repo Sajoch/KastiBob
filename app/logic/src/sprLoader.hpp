@@ -15,17 +15,20 @@ class API Sprite{
   bool RawToPng();
 public:
   void toBase64();
+  Sprite();
   Sprite(uint32_t off);
   void clearPng();
   void clearRaw();
   std::string getImage();
   std::string getRaw();
+  std::string* getRawPointer();
 };
 
 
 class API SpriteLoader{
   std::string error;
   std::vector<Sprite> sprites;
+  Sprite empty;
   std::string buffer;
   size_t offset_to_data;
   class BinaryFile* spr;
@@ -38,5 +41,5 @@ public:
   void clearPng(uint32_t id);
   void clearRaw(uint32_t id);
   std::string getImage(uint32_t id);
-  std::string getRaw(uint32_t id);
+  Sprite& get(uint32_t id);
 };
