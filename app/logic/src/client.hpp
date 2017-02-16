@@ -6,7 +6,18 @@
 #include <chrono>
 #include <functional>
 #include "dll.h"
+<<<<<<< HEAD
 #include "creature.hpp"
+=======
+//#include "cipher.hpp"
+//#include "packet.hpp"
+//#include "network.hpp"
+//#include "utils.hpp"
+#include "creature.hpp"
+//#include "ground.hpp"
+//#include "outfit.hpp"
+//#include "extendClient.hpp"
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 
 class API Character{
 	std::string nick;
@@ -31,7 +42,10 @@ public:
 
 class API Client: public Creature{
 	friend class ExtendClient;
+<<<<<<< HEAD
 	friend class Item;
+=======
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	class XTEAcipher* xtea;
 	class RSAcipher* rsa;
 	static const char* rsa_e_n;
@@ -44,9 +58,12 @@ class API Client: public Creature{
 	static int32_t mapLayers;
 	ClientState state;
 	class ExtendClient* ext;
+<<<<<<< HEAD
 	
 	std::chrono::system_clock::time_point last_ping;
 	int64_t duration_between_pings;
+=======
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 
 	Character current_character;
 	std::vector<Character> characters;
@@ -59,7 +76,10 @@ class API Client: public Creature{
 	std::function<void(void)> disconnectHandler;
 	std::function<void(void)> afterRecvFunc;
 	class Ground* gMap;
+<<<<<<< HEAD
 	class DatLoader* datobjs;
+=======
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	
 	uint16_t health;
 	uint16_t max_health;
@@ -73,7 +93,10 @@ class API Client: public Creature{
 	uint16_t magic_level_percent;
 	uint16_t soul;
 	uint16_t stamina;
+<<<<<<< HEAD
 	uint16_t icons;
+=======
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	
 	Client_Skill skills[7];
 
@@ -88,6 +111,10 @@ class API Client: public Creature{
 	void disconnect(std::string reason);
 	void closeConnection();
 	void recv(NetworkPacket& p);
+<<<<<<< HEAD
+=======
+	void idle();
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	
 public:
 	bool under;

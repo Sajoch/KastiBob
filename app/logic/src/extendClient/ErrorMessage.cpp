@@ -11,5 +11,9 @@ void ExtendClient::ErrorMessage(NetworkPacket& p){
 		return;
 	}
 	string error = p.getTString();
+<<<<<<< HEAD
 	c->errorHandler(error, "ErrorMessage");
+=======
+	cout<<"Error: "<<error<<endl;
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }

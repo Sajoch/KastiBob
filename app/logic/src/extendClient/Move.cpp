@@ -1,6 +1,7 @@
 #include "../extendClient.hpp"
 #include "../packet.hpp"
 #include "../client.hpp"
+<<<<<<< HEAD
 #include "../ground.hpp"
 
 void ExtendClient::MoveNorth(NetworkPacket& p){
@@ -48,3 +49,18 @@ void ExtendClient::MoveCheckZ(){
 	}
 	c->under = false;
 }
+=======
+
+void ExtendClient::MoveNorth(NetworkPacket& p){
+	c->y--;
+}
+void ExtendClient::MoveWest(NetworkPacket& p){
+	c->x--;
+}
+void ExtendClient::MoveSouth(NetworkPacket& p){
+	c->y++;
+}
+void ExtendClient::MoveEast(NetworkPacket& p){
+		c->x++;
+}
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa

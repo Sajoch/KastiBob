@@ -1,11 +1,17 @@
 LOGIC_SRC=../logic/src
 CPPFLAG= --std=c++11 -lQt5Widgets -lQt5WebKit -lQt5Core -lQt5WebKitWidgets \
+<<<<<<< HEAD
 -lQt5Gui -lpthread \
 -L. -lKastiBob_logic -I$(LOGIC_SRC) -Iinclude -Iuis_h -ggdb
 
 ifeq ($(OS),LINUX)
 CPPFLAG+= -I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
 endif
+=======
+-lQt5Gui  -lpng \
+-L. -lKastiBob_logic -I../logic/src -Iinclude -Iuis_h  \
+-I/usr/include/x86_64-linux-gnu/qt5 -fPIC -Wl,-rpath=.
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 obj/%.o :
 	@echo "-Compile" $@
 	@$(CXX) -c -Wall -o $@ $(CPPFLAG) $<
@@ -57,7 +63,11 @@ resources/%.gen.cpp: files/% resources/rcc_%.gen.qrc
 obj_rsc/%.o : resources/%.gen.cpp
 	@echo "-Compile "$@
 	@$(CXX) -c $< -o $@  $(CPPFLAG)
+<<<<<<< HEAD
 MOC=loginform runmain gamewindow charselect renderarea
+=======
+MOC=jsbridge loginform runmain gamewindow charselect
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 MOCS=$(patsubst %,moc_%.gen,$(MOC))
 
 OBJS=main charselect loginform gamewindow renderarea\
@@ -77,6 +87,7 @@ obj/charselect.o: src/charselect.cpp include/loginform.h include/charselect.h \
 obj/loginform.o: src/loginform.cpp include/loginform.h uis_h/loginform.gen.h \
 	include/charselect.h
 obj/gamewindow.o: src/gamewindow.cpp uis_h/gamewindow.gen.h include/gamewindow.h
+<<<<<<< HEAD
 #obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
 obj/renderarea.o: src/renderarea.cpp include/renderarea.hpp include/gamewindow.h include/render_image.hpp
 obj/render_image.o: src/render_image.cpp include/render_image.hpp
@@ -84,6 +95,14 @@ obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewi
 obj/config.o: src/config.cpp include/config.hpp $(LOGIC_SRC)/file.hpp
 #obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
 obj/moc_renderarea.gen.o: moc_cpp/renderarea.gen.cpp
+=======
+obj/jsbridge.o: src/jsbridge.cpp include/jsbridge.h include/gamewindow.h
+obj/main.o: src/main.cpp include/loginform.h include/charselect.h include/gamewindow.h
+obj/file.o: src/file.cpp include/file.hpp
+obj/spriteLoader.o: src/spriteLoader.cpp include/spriteLoader.hpp include/file.hpp
+
+obj/moc_jsbridge.gen.o: moc_cpp/jsbridge.gen.cpp
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 obj/moc_loginform.gen.o: moc_cpp/loginform.gen.cpp
 obj/moc_runmain.gen.o: moc_cpp/runmain.gen.cpp
 obj/moc_gamewindow.gen.o: moc_cpp/gamewindow.gen.cpp
@@ -92,8 +111,12 @@ obj/moc_charselect.gen.o: moc_cpp/charselect.gen.cpp
 include/gamewindow.h: uis_h/gamewindow.gen.h
 include/charselect.h: uis_h/charselect.gen.h
 include/loginform.h: uis_h/loginform.gen.h
+<<<<<<< HEAD
 #moc_cpp/jsbridge.gen.cpp: include/jsbridge.h
 moc_cpp/renderarea.gen.cpp: include/renderarea.hpp
+=======
+moc_cpp/jsbridge.gen.cpp: include/jsbridge.h
+>>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 moc_cpp/loginform.gen.cpp: include/loginform.h
 moc_cpp/runmain.gen.cpp: include/runmain.hpp
 moc_cpp/gamewindow.gen.cpp: include/gamewindow.h
