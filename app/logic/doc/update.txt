@@ -1,0 +1,6 @@
+http://eloth.info/srdate/update.php
+6 times hash of up to date files
+compare each with local version
+if not equal then download new version with
+http://eloth.info/update/$1
+$1 = filename

@@ -1,13 +1,19 @@
 #ifndef __ITEM_HPP
 #define __ITEM_HPP
 
-#include "thing.hpp"
+#include <cinttypes>
+#include "dll.h"
 
-class Item: public Thing{
-	uint32_t id;
+class API Item{
+	friend class Square;
+	int32_t id;
+	class DatObject* itemTemplate;
+	uint16_t stack;
 public:
-	Item(uint32_t _id);
-	uint32_t getId();
+	Item();
+	Item(int32_t _id, class DatLoader* dat, class NetworkPacket& p, class Client* c);
+	int32_t getId();
+	class DatObject* getTemplate();
 };
 
 #endif

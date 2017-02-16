@@ -1,22 +1,43 @@
 #include "jsbridge.h"
 #include "gamewindow.h"
+#include "runmain.hpp"
 #include "client.hpp"
-#include "spriteLoader.hpp"
+#include "sprLoader.hpp"
+#include "config.hpp"
 #include <QtCore/QVariant>
 #include <iostream>
+#include <QtCore/QTimer>
 
 
 using namespace std;
 
 extern Client* tclient;
+extern ConfigFile* paths;
 
-JSBridge::JSBridge(QObject *parent) : QObject(parent){
-  sprs = new SpriteLoader("..\\..\\kclient_v1\\Kasti.spr");
+JSBridge::JSBridge(RunMain* app) : QObject(0){
+  connect(this, &JSBridge::sendData, this, &JSBridge::sendDataToJS);
+  connect(this, &JSBridge::errorMsg, app, &RunMain::errorMsg);
+  
+}
+JSBridge::~JSBridge(){
+  tclient->clearCallbacks();
 }
 
 void JSBridge::setGW(GameWindow* that, QWebView* _webView){
   gamewindow = that;
-  mframe = _webView->page()->mainFrame();
+  webView = _webView;
+  mframe = webView->page()->currentFrame();
+  mframe->addToJavaScriptWindowObject("JSBridge", this);
+  mframe->evaluateJavaScript("start();");
+  tclient->afterError([&](std::string msg, std::string type){
+    cout<<type<<": "<<msg<<endl;
+    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+  });
+  tclient->afterDisconnect([&](){
+    cout<<"reconnecting"<<endl;
+    tclient->enter();
+  });
+  tclient->enter();
 }
 
 void JSBridge::CrossCallAfterUpdate(){
@@ -33,7 +54,6 @@ void JSBridge::CrossCallAfterUpdate(){
 
 void JSBridge::logout(){
   delete tclient;
-  delete sprs;
   gamewindow->logout();
 }
 
@@ -43,7 +63,7 @@ void JSBridge::charSelect(){
 }
 
 QString JSBridge::getImg(int id){
-  std::string buf = sprs->getImage(id);
+  std::string buf = "";//sprs->getImage(id);
   return QString::fromStdString(buf);
 }
 void JSBridge::start(){
@@ -74,7 +94,9 @@ void JSBridge::look(int id){
 void JSBridge::callAfterUpdate(QVariant data){
   QJsonDocument doc = QJsonDocument::fromVariant(data);
   QString json = doc.toJson(QJsonDocument::Compact);
-  cout<<json.toStdString()<<endl;
-  QString cmd = QString("Communication.update(%1)").arg(json);
-  mframe->evaluateJavaScript(cmd);
+  json = QString("Communication.update(%1)").arg(json);
+  sendData(json);
+}
+void JSBridge::sendDataToJS(QString json){
+  mframe->evaluateJavaScript(json);
 }

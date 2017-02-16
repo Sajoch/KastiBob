@@ -1,71 +1,152 @@
+#include <QtWidgets/QApplication>
+#include <QtCore/QLibrary>
+#include <QtCore/QDir>
+#include <QtCore/QStringList>
+#include <QtCore/QThread>
+#include <QtWidgets/QMessageBox>
+#include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
-#include <QtWidgets/QApplication>
-#include <QtCore/QLibrary>
-#include <QtCore/QTimer>
-#include <QtCore/QDir>
-#include <QtCore/QStringList>
-#include "client.hpp"
+#include "config.hpp"
+#include "datLoader.hpp"
+#include "sprLoader.hpp"
+#include "updater.hpp"
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
-Client* tclient = 0;
-QTimer *logic_loop;
-LoginForm* lf;
-CharSelect* cs;
-GameWindow* gw;
+//TODO no global
+class Client* tclient = 0;
 
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
+class LoaderThread: public QThread{
+public:
+  LoaderThread(DatLoader* _dat, SpriteLoader* _spr){
+    dat = _dat;
+    spr = _spr;
+  }
+private:
+  DatLoader* dat;
+  SpriteLoader* spr;
+  Updater* up;
+  void run(){
+    ConfigFile update("update.cfg");
+    int64_t storedMs = update.getVal("LAST", 0);
+    chrono::high_resolution_clock::duration storedDur = chrono::seconds(storedMs);
+    chrono::time_point<chrono::high_resolution_clock> last(storedDur);
 
-void GoToLoginForm(){
-  QTimer::singleShot(0, [](){
-    lf->show();
-    cs->hide();
-    gw->hide();
-    lf->load();
-    logic_loop->stop();
-  });
+    chrono::time_point<chrono::high_resolution_clock> now = chrono::high_resolution_clock::now();
+    chrono::high_resolution_clock::duration now_dur = now.time_since_epoch();
+    int64_t ms = chrono::duration_cast<chrono::seconds>(now_dur).count();
+
+    int hdiff = chrono::duration_cast<chrono::hours>(now - last).count() / 24;
+    
+    if(hdiff > 0){
+      update.setVal("LAST", ms);
+      up = new Updater("http://www.eloth.info/srdate/update.php","http://eloth.info/update/$1");
+      up->afterChangeState([&](std::string dl, int state){
+        cout<<"downloaded "<<state<<"% of "<<dl<<endl;
+      });
+      up->check(dat->getPath(), Updater_File::FILE_DAT);
+      up->check(spr->getPath(), Updater_File::FILE_SPR);
+    }
+    dat->load();
+    spr->load();
+  }
+};
+
+RunMain::RunMain(){
+  lf = 0;
+  cs = 0;
+  gw = 0;
+  paths = new ConfigFile("path.cfg");
+  std::string dat_path = paths->getVal("DAT_FILE","Tibia.dat");
+  std::string spr_path = paths->getVal("SPR_FILE","Tibia.spr");
+  datobjs = new DatLoader(dat_path);
+  sprobjs = new SpriteLoader(spr_path);
+  stateLoadedResources = false;
+  lt = new LoaderThread(datobjs, sprobjs);
+  connect(lt, &LoaderThread::finished, this, &RunMain::loadedResources);
+  lt->start();
 }
-void GoToCharSelect(){
-  QTimer::singleShot(0, [](){
-    cs->show();
-    lf->hide();
-    gw->hide();
-    cs->load();
-    logic_loop->stop();
-  });
+
+RunMain::~RunMain(){
+  delAllWindows();
+  if(datobjs != 0){
+    delete datobjs;
+  }
+  delete lt;
 }
-void GoToGameWindow(){
-  QTimer::singleShot(0, [](){
-    gw->show();
-    cs->hide();
-    lf->hide();
-    gw->load();
-  });
+
+void RunMain::loadedResources(){
+  if(lf != 0){
+    lf->resourcesLoaded();
+  }
+  stateLoadedResources = true;
 }
+
+void RunMain::delAllWindows(){
+  if(lf != 0){
+    delete lf;
+    lf = 0;
+  }
+  if(cs != 0){
+    delete cs;
+    cs = 0;
+  }
+  if(gw != 0){
+    delete gw;
+    gw = 0;
+  }
+}
+
+void RunMain::GoToLoginForm(){
+  delAllWindows();
+  lf = new LoginForm(this);
+  lf->load();
+  if(stateLoadedResources){
+    lf->resourcesLoaded();
+  }
+}
+void RunMain::GoToCharSelect(){
+  delAllWindows();
+  cs = new CharSelect(this);
+  cs->load();
+}
+void RunMain::GoToGameWindow(){
+  delAllWindows();
+  gw = new GameWindow(this);
+  gw->load();
+}
+DatLoader* RunMain::getDatobjs(){
+  return datobjs;
+}
+
+SpriteLoader* RunMain::getSpr(){
+  return sprobjs;
+}
+Client* RunMain::getClient(){
+  return tclient;
+}
+Client* RunMain::getClient(Client* v){
+  tclient = v;
+  return tclient;
+}
+
+void RunMain::errorMsg(QString msg){
+  QMessageBox msgBox;
+  msg = QApplication::translate("ErrorMsg", msg.toUtf8().data(), 0);
+  msgBox.setText(msg);
+  msgBox.exec();
+}
+
+RunMain* app;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    /* list resources entry
-    QStringList resources = QDir(":").entryList();
-    for(int i =0;i<resources.size();i++){
-      cout<<resources.at(i).toUtf8().constData()<<endl;
-    }
-    */
-    lf = new LoginForm();
-    cs = new CharSelect();
-    logic_loop = new QTimer();
-    QObject::connect(logic_loop, &QTimer::timeout, [&](){
-      if(tclient->tick()==0){
-        logic_loop->stop();
-      }
-    });
-    GoToLoginForm();
-    gw = new GameWindow();
-    return a.exec();
+    QApplication Qapp(argc, argv);
+    RunMain* app = new RunMain();
+    app->GoToLoginForm();
+    return Qapp.exec();
 }

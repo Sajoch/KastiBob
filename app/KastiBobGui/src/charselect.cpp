@@ -1,49 +1,60 @@
-#include <QtCore/QTimer>
 #include "charselect.h"
 #include "client.hpp"
+#include "runmain.hpp"
 
-extern Client* tclient;
-extern QTimer *logic_loop;
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
-
-CharSelect::CharSelect(QWidget *parent) :
-    QDialog(parent){
+CharSelect::CharSelect(RunMain* app) :
+    QDialog(0), 
+    runapp(app),
+    loginConf("login.cfg"){
   ui = new Ui_CharSelect();
   ui->setupUi(this);
-  connect(ui->pushButton, &QPushButton::clicked, this, logout);
-  connect(ui->pushButton_2, &QPushButton::clicked, this, enter);
+  
+  rChar = loginConf.getVal("CHAR", 0);
+  rAutoChar = loginConf.getVal("AUTOCHAR", 0);
+  
+  connect(ui->pushButton, &QPushButton::clicked, this, &CharSelect::logout);
+  connect(ui->pushButton_2, &QPushButton::clicked, this, &CharSelect::enter);
+  
+  connect(this, &CharSelect::logouted, app, &RunMain::GoToLoginForm);
+  connect(this, &CharSelect::entered, app, &RunMain::GoToGameWindow);
+  connect(this, &CharSelect::errorMsg, app, &RunMain::errorMsg);
 }
 
 void CharSelect::load(){
   while(ui->comboBox->count()>0){
     ui->comboBox->removeItem(0);
   }
-  tclient->listChars([&](std::string name, size_t id){
-    ui->comboBox->addItem(name.c_str(), id);
+  runapp->getClient()->listChars([&](std::string name, size_t id){
+    ui->comboBox->addItem(name.c_str(), (quint64)id);
   });
+  ui->comboBox->setCurrentIndex(rChar);
+  runapp->getClient()->afterError([&](std::string msg, std::string type){
+    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+  });
+  if(rAutoChar){
+    //enter();
+  }
+  show();
 }
 
 void CharSelect::enter(){
-  logic_loop->start(1);
   size_t id = ui->comboBox->currentData().toULongLong();
-  if(tclient->setChar(id)){
-    GoToGameWindow();
+  loginConf.setVal("CHAR", ui->comboBox->currentIndex());
+  if(runapp->getClient()->setChar(id)){
+    entered();
   }else{
     logout();
   }
 }
 
 void CharSelect::logout(){
-  delete tclient;
-  logic_loop->stop();
-  GoToLoginForm();
+  delete runapp->getClient();
+  logouted();
 }
 
 void CharSelect::keyPressEvent(QKeyEvent *e) {
   if(e->key() != Qt::Key_Escape){
-      QDialog::keyPressEvent(e);
+    QDialog::keyPressEvent(e);
   } else {
 
   }
@@ -51,5 +62,5 @@ void CharSelect::keyPressEvent(QKeyEvent *e) {
 
 CharSelect::~CharSelect()
 {
-
+  runapp->getClient()->clearCallbacks();
 }

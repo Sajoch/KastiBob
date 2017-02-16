@@ -2,35 +2,28 @@
 #include <QtWebKitWidgets/QWebPage>
 #include <QtCore/QUrl>
 #include "gamewindow.h"
-#include "jsbridge.h"
+#include "renderarea.hpp"
+#include "sprLoader.hpp"
+#include "runmain.hpp"
+#include "client.hpp"
+#include <iostream>
 
-void GoToLoginForm();
-void GoToCharSelect();
-void GoToGameWindow();
+using namespace std;
 
-GameWindow::GameWindow(QWidget *parent) :
-    QMainWindow(parent)
+GameWindow::GameWindow(RunMain* app) :
+    QMainWindow(0),
+    runapp(app)
 {
-    ui = new Ui_GameWindow();
-    ui->setupUi(this);
-    QWebPage* page = ui->webView->page();
-    page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  ui = new Ui_GameWindow();
+  ui->setupUi(this);
+  render = new RenderArea(this, runapp);
+  ui->horizontalLayout->addWidget(render);
+  connect(this, &GameWindow::logout, runapp, &RunMain::GoToLoginForm);
+  connect(this, &GameWindow::charSelect, runapp, &RunMain::GoToGameWindow);
 }
 void GameWindow::load(){
-  bridge = new JSBridge(this);
-  bridge->setGW(this, ui->webView);
-  QWebPage* page = ui->webView->page();
-  QWebFrame* frame = page->mainFrame();
-  frame->addToJavaScriptWindowObject("JSBridge", bridge);
-  frame->evaluateJavaScript("start();");
-}
-
-void GameWindow::logout(){
-  GoToLoginForm();
-}
-
-void GameWindow::charSelect(){
-  GoToCharSelect();
+  show();
+  runapp->getClient()->enter();
 }
 
 bool GameWindow::close(){
@@ -38,6 +31,5 @@ bool GameWindow::close(){
 }
 
 GameWindow::~GameWindow(){
-  delete bridge;
   delete ui;
 }

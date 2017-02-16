@@ -1,6 +1,6 @@
 #include "MovePacket.hpp"
 
-MovePacket::MovePacket(ClientDirectory dir, XTEAcipher& xtea){
+MovePacket::MovePacket(ClientDirectory dir, XTEAcipher* xtea){
 	addUint16(1);
 	switch(dir){
 		case ClientDirectory::STOP:

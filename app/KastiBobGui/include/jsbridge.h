@@ -11,9 +11,11 @@ class JSBridge : public QObject
 {
   Q_OBJECT
 public:
-  explicit JSBridge(QObject *parent = 0);
+  explicit JSBridge(class RunMain* app);
+  ~JSBridge();
   void setGW(class GameWindow* that, QWebView* _webview);
   void CrossCallAfterUpdate();
+  void sendDataToJS(QString json);
 
   Q_INVOKABLE void logout();
   Q_INVOKABLE void charSelect();
@@ -24,8 +26,11 @@ public:
   Q_INVOKABLE void callAfterUpdate(QVariant data);
 private:
   class GameWindow* gamewindow;
+  QWebView* webView;
   QWebFrame* mframe;
-  class SpriteLoader* sprs;
+signals:
+  void sendData(QString json);
+  void errorMsg(QString msg, QString type);
 };
 
 #endif // JSBRIDGE_H

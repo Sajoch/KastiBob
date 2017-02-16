@@ -39,7 +39,13 @@ kclient_v2.zip
 *.gen.h
 *.gen.hpp
 *.gen.qrc
+path.cfg
+login.cfg
+update.cfg
 
+*.dat
+*.spr
+*.pic
 
 # Stackdump
 *.stackdump
@@ -52,3 +58,4 @@ node_modules
 
 bin2c/bin2c
 running_inject/KastiBob_run
+app/KastiBobGui/KastiBobGui

@@ -5,7 +5,6 @@
 #include "client.hpp"
 #include <cstdlib>
 #include <ctime>
-#include <Poco/Thread.h>
 
 using namespace std;
 
@@ -15,18 +14,7 @@ const char* Client::rsa_e_n = "65537";
 uint32_t Client::dat_signature = 0x467FD7E6;
 uint32_t Client::spr_signature = 0x467F9E74;
 uint32_t Client::pic_signature = 0x4AE5C3D3;
-uint32_t Client::mapViewX = 8;
-uint32_t Client::mapViewY = 8;
+int32_t Client::mapViewX = 8;
+int32_t Client::mapViewY = 8;
 int32_t Client::mapLayers = 15; //0-15 = 16 layers
 
-int main(){
-	srand(time(0));
-	//178.32.162.105
-	std::string addr = "91.134.189.246:7171";
-	Client kastiClient(addr, 20007, 2, "dupad2", "dupad2");
-	while(kastiClient.tick()){
-		//C++11 compability
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	}
-  return 0;
-}

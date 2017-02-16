@@ -13,6 +13,7 @@ public:
 	void addUint8(uint8_t a);
 	void addUint16(uint16_t a);
 	void addUint32(uint32_t a);
+	void addUint64(uint64_t a);
 	void addString(std::string a);
 	void addTString(std::string a);
 	uint32_t checksum();
@@ -22,21 +23,25 @@ public:
 	uint16_t getUint16();
 	uint16_t peekUint16();
 	uint32_t getUint32();
+	uint64_t getUint64();
 	std::string getTString(); //TODO split to peak size
 	size_t peakTStringSize();
+	bool peakStringLength();
 	std::string& getData();
 	size_t getSize();
 	void resize(size_t len);
-	void xteaDecrypt(XTEAcipher& xtea);
-	void xteaEncrypt(XTEAcipher& xtea);
+	void xteaDecrypt(XTEAcipher* xtea);
+	void xteaEncrypt(XTEAcipher* xtea);
 
 	void dump();
 
 	static uint8_t peekUint8(std::string& b);
 	static uint16_t peekUint16(std::string& b);
 	static uint32_t peekUint32(std::string& b);
+	static uint64_t peekUint64(std::string& b);
 	static void addUint8(std::string& b, uint8_t v);
 	static void addUint16(std::string& b, uint16_t v);
 	static void addUint32(std::string& b, uint32_t v);
+	static void addUint64(std::string& b, uint64_t v);
 };
 #endif

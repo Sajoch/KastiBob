@@ -4,7 +4,6 @@
 #include <string>
 #include "utils.hpp"
 #include "outfit.hpp"
-#include "thing.hpp"
 #include "dll.h"
 
 enum class CreatureType{
@@ -14,23 +13,34 @@ enum class CreatureType{
   Hero
 };
 
-class API Creature: public Thing{
+class API Creature{
 friend class Client;
 friend class ExtendClient;
   CreatureType type;
   std::string name;
   uint32_t id;
-  uint32_t x;
-  uint32_t y;
-  uint32_t z;
+  int32_t x;
+  int32_t y;
+  int32_t z;
   uint32_t hpp;
+  uint32_t lightLevel;
+  uint32_t lightColor;
+  uint32_t speed;
+  uint32_t skull;
+  bool blockSpace;
   Outfit apperance;
   ClientDirectory directory;
+  class DatObject* creatureTemplate;
 public:
   Creature();
+  static int setNewCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
+  static int setKnownCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
+  static int setUnk1Creature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();
+  class DatObject* getTemplate();
+  Outfit& getApperance();
 };
 
 #endif

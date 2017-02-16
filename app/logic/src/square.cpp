@@ -1,23 +1,74 @@
 #include "square.hpp"
+#include "datLoader.hpp"
+#include <iostream>
 
+using namespace std;
 
-bool Square::getCreature(uint32_t stackId, Creature& cr){
-  if(stackId < creatures.size()){
-    cr = creatures[stackId];
+Square::Square(int32_t _x, int32_t _y):
+x(_x), y(_y)
+{
+  
+}
+
+bool Square::getCreature(int32_t _z, uint32_t stackId, Creature& cr){
+  if(stackId < creatures[_z].size()){
+    cr = creatures[_z][stackId];
     return true;
   }else{
     return false;
   }
 }
-bool Square::removeCreature(uint32_t stackId){
-  if(stackId < creatures.size()){
-    creatures.erase(creatures.begin() + stackId);
+bool Square::removeCreature(int32_t _z, uint32_t stackId){
+  if(stackId < creatures[_z].size()){
+    creatures[_z].erase(creatures[_z].begin() + stackId);
     return true;
   }else{
     return false;
   }
 }
-bool Square::addCreature(Creature& v){
-  creatures.push_back(v);
-  return true;
+uint32_t Square::getCreatureAmount(int32_t _z){
+  return creatures[_z].size();
+}
+void Square::addCreature(int32_t _z, Creature& v){
+  creatures[_z].push_back(v);
+}
+void Square::addItem(int32_t _z, Item& v){
+  items[_z].push_back(v);
+}
+void Square::clear(int32_t _z){
+  items[_z].clear();
+  creatures[_z].clear();
+}
+uint32_t Square::getItemsAmount(int32_t _z){
+  return items[_z].size();
+}
+
+bool Square::getItem(int32_t _z, uint32_t stackId, Item& cr){
+  if(stackId < items[_z].size()){
+    cr = items[_z][stackId];
+    return true;
+  }else{
+    return false;
+  }
+}
+bool Square::isAbove(int32_t _z){
+  if(_z < 1){
+    return false;
+  }
+  _z-=1;//high
+  for(int32_t cz=_z; cz>0; cz--){
+    if(items[cz].size() > 0){
+      return true;
+    }
+  }
+  return false;
+}
+void Square::dump(){
+  cout<<"sq "<<x<<","<<y<<endl;
+}
+int32_t Square::getX(){
+  return x;
+}
+int32_t Square::getY(){
+  return y;
 }
