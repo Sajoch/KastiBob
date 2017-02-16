@@ -2,10 +2,7 @@
 #include "../packet.hpp"
 #include "../client.hpp"
 #include "../ground.hpp"
-<<<<<<< HEAD
 #include <iostream>
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 
 void ExtendClient::CreatureMove(NetworkPacket& p){
 	if(p.getSize()<11) {
@@ -22,7 +19,6 @@ void ExtendClient::CreatureMove(NetworkPacket& p){
 	c->gMap->moveCreature(old_x, old_y, old_z, old_stackPos, new_x, new_y, new_z);
 }
 void ExtendClient::CreatureHealth(NetworkPacket& p){
-<<<<<<< HEAD
 	if(p.getSize()<5){
 		c->disconnect("CreatureHealth too short");
 		return;
@@ -37,12 +33,6 @@ void ExtendClient::CreaturePassable(NetworkPacket& p){
 	}
 	uint32_t id = p.getUint32();
 	uint8_t impassable = p.getUint8();
-=======
-	if(p.getSize()<1){
-		c->disconnect("CreatureHealth too short");
-		return;
-	}
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }
 void ExtendClient::CreatureLight(NetworkPacket& p){
 	if(p.getSize()<6){
@@ -60,7 +50,6 @@ void ExtendClient::CreatureLight(NetworkPacket& p){
 	}
 }
 void ExtendClient::CreatureSpeak(NetworkPacket& p){
-<<<<<<< HEAD
 	if(p.getSize()<4){
 		c->disconnect("CreatureSpeak too short");
 		return;
@@ -79,10 +68,4 @@ void ExtendClient::CreatureSpeak(NetworkPacket& p){
 	uint16_t type =  p.getUint8();
 	std::cout<<"type "<<type<<std::endl;
 	p.dump();
-=======
-	if(p.getSize()<1){
-		c->disconnect("CreatureSpeak too short");
-		return;
-	}
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }

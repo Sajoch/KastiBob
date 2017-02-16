@@ -2,28 +2,21 @@
 #include <QtCore/QLibrary>
 #include <QtCore/QDir>
 #include <QtCore/QStringList>
-<<<<<<< HEAD
 #include <QtCore/QThread>
 #include <QtWidgets/QMessageBox>
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 #include "runmain.hpp"
 #include "loginform.h"
 #include "charselect.h"
 #include "gamewindow.h"
-<<<<<<< HEAD
 #include "config.hpp"
 #include "datLoader.hpp"
 #include "sprLoader.hpp"
 #include "updater.hpp"
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 #include <iostream>
 #include <chrono>
 
 using namespace std;
 
-<<<<<<< HEAD
 //TODO no global
 class Client* tclient = 0;
 
@@ -119,48 +112,10 @@ void RunMain::GoToLoginForm(){
 void RunMain::GoToCharSelect(){
   delAllWindows();
   cs = new CharSelect(this);
-=======
-class Client* tclient = 0;
-
-RunMain::RunMain(){
-  lf = 0;
-  cs = 0;
-  gw = 0;
-}
-
-RunMain::~RunMain(){
-  delAllWindows();
-}
-
-void RunMain::delAllWindows(){
-  if(lf != 0){
-    delete lf;
-    lf = 0;
-  }
-  if(cs != 0){
-    delete cs;
-    cs = 0;
-  }
-  if(gw != 0){
-    delete gw;
-    gw = 0;
-  }
-}
-
-void RunMain::GoToLoginForm(){
-  delAllWindows();
-  lf = new LoginForm();
-  lf->load();
-}
-void RunMain::GoToCharSelect(){
-  delAllWindows();
-  cs = new CharSelect();
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
   cs->load();
 }
 void RunMain::GoToGameWindow(){
   delAllWindows();
-<<<<<<< HEAD
   gw = new GameWindow(this);
   gw->load();
 }
@@ -186,22 +141,12 @@ void RunMain::errorMsg(QString msg){
   msgBox.exec();
 }
 
-=======
-  gw = new GameWindow();
-  gw->load();
-}
-
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 RunMain* app;
 
 int main(int argc, char *argv[])
 {
     QApplication Qapp(argc, argv);
-<<<<<<< HEAD
     RunMain* app = new RunMain();
-=======
-    app = new RunMain();
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
     app->GoToLoginForm();
     return Qapp.exec();
 }

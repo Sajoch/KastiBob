@@ -1,10 +1,7 @@
 ifeq ($(OS),LINUX)
 	CROSS_COMPILE=
 	CROSS_COMPILE32=
-<<<<<<< HEAD
 	LOGIC_SHARED=logic_so
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 else ifeq ($(OS), WIN32)
 	CROSS_COMPILE=i686-w64-mingw32-
 	CROSS_COMPILE32=i686-w64-mingw32-
@@ -29,7 +26,6 @@ mdll: minject
 test_dll: mdll
 	$(MAKE) -C KastiDll test
 logic:
-<<<<<<< HEAD
 	$(MAKE) -C app/logic test
 logic_dll:
 	$(MAKE) -C app/logic dll
@@ -45,28 +41,6 @@ clean_gui:
 	$(MAKE) -C app/KastiBobGui clean
 clean_logic:
 	$(MAKE) -C app/logic clean
-=======
-	+make -C app/logic test
-logic_dll:
-	+make -C app/logic dll
-logic_so:
-	+make -C app/logic so
-sprunpack:
-	make -C app/sprunpack test
-gui: logic_dll
-	+make -C app/KastiBobGui test
-linuxgui: logic_so
-	+make -C app/KastiBobGui test
-dgui:
-	make -C app/logic dll
-	make -C app/KastiBobGui debug
-linuxdgui: logic_so
-	+make -C app/KastiBobGui debug
-clean_gui:
-	make -C app/KastiBobGui clean
-clean_logic:
-	make -C app/logic clean
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 clean:
 	$(MAKE) -C KastiDll clean
 	$(MAKE) -C running_inject clean

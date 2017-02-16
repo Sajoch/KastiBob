@@ -14,9 +14,5 @@ void ExtendClient::TextMessage(NetworkPacket& p){
 		return;
 	}
 	std::string msg = p.getTString();
-<<<<<<< HEAD
 	std::cout<<"text type: "<<type<<": "<<msg<<std::endl;
-=======
-	std::cout<<"type: "<<type<<": "<<msg<<std::endl;
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }

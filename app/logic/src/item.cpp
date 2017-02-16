@@ -1,5 +1,4 @@
 #include "item.hpp"
-<<<<<<< HEAD
 #include "datLoader.hpp"
 #include "packet.hpp"
 #include "client.hpp"
@@ -30,11 +29,4 @@ int32_t Item::getId(){
 }
 DatObject* Item::getTemplate(){
 	return itemTemplate;
-=======
-
-Item::Item(uint32_t _id):
-	Thing(ThingType::ITEM), id(_id)
-{
-	setError(0);
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }

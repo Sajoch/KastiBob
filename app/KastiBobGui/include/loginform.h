@@ -22,10 +22,7 @@ public:
   void changeLoginState(int a, std::string msg);
 signals:
   void logged();
-<<<<<<< HEAD
   void errorMsg(QString msg, QString type);
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 private:
   class RunMain* runapp;
   ConfigFile loginConf;

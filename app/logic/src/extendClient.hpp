@@ -1,28 +1,22 @@
 #ifndef __EXTENDCLIENT_HPP
 #define __EXTENDCLIENT_HPP
 #include <cinttypes>
-<<<<<<< HEAD
 #include <map>
 #include <functional>
 #include <string>
 #include <tuple>
 
 #define DEBUG_CB
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 
 class ExtendClient{
 	class Client* c;
 	bool getMap(class NetworkPacket& p, int32_t bx, int32_t by, int32_t bz, int32_t w, int32_t h);
 	bool getFloorMap(class NetworkPacket& p, int32_t bx, int32_t by, int32_t _z, int32_t w, int32_t h, int32_t& skipTiles);
 	bool getSquareMap(class NetworkPacket& p, int32_t _x, int32_t _y, int32_t _z);
-<<<<<<< HEAD
 	int getThing(class Square& sq, int32_t _z, class NetworkPacket& p);
 	void MoveCheckZ();
 	std::map<uint16_t, std::string> cbs_names;
 	std::map<uint16_t, void(ExtendClient::*)(class NetworkPacket& p)> cbs_funcs;
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 public:
 	#ifdef DEBUG_CB
 		bool getCallback(void(ExtendClient::*&func_addr)(NetworkPacket& p), std::string& func_name, uint16_t type);
@@ -46,11 +40,7 @@ public:
 	void MoveWest(class NetworkPacket& p);
 	void UpdateTile(class NetworkPacket& p);
 	void TileAddThing(class NetworkPacket& p);
-<<<<<<< HEAD
 	void TileUpdateItem(class NetworkPacket& p);
-=======
-	void TileTransformThing(class NetworkPacket& p);
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	void TileRemoveThing(class NetworkPacket& p);
 	void CreatureMove(class NetworkPacket& p);
 	void OpenContainer(class NetworkPacket& p);

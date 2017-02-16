@@ -33,15 +33,9 @@ friend class ExtendClient;
   class DatObject* creatureTemplate;
 public:
   Creature();
-<<<<<<< HEAD
   static int setNewCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
   static int setKnownCreature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
   static int setUnk1Creature(class DatLoader* datobjs, Creature & ret, NetworkPacket& p);
-=======
-  static Creature setNewCreature(NetworkPacket& p);
-  static Creature setKnownCreature(NetworkPacket& p);
-  static Creature setUnk1Creature(NetworkPacket& p);
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
   uint32_t getX();
   uint32_t getY();
   uint32_t getZ();

@@ -19,10 +19,7 @@ public:
 signals:
   void logouted();
   void entered();
-<<<<<<< HEAD
   void errorMsg(QString msg, QString type);
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 private:
   class RunMain* runapp;
   ConfigFile loginConf;

@@ -6,7 +6,6 @@
 #include "client.hpp"
 #include "datLoader.hpp"
 
-<<<<<<< HEAD
 LoginForm::LoginForm(RunMain* app) :
     QDialog(0), 
     runapp(app),
@@ -26,32 +25,15 @@ LoginForm::LoginForm(RunMain* app) :
     rPassword = loginConf.getVal("PASSWORD", "");
   }
   
-=======
-extern RunMain* app;
-extern Client* tclient;
-
-LoginForm::LoginForm(QWidget *parent) :
-    QDialog(parent)
-{
-  ui = new Ui_LoginForm();
-  ui->setupUi(this);
-  //TODO outside
-  ui->comboBox->addItem("Kasteria.net", "91.134.189.246:7171");
-  ui->comboBox->addItem("Tibijka.net", "178.32.162.105:7171");
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
   connect(ui->pushButton_2, &QPushButton::clicked, this, &LoginForm::login);
   connect(ui->pushButton, &QPushButton::clicked, this, &LoginForm::exit);
   
   connect(this, &LoginForm::logged, app, &RunMain::GoToCharSelect);
-<<<<<<< HEAD
   connect(this, &LoginForm::errorMsg, app, &RunMain::errorMsg);
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 }
 
 void LoginForm::load(){
   ui->retranslateUi(this);
-<<<<<<< HEAD
   changeLoginState(2, "loading resources");
   ui->comboBox->setCurrentIndex(rServer);
   if(!rLogin.empty()){
@@ -64,9 +46,6 @@ void LoginForm::load(){
     ui->lineEdit->setText(QString::fromStdString(rPassword));
     login();
   }
-=======
-  ui->lineEdit_2->setFocus();
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
   show();
 }
 

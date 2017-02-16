@@ -6,14 +6,7 @@
 #include "extendClient.hpp"
 #include "ground.hpp"
 #include "network.hpp"
-<<<<<<< HEAD
 #include "datLoader.hpp"
-=======
-/*
-#include "packets/PingPacket.hpp"
-*/
-#include "thing.hpp"
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 
 #include <sstream>
 
@@ -51,11 +44,7 @@ void Character::show(){
 	cout<<"Nick: "<<nick<<" on "<<getAddress()<<endl;
 }
 
-<<<<<<< HEAD
 Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p, DatLoader* dat):
-=======
-Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	version(_version), os(_os),
 	login(l), password(p)
 {
@@ -63,14 +52,8 @@ Client::Client(string ip, uint16_t _version, uint16_t _os, string l, string p):
 	rsa = new RSAcipher(rsa_m_n, rsa_e_n);
 	ext = new ExtendClient(this);
 	gMap = new Ground();
-<<<<<<< HEAD
 	datobjs = dat;
 	
-=======
-	
-	lastAntyIdle = chrono::system_clock::now();
-	AntyIdle_duration = chrono::seconds(1);
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	conn = 0;
 	clearCallbacks();	
 	newConnection(ip);
@@ -89,14 +72,11 @@ void Client::newConnection(std::string ip){
 	}
 	cout<<"new connection to "<<ip<<endl;
 	conn = new NetworkManager(ip);
-<<<<<<< HEAD
 	conn->SetOnError([&](std::string msg){
 		cout<<msg<<endl;
 		errorHandler(msg, "NetworkError");
 		disconnectHandler();
 	});
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 	conn->SetOnPacketRecived([&](NetworkPacket& p){
 		recv(p);
 	});
@@ -150,7 +130,6 @@ bool Client::setChar(size_t id){
 	}
 	return false;
 }
-<<<<<<< HEAD
 void Client::enter(){
 	newConnection(current_character.getAddress());
 	current_character.show();
@@ -159,8 +138,6 @@ void Client::enter(){
 	last_ping = std::chrono::system_clock::now();
 }
 
-=======
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 void Client::recv(NetworkPacket& p){
 	if(xtea_crypted){
 		p.xteaDecrypt(xtea);
@@ -182,17 +159,9 @@ void Client::recv(NetworkPacket& p){
 			}break;
 			case ClientState::LOGIN:{
 				state = ClientState::NONE;
-<<<<<<< HEAD
 				do{
 					packetType = p.getUint8();
 					//cout<<"recv "<<packetType<<endl;
-=======
-				cout<<"login start disconnect "<<p.getSize()<<endl;
-				closeConnection();
-				do{
-					packetType = p.getUint8();
-					cout<<"recv "<<packetType<<endl;
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 					switch(packetType){
 						case 0x0A:{ //Error message
 							std::string errormsg = p.getTString();
@@ -259,7 +228,6 @@ void Client::recv(NetworkPacket& p){
 					disconnect("no valid character in game");
 				}
 				packetType = p.getUint8();
-<<<<<<< HEAD
 				void(ExtendClient::*cb_ret)(NetworkPacket& p);
 				std::string function_name;
 				if(ext->getCallback(cb_ret, function_name, packetType)){
@@ -275,240 +243,6 @@ void Client::recv(NetworkPacket& p){
 					errorHandler(to_string(packetType), "NetworkParser");
 					exit(1);
 					return;
-=======
-				cout<<"packet "<<packetType<<endl;
-				switch(packetType){
-					case 0x0A:
-						ext->SelfAppear(p);
-						break;
-					/*case 0x0B:
-						ext->GMActions(p);
-						break;
-					*/
-					case 0x14:
-						ext->ErrorMessage(p);
-						break;
-					/*case 0x15:
-						ext->FYIMessage(p);
-						break;
-					case 0x16:
-						ext->WaitingList(p);
-						break;
-					*/
-					case 0x1E:
-						ext->Ping(p);
-						break;
-					case 0x1F:
-						ext->Init(p);
-						break;
-					/*case 0x28:
-						ext->Death(p);
-						break;
-					case 0x32:
-						ext->CanReportBugs(p);
-						break;
-					*/
-					case 0x64:
-						ext->MapDescription(p);
-						break;
-					case 0x65:
-						ext->MoveNorth(p);
-						break;
-					case 0x66:
-						ext->MoveEast(p);
-						break;
-					case 0x67:
-						ext->MoveSouth(p);
-						break;
-					case 0x68:
-						ext->MoveWest(p);
-						break;
-					/*case 0x69:
-						ext->UpdateTile(p);
-						break;*/
-					case 0x6A:
-						ext->TileAddThing(p);
-						break;
-					/*case 0x6B:
-						ext->TileTransformThing(p);
-						break;
-					case 0x6C:
-						ext->TileRemoveThing(p);
-						break;*/
-					case 0x6D:
-						ext->CreatureMove(p);
-						break;
-					/*case 0x6E:
-						ext->OpenContainer(p);
-						break;
-					case 0x6F:
-						ext->CloseContainer(p);
-						break;
-					case 0x70:
-						ext->ContainerAddItem(p);
-						break;
-					case 0x71:
-						ext->ContainerUpdateItem(p);
-						break;
-					case 0x72:
-						ext->ContainerRemoveItem(p);
-						break;
-					*/
-					case 0x78:
-						ext->InventorySetSlot(p);
-						break;
-					case 0x79:
-						ext->InventoryResetSlot(p);
-						break;
-					/*case 0x7D:
-						ext->SafeTradeRequestAck(p);
-						break;
-					case 0x7E:
-						ext->SafeTradeRequestNoAck(p);
-						break;
-					case 0x7F:
-						ext->SafeTradeClose(p);
-						break;
-					*/
-					case 0x82:
-						ext->WorldLight(p);
-						break;
-					case 0x83:
-						ext->MagicEffect(p);
-						break;
-					/*case 0x84:
-						ext->AnimatedText(p);
-						break;
-					case 0x85:
-						ext->DistanceShot(p);
-						break;
-					case 0x86:
-						ext->CreatureSquare(p);
-						break;
-					*/
-					case 0x8C:
-						ext->CreatureHealth(p);
-						break;
-					case 0x8D:
-						ext->CreatureLight(p);
-						break;
-					/*case 0x8E:
-						ext->CreatureOutfit(p);
-						break;
-					case 0x8F:
-						ext->CreatureSpeed(p);
-						break;
-					case 0x90:
-						ext->CreatureSkulls(p);
-						break;
-					case 0x91:
-						ext->CreatureShields(p);
-						break;
-					case 0x92:
-						ext->CreaturePassable(p);
-						break;
-					case 0x96:
-						ext->ItemTextWindow(p);
-						break;
-					case 0x97:
-						ext->HouseTextWindow(p);
-						break;*/
-					case 0xA0:
-						ext->PlayerStats(p);
-						break;
-					case 0xA1:
-						ext->PlayerSkills(p);
-						break;
-					case 0xA2:
-						ext->PlayerIcons(p);
-						break;/*
-					case 0xA3:
-						ext->PlayerCancelAttack(p);
-						break;
-					*/
-					case 0xAA:
-						ext->CreatureSpeak(p);
-						break;
-					/*case 0xAB:
-						ext->ChannelList(p);
-						break;
-					case 0xAC:
-						ext->OpenChannel(p);
-						break;
-					case 0xAD:
-						ext->OpenPrivatePlayerChat(p);
-						break;
-					case 0xAE:
-						ext->OpenRuleViolation(p);
-						break;
-					case 0xAF:
-						ext->RuleViolationAF(p);
-						break;
-					case 0xB0:
-						ext->RuleViolationB0(p);
-						break;
-					case 0xB1:
-						ext->RuleViolationB1(p);
-						break;
-					case 0xB2:
-						ext->CreatePrivateChannel(p);
-						break;
-					case 0xB3:
-						ext->ClosePrivateChannel(p);
-						break;
-					*/
-					case 0xB4:
-						ext->TextMessage(p);
-						break;
-					/*case 0xB5:
-						ext->PlayerCancelWalk(p);
-						break;
-					case 0xBE:
-						ext->FloorChangeUp(p);
-						break;
-					case 0xBF:
-						ext->FloorChangeDown(p);
-						break;
-					case 0xC8:
-						ext->OutfitWindow(p);
-						break;
-					case 0xD2:
-						ext->VipState(p);
-						break;
-					case 0xD3:
-						ext->VipLogin(p);
-						break;
-					case 0xD4:
-						ext->VipLogout(p);
-						break;
-					case 0xF0:
-						ext->QuestList(p);
-						break;
-					case 0xF1:
-						ext->QuestPartList(p);
-						break;
-					case 0x7A:
-						ext->OpenShopWindow(p);
-						break;
-					case 0x7B:
-						ext->PlayerCash(p);
-						break;
-					case 0x7C:
-						ext->CloseShopWindow(p);
-						break;
-					case 0xDC:
-						ext->ShowTutorial(p);
-						break;
-					case 0xDD:
-						ext->AddMapMarker(p);
-						break;
-					*/
-					default:
-						cout<<"unknown packet type "<<packetType<<endl;
-						p.dump();
-						exit(1);
-						return;
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 				}
 				if(p.getSize()>0){
 					continue;
@@ -523,16 +257,12 @@ void Client::recv(NetworkPacket& p){
 int32_t Client::getMapViewX(){
 	return mapViewX;
 }
-<<<<<<< HEAD
 int32_t Client::getMapViewY(){
 	return mapViewY;
 }
 Square& Client::getSquare(int32_t cx, int32_t cy){
 	return gMap->getSquare(cx, cy);
 }
-=======
-
->>>>>>> abd77b599c1b4eee9908b15350175c3b260553fa
 void Client::move(ClientDirectory dir){
 	if(conn == 0){
 		return;
