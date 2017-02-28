@@ -2,34 +2,48 @@
 #include <QtWebKitWidgets/QWebPage>
 #include <QtCore/QUrl>
 #include "gamewindow.h"
-#include "renderarea.hpp"
-#include "sprLoader.hpp"
+#include "jsbridge.h"
 #include "runmain.hpp"
-#include "client.hpp"
 #include <iostream>
 
 using namespace std;
 
-GameWindow::GameWindow(RunMain* app) :
-    QMainWindow(0),
+GameWindow::GameWindow(RunMain* app):
     runapp(app)
 {
-  ui = new Ui_GameWindow();
-  ui->setupUi(this);
-  render = new RenderArea(this, runapp);
-  ui->horizontalLayout->addWidget(render);
-  connect(this, &GameWindow::logout, runapp, &RunMain::GoToLoginForm);
-  connect(this, &GameWindow::charSelect, runapp, &RunMain::GoToGameWindow);
+	ui = new Ui_GameWindow();
+	ui->setupUi(this);
+	QWebPage* page = ui->webView->page();
+	page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
+	connect(this, &GameWindow::logout, app, &RunMain::GoToLoginForm);
+	connect(this, &GameWindow::charSelect, app, &RunMain::GoToGameWindow);
+
+	connect(page, &QWebPage::loadFinished, this, &GameWindow::loaded);
+	calledExec = false;
+	loaded_page = false;
+}
+void GameWindow::loaded(){
+	loaded_page = true;
+	if(calledExec){
+		load();
+		calledExec = false;
+	}
 }
 void GameWindow::load(){
-  show();
-  runapp->getClient()->enter();
+	if(!loaded_page){
+	  calledExec = true;
+	  return;
+	}
+	bridge = new JSBridge(this, ui->webView, runapp);
+	show();
 }
 
 bool GameWindow::close(){
-  return true;
+	return true;
 }
 
 GameWindow::~GameWindow(){
-  delete ui;
+	delete bridge;
+	delete ui;
 }

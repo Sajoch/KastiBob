@@ -20,6 +20,7 @@ public:
   void selectServer();
   void keyPressEvent(QKeyEvent *e);
   void changeLoginState(int a, std::string msg);
+	void setProgess(double a);
 signals:
   void logged();
   void errorMsg(QString msg, QString type);

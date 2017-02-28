@@ -11,9 +11,8 @@ class JSBridge : public QObject
 {
   Q_OBJECT
 public:
-  explicit JSBridge(class RunMain* app);
+  explicit JSBridge(class GameWindow* that, QWebView* _webview, class RunMain* app);
   ~JSBridge();
-  void setGW(class GameWindow* that, QWebView* _webview);
   void CrossCallAfterUpdate();
   void sendDataToJS(QString json);
 
@@ -26,6 +25,7 @@ public:
   Q_INVOKABLE void callAfterUpdate(QVariant data);
 private:
   class GameWindow* gamewindow;
+	class RunMain* runapp;
   QWebView* webView;
   QWebFrame* mframe;
 signals:

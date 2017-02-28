@@ -11,27 +11,12 @@
 #include "config.hpp"
 #include "datLoader.hpp"
 #include "sprLoader.hpp"
+#include "loaderthread.hpp"
 #include <iostream>
 
 using namespace std;
 
-//TODO no global
-class Client* tclient = 0;
 
-class LoaderThread: public QThread{
-public:
-  LoaderThread(DatLoader* _dat, SpriteLoader* _spr){
-    dat = _dat;
-    spr = _spr;
-  }
-private:
-  DatLoader* dat;
-  SpriteLoader* spr;
-  void run(){
-    dat->load();
-    spr->load();
-  }
-};
 
 RunMain::RunMain(){
   lf = 0;
@@ -62,6 +47,9 @@ void RunMain::loadedResources(){
   }
   stateLoadedResources = true;
 }
+void RunMain::loadedResourcesBar(double a){
+	
+}
 
 void RunMain::delAllWindows(){
   if(lf != 0){
@@ -82,6 +70,7 @@ void RunMain::GoToLoginForm(){
   delAllWindows();
   lf = new LoginForm(this);
   lf->load();
+	connect(lt, &LoaderThread::img, lf, &LoginForm::setProgess);
   if(stateLoadedResources){
     lf->resourcesLoaded();
   }

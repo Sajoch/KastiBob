@@ -177,7 +177,6 @@ std::string SpriteLoader::getError(){
 
 bool SpriteLoader::loadRaw(Sprite& sp){
   size_t offset_read = sp.offset + 5 - offset_to_data;
-  //cout<<"offset "<<sp.offset<<" buffer offset "<<offset_read<<endl;
   uint32_t pixel_offset = 0;
   sp.image.resize(4*32*32, '\0');
   size_t data_left = sp.size;
@@ -210,9 +209,6 @@ bool SpriteLoader::loadRaw(Sprite& sp){
       return false;
     }
     for(uint16_t ip=0;ip<datas;ip++){
-      //uint32_t x = (pixel_offset%128)/4;
-      //uint32_t y = pixel_offset/128;
-      //uint32_t pos = x*128+y*4;
       sp.image[pixel_offset+0] = buffer[offset_read];
       sp.image[pixel_offset+1] = buffer[offset_read + 1];
       sp.image[pixel_offset+2] = buffer[offset_read + 2];
@@ -222,8 +218,23 @@ bool SpriteLoader::loadRaw(Sprite& sp){
     }
     data_left -= datas * 3;
   }
-  sp.raw = sp.image;
   return true;
+}
+
+void SpriteLoader::loadAll(std::function<void(double)> ret){
+	size_t l = sprites.size();
+	for(size_t id=0;id<l;id++){
+		Sprite& sp = sprites[id];
+		if(!sp.loaded){
+			loadRaw(sp);
+			sp.RawToPng();
+			sp.raw.clear();
+			sp.toBase64();
+		  sp.loaded = true;
+			ret((id+1)/(double)l);
+		}
+	}
+	buffer.clear();
 }
 
 std::string SpriteLoader::getImage(uint32_t id){
@@ -243,6 +254,7 @@ std::string SpriteLoader::getImage(uint32_t id){
     error="cannot convert raw to png";
     return "";
   }
+	sp.toBase64();
   sp.loaded = true;
   return sp.getImage();
 }

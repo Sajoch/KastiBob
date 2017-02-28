@@ -5,22 +5,24 @@
 
 
 class GameWindow : public QMainWindow{
-  Q_OBJECT
+	Q_OBJECT
 public:
-  explicit GameWindow(class RunMain* app);
-  ~GameWindow();
-  
-  void load();
-  bool close();
+	explicit GameWindow(class RunMain* app);
+	~GameWindow();
+	bool calledExec;
+	bool loaded_page;
+	void load();
+	bool close();
 signals:
-  void logout();
-  void charSelect();
-  void errorMsg(QString msg);
+	void logout();
+	void charSelect();
+	void errorMsg(QString msg);
 private:
-  class RunMain* runapp;
-  class RenderArea* render;
-  Ui_GameWindow* ui;
-  void attachObject();
+	void loaded();
+	class RunMain* runapp;
+	Ui_GameWindow* ui;
+	class JSBridge* bridge;
+	void attachObject();
 };
 
 #endif // _GAMEWINDOW_H

@@ -11,80 +11,81 @@
 
 using namespace std;
 
-extern Client* tclient;
 extern ConfigFile* paths;
 
-JSBridge::JSBridge(RunMain* app) : QObject(0){
-  connect(this, &JSBridge::sendData, this, &JSBridge::sendDataToJS);
-  connect(this, &JSBridge::errorMsg, app, &RunMain::errorMsg);
-  
+JSBridge::JSBridge(GameWindow* that, QWebView* _webview, RunMain* app): 
+QObject(0),
+runapp(app)
+{
+	connect(this, &JSBridge::sendData, this, &JSBridge::sendDataToJS);
+	connect(this, &JSBridge::errorMsg, app, &RunMain::errorMsg);
+	gamewindow = that;
+	webView = _webview;
+	mframe = webView->page()->currentFrame();
+	mframe->addToJavaScriptWindowObject("JSBridge", this);
+	mframe->evaluateJavaScript("start();");
+	//runapp->getClient()->afterError([&](std::string msg, std::string type){
+		//cout<<type<<": "<<msg<<endl;
+		//errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
+	//});
+	//runapp->getClient()->afterDisconnect([&](){
+		//cout<<"reconnecting"<<endl;
+		//runapp->getClient()->enter();
+	//});
+	runapp->getClient()->enter();
 }
 JSBridge::~JSBridge(){
-  tclient->clearCallbacks();
-}
-
-void JSBridge::setGW(GameWindow* that, QWebView* _webView){
-  gamewindow = that;
-  webView = _webView;
-  mframe = webView->page()->currentFrame();
-  mframe->addToJavaScriptWindowObject("JSBridge", this);
-  mframe->evaluateJavaScript("start();");
-  tclient->afterError([&](std::string msg, std::string type){
-    cout<<type<<": "<<msg<<endl;
-    //errorMsg(QString::fromStdString(msg), QString::fromStdString(type));
-  });
-  tclient->afterDisconnect([&](){
-    cout<<"reconnecting"<<endl;
-    tclient->enter();
-  });
-  tclient->enter();
+  //app->getClient()->clearCallbacks();
 }
 
 void JSBridge::CrossCallAfterUpdate(){
-  QVariantMap hero;
-  QVariantMap pos;
-  pos["x"] = tclient->getX();
-  pos["y"] = tclient->getY();
-  pos["z"] = tclient->getZ();
-  hero["pos"] = pos;
-  QVariantMap obj;
-  obj["hero"] = hero;
-  callAfterUpdate(obj);
+	QVariantMap hero;
+	QVariantMap pos;
+	pos["x"] = runapp->getClient()->getX();
+	pos["y"] = runapp->getClient()->getY();
+	pos["z"] = runapp->getClient()->getZ();
+	hero["pos"] = pos;
+	QVariantMap obj;
+	obj["hero"] = hero;
+	QVariantMap map;
+	
+	
+	obj["map"] = map;
+	callAfterUpdate(obj);
 }
 
 void JSBridge::logout(){
-  delete tclient;
-  gamewindow->logout();
+  //gamewindow->logout();
 }
 
 void JSBridge::charSelect(){
-  tclient->setChar(0);
-  gamewindow->charSelect();
+  //app->getClient()->setChar(0);
+  //gamewindow->charSelect();
 }
 
 QString JSBridge::getImg(int id){
-  std::string buf = "";//sprs->getImage(id);
+  std::string buf = runapp->getSpr()->getImage(id);
   return QString::fromStdString(buf);
 }
 void JSBridge::start(){
   CrossCallAfterUpdate();
-  tclient->afterRecv([&](){
-    CrossCallAfterUpdate();
-  });
+  //app->getClient()->afterRecv([&](){
+    //CrossCallAfterUpdate();
+  //});
 }
 void JSBridge::move(int dir){
   switch(dir){
     case 1: //up
-      tclient->move(ClientDirectory::NORTH);
+      //app->getClient()->move(ClientDirectory::NORTH);
     break;
     case 2://down
-      tclient->move(ClientDirectory::SOUTH);
+      //app->getClient()->move(ClientDirectory::SOUTH);
     break;
     case 3://left
-      tclient->move(ClientDirectory::WEST);
+      //app->getClient()->move(ClientDirectory::WEST);
     break;
     case 4://right
-      tclient->move(ClientDirectory::EAST);
+      //app->getClient()->move(ClientDirectory::EAST);
     break;
   }
 }

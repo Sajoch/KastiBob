@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <functional>
 #include "dll.h"
 #include "file.hpp"
 
@@ -36,6 +37,7 @@ public:
   std::string getError();
   SpriteLoader(std::string path);
   ~SpriteLoader();
+	void loadAll(std::function<void(double)> ret);
   bool load();
   bool loadRaw(Sprite& sp);
   void clearPng(uint32_t id);

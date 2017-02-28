@@ -22,6 +22,7 @@ public:
   
   void delAllWindows();
 	void loadedResources();
+	void loadedResourcesBar(double a);
   void GoToLoginForm();
   void GoToCharSelect();
   void GoToGameWindow();

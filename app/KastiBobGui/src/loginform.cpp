@@ -32,6 +32,10 @@ LoginForm::LoginForm(RunMain* app) :
   connect(this, &LoginForm::errorMsg, app, &RunMain::errorMsg);
 }
 
+void LoginForm::setProgess(double a){
+	ui->progressBar->setValue(a*100);
+}
+
 void LoginForm::load(){
   ui->retranslateUi(this);
   changeLoginState(2, "loading resources");
