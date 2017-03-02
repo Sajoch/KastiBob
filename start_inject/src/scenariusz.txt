@@ -1,4 +1,0 @@
-zrobic w kazdym menu wlacznik lub wylacznik
-
-w glownym menu okno z wlacznikami lub wylacznikami
-	
