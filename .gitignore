@@ -1,57 +1,19 @@
-# Compiled Object files
-*.slo
-*.lo
 *.o
-*.obj
+*.d
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
 *.so
-*.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
+build
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-
-# Kastia client
-kclient_v1
-kclient_v2.zip
-
-# Generate files
 *.gen
 *.gen.cpp
 *.gen.h
 *.gen.hpp
 *.gen.qrc
-path.cfg
-login.cfg
 
+*.cfg
 
-# Stackdump
 *.stackdump
 
-#QT5
-KastiBob/build-*-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug/
-KastiBob/build-*-Desktop_Qt_5_7_0_MSVC2013_64bit-Debug/
-*.pro.user*
 node_modules
-
-bin2c/bin2c
-running_inject/KastiBob_run
-app/KastiBobGui/KastiBobGui
