@@ -1,10 +1,10 @@
 #include <iostream>
-#include "test.hpp"
+#include "runmain.hpp"
 
 using namespace std;
 
 int main(int argc, char const *argv[]) {
 	
-	cout<<"hello"<<endl;
+	RunMain app();
 	return 0;
 }

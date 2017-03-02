@@ -35,7 +35,7 @@ obj: build
 
 make_deps_cpp: $(cpp_deps)
 
-build/deps/%.cpp.d: src/%.cpp build/obj/%.cpp.o
+build/deps/%.cpp.d: src/%.cpp
 	@echo "Make deps "$@
 	$(CXX) -MM -MT build/obj/$*.cpp.o $< -o $@
 
