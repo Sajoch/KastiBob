@@ -4,7 +4,7 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-	
-	RunMain app();
+	RunMain app;
+	app.show_login();
 	return 0;
 }
