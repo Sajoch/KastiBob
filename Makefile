@@ -1,10 +1,17 @@
+undefine CXX
+undefine RCC
+undefine UIC
+undefine LD
+undefine AR
+undefine MOC
+undefine LIBPATH
 -include user.conf
-CXX=$(PRE)g++
-RCC=$(PRE)rcc
-UIC=$(PRE)uic
-LD=$(PRE)ld
-AR=$(PRE)ar
-MOC=$(PRE)moc
+CXX?=$(PRE)g++
+RCC?=$(PRE)rcc
+UIC?=$(PRE)uic
+LD?=$(PRE)ld
+AR?=$(PRE)ar
+MOC?=$(PRE)moc
 
 INCLUDEPATH+=inc build/ui_forms/
 CXXFLAGS+=--std=c++11 -Wall -Wextra
@@ -19,7 +26,7 @@ CXXFLAGS+=$(INCS)
 LDFLAGS+=$(INCS)
 LDFLAGS+= $(patsubst %,-L%,$(LIBPATH))
 LDFLAGS+= $(patsubst %,-l%,$(LIBS))
-LDFLAGS+=  -Xlinker -v
+#LDFLAGS+=  -Xlinker -v
 
 #cpp files
 cpp_files=$(wildcard src/*.cpp)
@@ -87,7 +94,7 @@ make_resources_qrc: $(rsc_qrc_files)
 make_resources_cpp: $(rsc_cpp_files)
 make_resources_obj: $(rsc_obj_files)
 make_resources: make_resources_qrc make_resources_cpp make_resources_obj $(ALL_RESOURCES_ONE)
-build/resources/qrc/%.qrc: 
+build/resources/qrc/%.qrc:
 	@echo "Generate rule to create "$@
 	@nodejs scripts/make_qrc.js $@ resources/$*
 build/resources/cpp/%.cpp: build/resources/qrc/%.qrc resources/%
@@ -122,9 +129,9 @@ run_$(PROGRAM): all
 	./$(PROGRAM)
 debug_$(PROGRAM): all
 	gdb $(PROGRAM)
-	
+
 #Clean
-	
+
 .PHONY: clean clean_program clean_obj_cpp clean_deps_cpp clean_ui_form
 clean_program:
 	@(rm $(PROGRAM) >/dev/null 2>&1 || true)
@@ -134,5 +141,5 @@ clean_deps_cpp:
 	@(rm -rf build/deps/* >/dev/null 2>&1 || true)
 clean_ui_form:
 	@(rm -rf build/ui_forms/* >/dev/null 2>&1 || true)
-clean: 
+clean:
 	@(rm -rf build >/dev/null 2>&1 || true)

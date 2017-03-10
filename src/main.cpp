@@ -3,8 +3,8 @@
 
 using namespace std;
 
-int main(int argc, char const *argv[]) {
-	RunMain app;
+int main(int argc, char *argv[]) {
+	RunMain app(argc, argv);
 	app.show_login();
-	return 0;
+	return app.exec();
 }
